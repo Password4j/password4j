@@ -1,16 +1,16 @@
-package org.password4j;
+package org.password4j.encryption;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
-import java.util.Random;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.password4j.SaltGenerator;
 
 
 public final class PBKDF2Strategy implements EncryptionStrategy
@@ -18,7 +18,7 @@ public final class PBKDF2Strategy implements EncryptionStrategy
 
     private static final Logger LOG = LogManager.getLogger();
 
-    private static final String ALGORITHM_PREFIX = "PBKDF2WithHmac";
+    public static final String ALGORITHM_PREFIX = "PBKDF2WithHmac";
 
     private String hashFunction = "SHA512";
 
@@ -26,13 +26,10 @@ public final class PBKDF2Strategy implements EncryptionStrategy
 
     private int length = 512;
 
-    private byte[] salt = new byte[64];
-
     public PBKDF2Strategy()
     {
-        createSalt();
+        //
     }
-
 
     public PBKDF2Strategy(int iterations, int length)
     {
@@ -47,15 +44,10 @@ public final class PBKDF2Strategy implements EncryptionStrategy
         this.hashFunction = hashFunction;
     }
 
-    private void createSalt()
-    {
-        Random random = new SecureRandom();
-        random.nextBytes(this.salt);
-    }
-
-
     public byte[] encrypt(char[] plain)
     {
+        byte[] salt = SaltGenerator.generate();
+
         try
         {
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(getAlgorithm());
@@ -70,7 +62,8 @@ public final class PBKDF2Strategy implements EncryptionStrategy
         }
         catch (InvalidKeySpecException iks)
         {
-            LOG.error("Invalid specification with plain=`{}`, salt=`{}`, #iterations=`{}` and length=`{}`", coverPassword(plain), salt, iterations, length, iks);
+            LOG.error("Invalid specification with plain=`{}`, salt=`{}`, #iterations=`{}` and length=`{}`", coverPassword(plain),
+                    salt, iterations, length, iks);
             return new byte[0];
         }
     }
@@ -90,11 +83,6 @@ public final class PBKDF2Strategy implements EncryptionStrategy
     @Override
     public String toString()
     {
-        return "PBKDF2Strategy{" +
-                "algorithm='" + getAlgorithm() + '\'' +
-                ", iterations=" + iterations +
-                ", length=" + length +
-                ", salt=" + Arrays.toString(salt) +
-                '}';
+        return "PBKDF2Strategy{" + "hashFunction=" + hashFunction + ", iterations=" + iterations + ", length=" + length + '}';
     }
 }

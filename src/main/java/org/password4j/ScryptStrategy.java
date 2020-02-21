@@ -1,21 +1,20 @@
-package org.password4j.encryption;
+package org.password4j;
 
 import java.security.GeneralSecurityException;
-
-import org.password4j.SaltGenerator;
+import java.util.Arrays;
 
 import com.lambdaworks.codec.Base64;
 import com.lambdaworks.crypto.SCrypt;
+import com.lambdaworks.crypto.SCryptUtil;
 
 
-public class ScryptStrategy implements EncryptionStrategy
+public class ScryptStrategy implements HashingStrategy
 {
+    private int resources = 8; // r
 
-    private int resources = 16; // r
+    private int workFactor = 2 << 14; // N
 
-    private int workFactor = 2; // N
-
-    private int parallelization = Runtime.getRuntime().availableProcessors(); // p
+    private int parallelization = 1; // p
 
     private long requiredBytes = 128L * workFactor * resources * parallelization;
 
@@ -23,7 +22,7 @@ public class ScryptStrategy implements EncryptionStrategy
     {
         //
     }
-    
+
     public ScryptStrategy(int resources, int workFactor, int parallelization)
     {
         this();
@@ -33,13 +32,13 @@ public class ScryptStrategy implements EncryptionStrategy
     }
 
     @Override
-    public Encryption encrypt(char[] plain)
+    public Hash hash(char[] plain)
     {
-        return encrypt(plain, SaltGenerator.generate(16));
+        return hash(plain, SaltGenerator.generate());
     }
 
     @Override
-    public Encryption encrypt(char[] plain, byte[] salt)
+    public Hash hash(char[] plain, byte[] salt)
     {
         try
         {
@@ -49,12 +48,26 @@ public class ScryptStrategy implements EncryptionStrategy
             sb.append("$s0$").append(params).append('$');
             sb.append(Base64.encode(salt)).append('$');
             sb.append(Base64.encode(derived));
-            return new Encryption(Encryption.Status.OK, sb.toString().getBytes(), salt);
+            return new Hash(this, sb.toString().getBytes(), salt);
         }
-        catch (GeneralSecurityException var9)
+        catch (IllegalArgumentException | GeneralSecurityException e)
         {
-            return new Encryption(Encryption.Status.UNSUPPORTED, new byte[0], salt);
+            String message = "Invalid specification with salt=" + Arrays
+                    .toString(salt) + ", N=`" + workFactor + ", r=`" + resources + " and p=`" + parallelization + "`";
+            throw new BadParametersException(message, e);
         }
+    }
+
+    @Override
+    public boolean check(char[] plain, byte[] hashed)
+    {
+        return SCryptUtil.check(new String(plain), new String(hashed));
+    }
+
+    @Override
+    public boolean check(char[] plain, byte[] hashed, byte[] salt)
+    {
+        return check(plain, hashed);
     }
 
     public long getRequiredBytes()

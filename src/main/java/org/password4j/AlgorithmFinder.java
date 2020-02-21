@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.password4j.encryption.PBKDF2Strategy;
 
 
 public class AlgorithmFinder
@@ -17,6 +16,11 @@ public class AlgorithmFinder
 
     private static final Logger LOG = LogManager.getLogger();
 
+    /**
+     * Make sure to use /dev/urandom instead of /dev/random in your
+     * `java.security` file.
+     * <code>securerandom.source=file:/dev/random</code>
+     */
     private static final SecureRandom SR_SOURCE;
 
     static
@@ -34,7 +38,7 @@ public class AlgorithmFinder
         SR_SOURCE = sr;
     }
 
-    static SecureRandom getSecureRandom()
+    public static SecureRandom getSecureRandom()
     {
         return SR_SOURCE;
     }
@@ -47,9 +51,9 @@ public class AlgorithmFinder
         {
             for (Provider.Service service : provider.getServices())
             {
-                if("SecretKeyFactory".equals(service.getType()) && service.getAlgorithm().startsWith("PBKDF2"))
+                if ("SecretKeyFactory".equals(service.getType()) && service.getAlgorithm().startsWith("PBKDF2"))
                 {
-                    result.add(service.getAlgorithm().replace(PBKDF2Strategy.ALGORITHM_PREFIX, ""));
+                    result.add(service.getAlgorithm());
                 }
             }
         }

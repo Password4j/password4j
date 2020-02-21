@@ -2,7 +2,6 @@ package org.password4j.encryption;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -18,17 +17,15 @@ public final class PBKDF2Strategy implements EncryptionStrategy
 
     private static final Logger LOG = LogManager.getLogger();
 
-    public static final String ALGORITHM_PREFIX = "PBKDF2WithHmac";
-
-    private String hashFunction = "SHA512";
+    private String algorithm = Algorithm.PBKDF2WithHmacSHA512.name();
 
     private int iterations = 10_000;
 
-    private int length = 512;
+    private int length = Algorithm.PBKDF2WithHmacSHA512.getBits();
 
     public PBKDF2Strategy()
     {
-        //
+
     }
 
     public PBKDF2Strategy(int iterations, int length)
@@ -38,51 +35,58 @@ public final class PBKDF2Strategy implements EncryptionStrategy
         this.length = length;
     }
 
-    public PBKDF2Strategy(String hashFunction, int iterations, int length)
+    public PBKDF2Strategy(String algorithm, int iterations, int length)
     {
         this(iterations, length);
-        this.hashFunction = hashFunction;
+        this.algorithm = algorithm;
     }
 
-    public byte[] encrypt(char[] plain)
+    public Encryption encrypt(char[] plain)
     {
         byte[] salt = SaltGenerator.generate();
-
-        try
-        {
-            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(getAlgorithm());
-            PBEKeySpec spec = new PBEKeySpec(plain, salt, iterations, length);
-            SecretKey key = secretKeyFactory.generateSecret(spec);
-            return key.getEncoded();
-        }
-        catch (NoSuchAlgorithmException nsae)
-        {
-            LOG.error("`{}` is not a valid algorithm", getAlgorithm(), nsae);
-            return new byte[0];
-        }
-        catch (InvalidKeySpecException iks)
-        {
-            LOG.error("Invalid specification with plain=`{}`, salt=`{}`, #iterations=`{}` and length=`{}`", coverPassword(plain),
-                    salt, iterations, length, iks);
-            return new byte[0];
-        }
-    }
-
-    private String getAlgorithm()
-    {
-        return ALGORITHM_PREFIX + this.hashFunction;
-    }
-
-    private String coverPassword(char[] plain)
-    {
-        char[] tmp = new char[plain == null ? 0 : plain.length];
-        Arrays.fill(tmp, '*');
-        return String.copyValueOf(tmp);
+        return encrypt(plain, salt);
     }
 
     @Override
-    public String toString()
+    public Encryption encrypt(char[] plain, byte[] salt)
     {
-        return "PBKDF2Strategy{" + "hashFunction=" + hashFunction + ", iterations=" + iterations + ", length=" + length + '}';
+        try
+        {
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm);
+            PBEKeySpec spec = new PBEKeySpec(plain, salt, iterations, length);
+            SecretKey key = secretKeyFactory.generateSecret(spec);
+            return new Encryption(Encryption.Status.OK, key.getEncoded(), salt);
+        }
+        catch (NoSuchAlgorithmException nsae)
+        {
+            LOG.error("`{}` is not a valid algorithm", algorithm, nsae);
+            return new Encryption(Encryption.Status.UNSUPPORTED, new byte[0], salt);
+        }
+        catch (InvalidKeySpecException iks)
+        {
+            LOG.error("Invalid specification with salt=`{}`, #iterations=`{}` and length=`{}`", salt, iterations, length, iks);
+            return new Encryption(Encryption.Status.BAD_PARAMS, new byte[0], salt);
+        }
+    }
+
+    public enum Algorithm
+    {
+        PBKDF2WithHmacSHA1(160), //
+        PBKDF2WithHmacSHA224(224), //
+        PBKDF2WithHmacSHA256(256), //
+        PBKDF2WithHmacSHA384(384), //
+        PBKDF2WithHmacSHA512(512);
+
+        private int bits;
+
+        Algorithm(int bits)
+        {
+            this.bits = bits;
+        }
+
+        public int getBits()
+        {
+            return bits;
+        }
     }
 }

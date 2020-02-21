@@ -7,6 +7,8 @@ package org.password4j.encryption;
 public interface EncryptionStrategy
 {
     
-    byte[] encrypt(char[] plain);
+    Encryption encrypt(char[] plain);
+
+    Encryption encrypt(char[] plain, byte[] salt);
 
 }

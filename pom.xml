@@ -30,9 +30,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-crypto</artifactId>
-      <version>5.2.2.RELEASE</version>
+      <groupId>org.mindrot</groupId>
+      <artifactId>jbcrypt</artifactId>
+      <version>0.4</version>
     </dependency>
 
     <dependency>
@@ -49,6 +49,11 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.lambdaworks</groupId>
+      <artifactId>scrypt</artifactId>
+      <version>1.4.0</version>
+    </dependency>
 
   </dependencies>
 

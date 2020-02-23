@@ -1,12 +1,11 @@
 package org.password4j;
 
-import org.apache.commons.codec.binary.Hex;
-
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Base64;
 
 
 public final class PBKDF2Strategy implements HashingStrategy
@@ -51,8 +50,8 @@ public final class PBKDF2Strategy implements HashingStrategy
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm);
             PBEKeySpec spec = new PBEKeySpec(plain.toCharArray(), salt.getBytes(), iterations, length);
             SecretKey key = secretKeyFactory.generateSecret(spec);
-            String params = Long.toString(algorithm.hashCode() << 16 | iterations << 8 | length, 16);
-            String hash = params + ":" + salt + ":" + Hex.encodeHexString(key.getEncoded());
+            String params = Long.toString((((long)iterations) << 32) | (length & 0xffffffffL));
+            String hash = "$" + Algorithm.valueOf(algorithm).getCode() + "$" +params + "$" + salt + "$" + Base64.getEncoder().encodeToString(key.getEncoded());
             return new Hash(this, hash, salt);
         }
         catch (NoSuchAlgorithmException nsae)

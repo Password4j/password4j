@@ -19,7 +19,25 @@ public class HashStrategyTest
         Hash hash = strategy.hash(password, salt);
 
         // THEN
-        Assert.assertEquals("-4910ef00:abc:fd64d07d34dcf0783c1a5a653f42ed86981d125506f88dcccaebcaf0c2383274", hash.getResult());
+        Assert.assertEquals("$3$42949672960256$abc$/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=", hash.getResult());
+    }
+
+    @Test
+    public void testPBKDF2EachVariants()
+    {
+        for(PBKDF2Strategy.Algorithm alg : PBKDF2Strategy.Algorithm.values())
+        {
+            // GIVEN
+            HashingStrategy strategy = new PBKDF2Strategy(alg.name(), 10_000, 256);
+            String password = "password";
+            String salt = "abc";
+
+            // WHEN
+            Hash hash = strategy.hash(password, salt);
+
+            // THEN
+            Assert.assertTrue(hash.getResult().startsWith("$"+alg.getCode()+"$"));
+        }
     }
 
     @Test(expected = UnsupportedOperationException.class)

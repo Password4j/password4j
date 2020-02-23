@@ -1,20 +1,12 @@
 package org.password4j;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
-import org.mindrot.jbcrypt.BCrypt;
-
-
 public class Hash
 {
-    private static final byte[] EMPTY = new byte[0];
+    private static final String EMPTY = "";
 
-    private byte[] result = EMPTY;
+    private String result = EMPTY;
 
-    private byte[] salt = EMPTY;
-
-    private Function<byte[], String> f = (String::new);
+    private String salt = EMPTY;
 
     private HashingStrategy hashingStrategy;
 
@@ -23,43 +15,33 @@ public class Hash
         //
     }
 
-    public Hash(HashingStrategy hashingStrategy, byte[] salt)
+    public Hash(HashingStrategy hashingStrategy, String salt)
     {
         this.hashingStrategy = hashingStrategy;
         this.salt = salt;
     }
 
-    public Hash(HashingStrategy hashingStrategy, byte[] result, byte[] salt)
+    public Hash(HashingStrategy hashingStrategy, String result, String salt)
     {
         this(hashingStrategy, salt);
         this.result = result;
     }
 
-    public byte[] getResult()
+    public String getResult()
     {
         return result;
     }
 
-    public byte[] getSalt()
+    public String getSalt()
     {
         return salt;
     }
 
-    public String resultAsString()
-    {
-        return f.apply(result);
-    }
-
-    public Hash readResultWith(Function<byte[], String> f)
-    {
-        this.f = f;
-        return this;
-    }
 
     @Override
     public String toString()
     {
-        return hashingStrategy.getClass().getSimpleName() + "[" + Arrays.toString(salt) + " - " + resultAsString() + "]";
+        return hashingStrategy.getClass().getSimpleName() + "[" + salt + " - " + result + "]";
     }
 
     public boolean check(String hashed)
@@ -69,9 +51,8 @@ public class Hash
             return false;
         }
 
-        return this.hashingStrategy.check(hashed.toCharArray(), this.getResult(), this.salt);
+        return this.hashingStrategy.check(hashed, this.getResult());
     }
-
 
 
 }

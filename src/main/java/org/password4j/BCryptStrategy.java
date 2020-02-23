@@ -19,36 +19,31 @@ public class BCryptStrategy implements HashingStrategy
     }
 
     @Override
-    public Hash hash(char[] plain)
+    public Hash hash(String plain)
     {
         String salt = BCrypt.gensalt(logRounds, AlgorithmFinder.getSecureRandom());
-        return hash(plain, salt.getBytes());
+        return hash(plain, salt);
     }
 
     @Override
-    public Hash hash(char[] plain, byte[] salt)
+    public Hash hash(String plain, String salt)
     {
-        return hash(new String(plain), new String(salt));
+        return internalHash(plain, salt);
     }
 
     @Override
-    public boolean check(char[] password, byte[] hashed)
+    public boolean check(String password, String hashed)
     {
-        return BCrypt.checkpw(new String(password), new String(hashed));
+        return BCrypt.checkpw(password, hashed);
     }
 
-    @Override
-    public boolean check(char[] password, byte[] hashed, byte[] salt)
-    {
-        return false;
-    }
 
-    private Hash hash(String plain, String salt)
+    private Hash internalHash(String plain, String salt)
     {
         try
         {
             String hash = BCrypt.hashpw(plain, salt);
-            return new Hash(this, hash.getBytes(), salt.getBytes());
+            return new Hash(this, hash, salt);
         }
         catch (IllegalArgumentException iae)
         {

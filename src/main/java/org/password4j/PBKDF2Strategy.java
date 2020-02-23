@@ -1,14 +1,12 @@
 package org.password4j;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
+import org.apache.commons.codec.binary.Hex;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-
-import org.apache.commons.codec.binary.Hex;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 
 
 public final class PBKDF2Strategy implements HashingStrategy
@@ -37,21 +35,25 @@ public final class PBKDF2Strategy implements HashingStrategy
         this.algorithm = algorithm;
     }
 
-    public Hash hash(char[] plain)
+
+    @Override
+    public Hash hash(String plain)
     {
         byte[] salt = SaltGenerator.generate();
-        return hash(plain, salt);
+        return hash(plain, new String(salt));
     }
 
     @Override
-    public Hash hash(char[] plain, byte[] salt)
+    public Hash hash(String plain, String salt)
     {
         try
         {
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm);
-            PBEKeySpec spec = new PBEKeySpec(plain, salt, iterations, length);
+            PBEKeySpec spec = new PBEKeySpec(plain.toCharArray(), salt.getBytes(), iterations, length);
             SecretKey key = secretKeyFactory.generateSecret(spec);
-            return new Hash(this, key.getEncoded(), salt).readResultWith(Hex::encodeHexString);
+            String params = Long.toString(algorithm.hashCode() << 16 | iterations << 8 | length, 16);
+            String hash = params + ":" + salt + ":" + Hex.encodeHexString(key.getEncoded());
+            return new Hash(this, hash, salt);
         }
         catch (NoSuchAlgorithmException nsae)
         {
@@ -60,25 +62,16 @@ public final class PBKDF2Strategy implements HashingStrategy
         }
         catch (IllegalArgumentException | InvalidKeySpecException e)
         {
-            String message = "Invalid specification with salt=" + Arrays
-                    .toString(salt) + ", #iterations=`" + iterations + "` and length=`" + length + "`";
+            String message = "Invalid specification with salt=" + salt + ", #iterations=`" + iterations + "` and length=`" + length + "`";
             throw new BadParametersException(message, e);
         }
     }
 
     @Override
-    public boolean check(char[] password, byte[] hashed)
+    public boolean check(String password, String hashed)
     {
         throw new UnsupportedOperationException();
     }
-
-    @Override
-    public boolean check(char[] password, byte[] hashed, byte[] salt)
-    {
-        byte[] result = hash(password, salt).getResult();
-        return slowEquals(result, hashed);
-    }
-
 
 
     /**
@@ -98,24 +91,38 @@ public final class PBKDF2Strategy implements HashingStrategy
         return diff == 0;
     }
 
+    public PBKDF2Strategy formattedAs(String format)
+    {
+
+        return this;
+    }
+
     public enum Algorithm
     {
-        PBKDF2WithHmacSHA1(160), //
-        PBKDF2WithHmacSHA224(224), //
-        PBKDF2WithHmacSHA256(256), //
-        PBKDF2WithHmacSHA384(384), //
-        PBKDF2WithHmacSHA512(512);
+        PBKDF2WithHmacSHA1(160, 1), //
+        PBKDF2WithHmacSHA224(224, 2), //
+        PBKDF2WithHmacSHA256(256, 3), //
+        PBKDF2WithHmacSHA384(384, 4), //
+        PBKDF2WithHmacSHA512(512, 5);
 
         private int bits;
 
-        Algorithm(int bits)
+        private int code;
+
+        Algorithm(int bits, int code)
         {
             this.bits = bits;
+            this.code = code;
         }
 
         public int getBits()
         {
             return bits;
+        }
+
+        public int getCode()
+        {
+            return code;
         }
     }
 }

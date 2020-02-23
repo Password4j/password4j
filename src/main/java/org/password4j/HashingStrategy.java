@@ -7,12 +7,9 @@ package org.password4j;
 public interface HashingStrategy
 {
     
-    Hash hash(char[] plain);
+    Hash hash(String plain);
 
-    Hash hash(char[] plain, byte[] salt);
+    Hash hash(String plain,String salt);
 
-    boolean check(char[] plain, byte[] hashed);
-
-    boolean check(char[] plain, byte[] hashed, byte[] salt);
-
+    boolean check(String plain, String hashed);
 }

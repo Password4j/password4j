@@ -1,11 +1,10 @@
 package org.password4j;
 
-import java.security.GeneralSecurityException;
-import java.util.Arrays;
-
 import com.lambdaworks.codec.Base64;
 import com.lambdaworks.crypto.SCrypt;
 import com.lambdaworks.crypto.SCryptUtil;
+
+import java.security.GeneralSecurityException;
 
 
 public class ScryptStrategy implements HashingStrategy
@@ -32,43 +31,39 @@ public class ScryptStrategy implements HashingStrategy
     }
 
     @Override
-    public Hash hash(char[] plain)
+    public Hash hash(String plain)
     {
-        return hash(plain, SaltGenerator.generate());
+        byte[] salt = SaltGenerator.generate();
+        return hash(plain, new String(salt));
     }
 
     @Override
-    public Hash hash(char[] plain, byte[] salt)
+    public Hash hash(String plain, String salt)
     {
         try
         {
-            byte[] derived = SCrypt.scrypt(new String(plain).getBytes(), salt, workFactor, resources, parallelization, 32);
+            byte[] saltAsBytes = salt.getBytes();
+            byte[] derived = SCrypt.scrypt(plain.getBytes(), saltAsBytes, workFactor, resources, parallelization, 32);
             String params = Long.toString((long) (log2(workFactor) << 16 | resources << 8 | parallelization), 16);
-            StringBuilder sb = new StringBuilder((salt.length + derived.length) * 2);
+            StringBuilder sb = new StringBuilder((saltAsBytes.length + derived.length) * 2);
             sb.append("$s0$").append(params).append('$');
-            sb.append(Base64.encode(salt)).append('$');
+            sb.append(Base64.encode(saltAsBytes)).append('$');
             sb.append(Base64.encode(derived));
-            return new Hash(this, sb.toString().getBytes(), salt);
+            return new Hash(this, sb.toString(), salt);
         }
         catch (IllegalArgumentException | GeneralSecurityException e)
         {
-            String message = "Invalid specification with salt=" + Arrays
-                    .toString(salt) + ", N=`" + workFactor + ", r=`" + resources + " and p=`" + parallelization + "`";
+            String message = "Invalid specification with salt=" + salt + ", N=`" + workFactor + ", r=`" + resources + " and p=`" + parallelization + "`";
             throw new BadParametersException(message, e);
         }
     }
 
     @Override
-    public boolean check(char[] plain, byte[] hashed)
+    public boolean check(String plain, String hashed)
     {
-        return SCryptUtil.check(new String(plain), new String(hashed));
+        return SCryptUtil.check(plain, hashed);
     }
 
-    @Override
-    public boolean check(char[] plain, byte[] hashed, byte[] salt)
-    {
-        return check(plain, hashed);
-    }
 
     public long getRequiredBytes()
     {

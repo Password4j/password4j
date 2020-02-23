@@ -12,14 +12,14 @@ public class HashStrategyTest
     {
         // GIVEN
         HashingStrategy strategy = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
-        char[] password = "password".toCharArray();
-        byte[] salt = new byte[]{'a', 'b', 'c'};
+        String password = "password";
+        String salt = "abc";
 
         // WHEN
         Hash hash = strategy.hash(password, salt);
 
         // THEN
-        Assert.assertEquals("fd64d07d34dcf0783c1a5a653f42ed86981d125506f88dcccaebcaf0c2383274", hash.resultAsString());
+        Assert.assertEquals("-4910ef00:abc:fd64d07d34dcf0783c1a5a653f42ed86981d125506f88dcccaebcaf0c2383274", hash.getResult());
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -27,8 +27,8 @@ public class HashStrategyTest
     {
         // GIVEN
         HashingStrategy strategy = new PBKDF2Strategy("notAnAlgorithm", 10_000, 256);
-        char[] password = "password".toCharArray();
-        byte[] salt = new byte[]{'a', 'b', 'c'};
+        String password = "password";
+        String salt = "abc";
 
         // WHEN
         strategy.hash(password, salt);
@@ -41,8 +41,8 @@ public class HashStrategyTest
     {
         // GIVEN
         HashingStrategy strategy = new PBKDF2Strategy();
-        char[] password = "password".toCharArray();
-        byte[] salt = new byte[0];
+        String password = "password";
+        String salt = new String(new byte[0]);
 
         // WHEN
         strategy.hash(password, salt);
@@ -55,8 +55,8 @@ public class HashStrategyTest
     {
         // GIVEN
         HashingStrategy strategy = new PBKDF2Strategy("notAnAlgorithm", 10_000, 256);
-        char[] password = "password".toCharArray();
-        byte[] salt = new byte[0];
+        String password = "password";
+        String salt = new String(new byte[0]);
 
         // WHEN
         strategy.hash(password, salt);

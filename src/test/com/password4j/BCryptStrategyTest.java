@@ -1,4 +1,4 @@
-package org.password4j;
+package com.password4j;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ public class BCryptStrategyTest
 
 
     @Test(expected = BadParametersException.class)
-    public void testPBKDF2WrongAlgorithm()
+    public void testBCryptBadParams()
     {
         // GIVEN
         HashingStrategy strategy = new BCryptStrategy(-1);
@@ -30,7 +30,7 @@ public class BCryptStrategyTest
 
 
     @Test
-    public void testPBKDF2Coherence()
+    public void testBCryptCoherence()
     {
         // GIVEN
         String password = "password";
@@ -44,7 +44,7 @@ public class BCryptStrategyTest
     }
 
     @Test
-    public void testPBKDF2CheckWithFixedConfigurations()
+    public void testBCryptCheckWithFixedConfigurations()
     {
         // GIVEN
         String password = "password";
@@ -58,7 +58,7 @@ public class BCryptStrategyTest
 
 
     @Test
-    public void testPBKDF2equality()
+    public void testBCryptequality()
     {
         // GIVEN
         BCryptStrategy strategy1 = new BCryptStrategy();

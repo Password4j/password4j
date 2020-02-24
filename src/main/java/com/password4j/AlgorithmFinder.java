@@ -1,4 +1,4 @@
-package org.password4j;
+package com.password4j;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

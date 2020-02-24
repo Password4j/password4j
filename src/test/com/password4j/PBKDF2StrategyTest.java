@@ -1,4 +1,4 @@
-package org.password4j;
+package com.password4j;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,12 +10,6 @@ import org.junit.Test;
 public class PBKDF2StrategyTest
 {
 
-
-    @Test
-    public void code()
-    {
-        System.out.println(PepperGenerator.generate());
-    }
 
     @Test
     public void testPBKDF2()

@@ -1,4 +1,4 @@
-package org.password4j;
+package com.password4j;
 
 /**
  * This interface is intended as an incapsulation

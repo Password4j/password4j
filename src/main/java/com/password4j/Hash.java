@@ -1,4 +1,4 @@
-package org.password4j;
+package com.password4j;
 
 public class Hash
 {

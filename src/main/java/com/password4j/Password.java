@@ -1,4 +1,4 @@
-package org.password4j;
+package com.password4j;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,7 +23,7 @@ public class Password
         this.plain = plain;
     }
 
-    public static Password from(String plain)
+    public static Password hash(String plain)
     {
         if (plain == null)
         {
@@ -32,21 +32,21 @@ public class Password
         return new Password(plain);
     }
 
-    public Password withSalt(String salt)
+    public Password addSalt(String salt)
     {
         this.salt = salt;
         return this;
     }
 
-    public Password withRandomSalt()
+    public Password addRandomSalt()
     {
         this.salt = new String(SaltGenerator.generate());
         return this;
     }
 
-    public Password withRandomSalt(int length)
+    public Password addRandomSalt(int length)
     {
-        if(length <= 0)
+        if (length <= 0)
         {
             throw new BadParametersException("Salt cannot have a non-positive length");
         }
@@ -58,15 +58,20 @@ public class Password
         return this;
     }
 
-    public Password withPepper(String pepper)
+    public Password addPepper()
+    {
+        this.pepper = PepperGenerator.get();
+        return this;
+    }
+
+    public Password addPepper(String pepper)
     {
         this.pepper = pepper;
         return this;
     }
 
 
-
-    public Hash hashWith(HashingStrategy hashingStrategy)
+    public Hash with(HashingStrategy hashingStrategy)
     {
         String peppered = plain;
         if (StringUtils.isEmpty(this.pepper))
@@ -84,5 +89,6 @@ public class Password
         }
 
     }
+
 
 }

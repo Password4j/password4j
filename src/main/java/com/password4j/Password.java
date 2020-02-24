@@ -79,15 +79,19 @@ public class Password
             peppered = this.pepper + peppered;
         }
 
+        Hash hash;
         if (StringUtils.isEmpty(this.salt))
         {
-            return hashingStrategy.hash(peppered);
+            hash = hashingStrategy.hash(peppered);
         }
         else
         {
-            return hashingStrategy.hash(peppered, salt);
+            hash = hashingStrategy.hash(peppered, salt);
         }
 
+        hash.setPepper(pepper);
+
+        return hash;
     }
 
 

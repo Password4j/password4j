@@ -8,6 +8,8 @@ public class Hash
 
     private String salt = EMPTY;
 
+    private String pepper;
+
     private HashingStrategy hashingStrategy;
 
     private Hash()
@@ -37,10 +39,20 @@ public class Hash
         return salt;
     }
 
+    public String getPepper()
+    {
+        return pepper;
+    }
+
+    void setPepper(String pepper)
+    {
+        this.pepper = pepper;
+    }
+
     @Override
     public String toString()
     {
-        return hashingStrategy.getClass().getSimpleName() + "[" + salt + " - " + result + "]";
+        return hashingStrategy.getClass().getSimpleName() + "[salt=" + getSalt() + ", pepper=" + getPepper() + ", hash=" + getResult() + "]";
     }
 
     public boolean check(String plain)

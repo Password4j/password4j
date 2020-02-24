@@ -19,9 +19,11 @@ public class AlgorithmFinder
     /**
      * Make sure to use /dev/urandom instead of /dev/random in your
      * `java.security` file.
-     * <code>securerandom.source=file:/dev/random</code>
+     * <code>securerandom.source=file:/dev/urandom</code>
      */
     private static final SecureRandom SR_SOURCE;
+
+    private static final String[] PBKDF2_VARIANTS;
 
     static
     {
@@ -36,17 +38,8 @@ public class AlgorithmFinder
             sr = new SecureRandom();
         }
         SR_SOURCE = sr;
-    }
 
-    public static SecureRandom getSecureRandom()
-    {
-        return SR_SOURCE;
-    }
-
-    public static List<String> getPBKDF2Variants()
-    {
         List<String> result = new ArrayList<>();
-
         for (Provider provider : Security.getProviders())
         {
             for (Provider.Service service : provider.getServices())
@@ -57,8 +50,22 @@ public class AlgorithmFinder
                 }
             }
         }
+        PBKDF2_VARIANTS = result.toArray(new String[0]);
 
-        return result;
     }
 
+    private AlgorithmFinder()
+    {
+        //
+    }
+
+    public static SecureRandom getSecureRandom()
+    {
+        return SR_SOURCE;
+    }
+
+    public static String[] getPBKDF2Variants()
+    {
+        return PBKDF2_VARIANTS;
+    }
 }

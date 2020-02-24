@@ -2,20 +2,17 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
-
+We release patches for security vulnerabilities. Which versions are eligible receiving such patches depend on the [<span>CVSS 3</span>](https://www.first.org/cvss/calculator/3.0) Rating:
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| 1.0.x   | :white_check_mark: |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+Please report (suspected) security vulnerabilities by opening a pull request in this repository. If the issue is confirmed, we will release a patch as soon as possible depending on complexity but historically within a few days.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+We generally **aren’t** interested in the following problems:
+* Any vulnerability with a [<span>CVSS 3</span>](https://www.first.org/cvss/calculator/3.0) score lower than `4.0`, unless it can be combined with other vulnerabilities to achieve a higher score.
+* DoS, phishing, text injection, or social engineering attacks. Wikis, Tracs, forums, etc are intended to allow users to edit them.
+* Output from automated scans - please manually verify issues and include a valid proof of concept.
+* Theoretical vulnerabilities where you can't demonstrate a significant security impact with a PoC.

@@ -1,9 +1,6 @@
 language: java
 
-os:
-  - linux
-  - osx
-  - windows
+dist: trusty
 
 jobs:
   include:

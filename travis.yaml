@@ -1,0 +1,25 @@
+sudo: false
+
+language: java
+
+dist: trusty
+
+matrix:
+  include:
+    - name: OpenJDK 8
+      jdk: openjdk8
+    - name: OracleJDK 8
+      jdk: oraclejdk8
+
+cache:
+  directories:
+    - $HOME/.m2
+
+before_script:
+  - pip install --user codecov
+
+script:
+  - mvn clean verify -B -U
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

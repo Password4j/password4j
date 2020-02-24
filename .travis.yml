@@ -1,8 +1,11 @@
 language: java
 
-dist: trusty
+os:
+  - linux
+  - osx
+  - windows
 
-matrix:
+jobs:
   include:
     - name: OpenJDK 8
       jdk: openjdk8

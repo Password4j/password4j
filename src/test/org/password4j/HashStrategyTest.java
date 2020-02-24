@@ -81,4 +81,46 @@ public class HashStrategyTest
 
         // THEN
     }
+
+    @Test
+    public void testPBKDF2Check()
+    {
+        // GIVEN
+        String hashed = "$3$42949672960256$abc$/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=";
+        String userSubmittedPassword = "password";
+
+        // WHEN
+        HashingStrategy strategy = PBKDF2Strategy.getInstanceFromHash(hashed);
+
+        // THEN
+        Assert.assertTrue(strategy.check(userSubmittedPassword, hashed));
+    }
+
+    @Test
+    public void testPBKDF2Coherence()
+    {
+        // GIVEN
+        String password = "password";
+
+        // WHEN
+        Hash hash = new PBKDF2Strategy().hash(password);
+
+        // THEN
+        Assert.assertTrue(hash.check(password));
+
+    }
+
+    @Test
+    public void testPBKDF2CheckWithFixedConfigurations()
+    {
+        // GIVEN
+        String hashed = "$3$42949672960256$abc$/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=";
+        String userSubmittedPassword = "password";
+
+        // WHEN
+        HashingStrategy strategy = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
+
+        // THEN
+        Assert.assertTrue(strategy.check(userSubmittedPassword, hashed));
+    }
 }

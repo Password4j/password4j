@@ -1,13 +1,14 @@
 package org.password4j;
 
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
+
 import com.lambdaworks.codec.Base64;
 import com.lambdaworks.crypto.SCrypt;
 import com.lambdaworks.crypto.SCryptUtil;
 
-import java.security.GeneralSecurityException;
 
-
-public class ScryptStrategy implements HashingStrategy
+public class SCryptStrategy implements HashingStrategy
 {
     private int resources = 8; // r
 
@@ -15,14 +16,12 @@ public class ScryptStrategy implements HashingStrategy
 
     private int parallelization = 1; // p
 
-    private long requiredBytes = 128L * workFactor * resources * parallelization;
-
-    public ScryptStrategy()
+    public SCryptStrategy()
     {
         //
     }
 
-    public ScryptStrategy(int resources, int workFactor, int parallelization)
+    public SCryptStrategy(int resources, int workFactor, int parallelization)
     {
         this();
         this.resources = resources;
@@ -64,10 +63,9 @@ public class ScryptStrategy implements HashingStrategy
         return SCryptUtil.check(plain, hashed);
     }
 
-
     public long getRequiredBytes()
     {
-        return requiredBytes;
+        return 128L * workFactor * resources * parallelization;
     }
 
     private static int log2(int n)
@@ -94,5 +92,31 @@ public class ScryptStrategy implements HashingStrategy
             log += 2;
         }
         return log + (n >>> 1);
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null || !this.getClass().equals(obj.getClass()))
+        {
+            return false;
+        }
+
+        SCryptStrategy otherStrategy = (SCryptStrategy) obj;
+        return this.workFactor == otherStrategy.workFactor //
+                && this.resources == otherStrategy.resources //
+                && this.parallelization == otherStrategy.parallelization;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getName() + Arrays.toString(new int[] { workFactor, resources, parallelization });
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return toString().hashCode();
     }
 }

@@ -1,5 +1,7 @@
 package org.password4j;
 
+import java.util.Arrays;
+
 import org.mindrot.jbcrypt.BCrypt;
 
 
@@ -37,7 +39,6 @@ public class BCryptStrategy implements HashingStrategy
         return BCrypt.checkpw(password, hashed);
     }
 
-
     private Hash internalHash(String plain, String salt)
     {
         try
@@ -51,6 +52,30 @@ public class BCryptStrategy implements HashingStrategy
             throw new BadParametersException(message, iae);
         }
 
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null || !this.getClass().equals(obj.getClass()))
+        {
+            return false;
+        }
+
+        BCryptStrategy otherStrategy = (BCryptStrategy) obj;
+        return this.logRounds == otherStrategy.logRounds;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getName() + Arrays.toString(new int[] { logRounds });
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return toString().hashCode();
     }
 
 }

@@ -9,7 +9,7 @@ We release patches for security vulnerabilities. Which versions are eligible rec
 
 ## Reporting a Vulnerability
 
-Please report (suspected) security vulnerabilities by opening a pull request in this repository. If the issue is confirmed, we will release a patch as soon as possible depending on complexity but historically within a few days.
+Please report (suspected) security vulnerabilities by opening a pull request in this repository with the **security** label. If the issue is confirmed, we will release a patch as soon as possible depending on complexity but historically within a few days.
 
 We generally **aren’t** interested in the following problems:
 * Any vulnerability with a [<span>CVSS 3</span>](https://www.first.org/cvss/calculator/3.0) score lower than `4.0`, unless it can be combined with other vulnerabilities to achieve a higher score.

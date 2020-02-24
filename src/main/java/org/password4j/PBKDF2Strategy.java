@@ -1,24 +1,42 @@
 package org.password4j;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
+import java.util.Base64;
+
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Base64;
 
 
 public final class PBKDF2Strategy implements HashingStrategy
 {
-    private String algorithm = Algorithm.PBKDF2WithHmacSHA512.name();
+    private Algorithm algorithm = Algorithm.PBKDF2WithHmacSHA512;
 
-    private int iterations = 10_000;
+    private int iterations = 64_000;
 
     private int length = Algorithm.PBKDF2WithHmacSHA512.getBits();
 
+    public static PBKDF2Strategy getInstanceFromHash(String hashed)
+    {
+        String[] parts = hashed.split("\\$");
+        if (parts.length == 5)
+        {
+            int algorithm = Integer.parseInt(parts[1]);
+            long configuration = Long.parseLong(parts[2]);
+
+            int iterations = (int) (configuration >> 32);
+            int length = (int) configuration;
+
+            return new PBKDF2Strategy(Algorithm.fromCode(algorithm), iterations, length);
+        }
+        throw new BadParametersException("`" + hashed + "` is not a valid hash");
+    }
+
     public PBKDF2Strategy()
     {
-
+        //
     }
 
     public PBKDF2Strategy(int iterations, int length)
@@ -31,9 +49,21 @@ public final class PBKDF2Strategy implements HashingStrategy
     public PBKDF2Strategy(String algorithm, int iterations, int length)
     {
         this(iterations, length);
-        this.algorithm = algorithm;
+        try
+        {
+            this.algorithm = Algorithm.valueOf(algorithm);
+        }
+        catch (IllegalArgumentException iae)
+        {
+            throw new UnsupportedOperationException("Algorithm `" + algorithm + "` is not recognized.", iae);
+        }
     }
 
+    public PBKDF2Strategy(Algorithm algorithm, int iterations, int length)
+    {
+        this(iterations, length);
+        this.algorithm = algorithm;
+    }
 
     @Override
     public Hash hash(String plain)
@@ -47,11 +77,12 @@ public final class PBKDF2Strategy implements HashingStrategy
     {
         try
         {
-            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm);
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm.name());
             PBEKeySpec spec = new PBEKeySpec(plain.toCharArray(), salt.getBytes(), iterations, length);
             SecretKey key = secretKeyFactory.generateSecret(spec);
-            String params = Long.toString((((long)iterations) << 32) | (length & 0xffffffffL));
-            String hash = "$" + Algorithm.valueOf(algorithm).getCode() + "$" +params + "$" + salt + "$" + Base64.getEncoder().encodeToString(key.getEncoded());
+            String params = Long.toString((((long) iterations) << 32) | (length & 0xffffffffL));
+            String hash = "$" + algorithm.getCode() + "$" + params + "$" + salt + "$" + Base64.getEncoder()
+                    .encodeToString(key.getEncoded());
             return new Hash(this, hash, salt);
         }
         catch (NoSuchAlgorithmException nsae)
@@ -69,9 +100,22 @@ public final class PBKDF2Strategy implements HashingStrategy
     @Override
     public boolean check(String password, String hashed)
     {
-        throw new UnsupportedOperationException();
+        String salt = getSaltFromHash(hashed);
+
+        Hash internalHas = hash(password, salt);
+
+        return slowEquals(internalHas.getResult().getBytes(), hashed.getBytes());
     }
 
+    private String getSaltFromHash(String hashed)
+    {
+        String[] parts = hashed.split("\\$");
+        if (parts.length == 5)
+        {
+            return parts[3];
+        }
+        throw new BadParametersException("`" + hashed + "` is not a valid hash");
+    }
 
     /**
      * Compares two byte arrays in length-constant time. This comparison method
@@ -123,5 +167,43 @@ public final class PBKDF2Strategy implements HashingStrategy
         {
             return code;
         }
+
+        public static Algorithm fromCode(int code)
+        {
+            for (Algorithm alg : values())
+            {
+                if (alg.getCode() == code)
+                {
+                    return alg;
+                }
+            }
+            return null;
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null || !this.getClass().equals(obj.getClass()))
+        {
+            return false;
+        }
+
+        PBKDF2Strategy otherStrategy = (PBKDF2Strategy) obj;
+        return this.algorithm.equals(otherStrategy.algorithm) //
+                && this.iterations == otherStrategy.iterations //
+                && this.length == otherStrategy.length;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getName() +  Arrays.toString(new int[]{algorithm.getCode(), iterations, length});
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return toString().hashCode();
     }
 }

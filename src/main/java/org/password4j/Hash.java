@@ -37,22 +37,31 @@ public class Hash
         return salt;
     }
 
-
     @Override
     public String toString()
     {
         return hashingStrategy.getClass().getSimpleName() + "[" + salt + " - " + result + "]";
     }
 
-    public boolean check(String hashed)
+    public boolean check(String plain)
     {
-        if (hashed == null)
+        if (plain == null)
         {
             return false;
         }
 
-        return this.hashingStrategy.check(hashed, this.getResult());
+        return this.hashingStrategy.check(plain, this.getResult());
     }
 
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null || !this.getClass().equals(obj.getClass()))
+        {
+            return false;
+        }
 
+        Hash otherHash = (Hash) obj;
+        return this.result.equals(otherHash.result) && this.salt.equals(otherHash.salt);
+    }
 }

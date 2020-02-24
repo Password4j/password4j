@@ -81,8 +81,9 @@ public final class PBKDF2Strategy implements HashingStrategy
             PBEKeySpec spec = new PBEKeySpec(plain.toCharArray(), salt.getBytes(), iterations, length);
             SecretKey key = secretKeyFactory.generateSecret(spec);
             String params = Long.toString((((long) iterations) << 32) | (length & 0xffffffffL));
-            String hash = "$" + algorithm.getCode() + "$" + params + "$" + salt + "$" + Base64.getEncoder()
-                    .encodeToString(key.getEncoded());
+            String salt64 = Base64.getEncoder().encodeToString(salt.getBytes());
+            String hash64 = Base64.getEncoder().encodeToString(key.getEncoded());
+            String hash = "$" + algorithm.getCode() + "$" + params + "$" + salt64 + "$" + hash64;
             return new Hash(this, hash, salt);
         }
         catch (NoSuchAlgorithmException nsae)
@@ -112,7 +113,7 @@ public final class PBKDF2Strategy implements HashingStrategy
         String[] parts = hashed.split("\\$");
         if (parts.length == 5)
         {
-            return parts[3];
+            return new String(Base64.getDecoder().decode(parts[3].getBytes()));
         }
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }
@@ -198,7 +199,7 @@ public final class PBKDF2Strategy implements HashingStrategy
     @Override
     public String toString()
     {
-        return getClass().getName() +  Arrays.toString(new int[]{algorithm.getCode(), iterations, length});
+        return getClass().getName() + Arrays.toString(new int[] { algorithm.getCode(), iterations, length });
     }
 
     @Override

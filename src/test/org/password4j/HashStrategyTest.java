@@ -22,7 +22,7 @@ public class HashStrategyTest
         Hash hash = strategy.hash(password, salt);
 
         // THEN
-        Assert.assertEquals("$3$42949672960256$abc$/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=", hash.getResult());
+        Assert.assertEquals("$3$42949672960256$YWJj$/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=", hash.getResult());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class HashStrategyTest
     public void testPBKDF2Check()
     {
         // GIVEN
-        String hashed = "$3$42949672960256$abc$/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=";
+        String hashed = "$3$42949672960256$YWJj$/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=";
         String userSubmittedPassword = "password";
 
         // WHEN
@@ -117,7 +117,7 @@ public class HashStrategyTest
     public void testPBKDF2CheckWithFixedConfigurations()
     {
         // GIVEN
-        String hashed = "$3$42949672960256$abc$/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=";
+        String hashed = "$3$42949672960256$YWJj$/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=";
         String userSubmittedPassword = "password";
 
         // WHEN

@@ -1,14 +1,14 @@
 package org.password4j;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 
 public class AlgorithmFinder
@@ -28,14 +28,21 @@ public class AlgorithmFinder
     static
     {
         SecureRandom sr;
-        try
+        if (isNonBlockingPRNG())
         {
-            sr = SecureRandom.getInstanceStrong();
-        }
-        catch (NoSuchAlgorithmException nsae)
-        {
-            LOG.warn("No source of strong randomness found for this environment.");
             sr = new SecureRandom();
+        }
+        else
+        {
+            try
+            {
+                sr = SecureRandom.getInstanceStrong();
+            }
+            catch (NoSuchAlgorithmException nsae)
+            {
+                LOG.warn("No source of strong randomness found for this environment.");
+                sr = new SecureRandom();
+            }
         }
         SR_SOURCE = sr;
 
@@ -67,5 +74,11 @@ public class AlgorithmFinder
     public static String[] getPBKDF2Variants()
     {
         return PBKDF2_VARIANTS;
+    }
+
+    private static boolean isNonBlockingPRNG()
+    {
+        String os = System.getProperty("os.name");
+        return os.contains("nux");
     }
 }

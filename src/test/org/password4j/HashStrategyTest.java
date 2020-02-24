@@ -1,5 +1,8 @@
 package org.password4j;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -123,4 +126,33 @@ public class HashStrategyTest
         // THEN
         Assert.assertTrue(strategy.check(userSubmittedPassword, hashed));
     }
+
+
+    @Test
+    public void testPBKDF2equality()
+    {
+        // GIVEN
+        PBKDF2Strategy strategy1 = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
+        PBKDF2Strategy strategy2 = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
+        PBKDF2Strategy strategy3 = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA1.name(), 10_000, 256);
+        PBKDF2Strategy strategy4 = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA256.name(), 64_000, 256);
+        PBKDF2Strategy strategy5 = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA256.name(), 64_000, 123);
+
+
+
+        // WHEN
+        Map<PBKDF2Strategy, String> map =new HashMap<>();
+        map.put(strategy1, strategy1.toString());
+        map.put(strategy2, strategy2.toString());
+        map.put(strategy3, strategy3.toString());
+        map.put(strategy4, strategy4.toString());
+        map.put(strategy5, strategy5.toString());
+
+
+
+        // THEN
+        Assert.assertEquals(4, map.size());
+        Assert.assertEquals(strategy1, strategy2);
+    }
+
 }

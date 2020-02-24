@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
-public class HashStrategyTest
+public class PBKDF2StrategyTest
 {
 
     @Test

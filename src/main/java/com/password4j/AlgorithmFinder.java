@@ -8,9 +8,7 @@ import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class AlgorithmFinder
@@ -26,8 +24,6 @@ public class AlgorithmFinder
     private static final SecureRandom SR_SOURCE;
 
     private static final String[] PBKDF2_VARIANTS;
-
-    private static final HashingStrategy[] STRATS = new HashingStrategy[3];
 
     static
     {
@@ -65,8 +61,6 @@ public class AlgorithmFinder
         PBKDF2_VARIANTS = result.toArray(new String[0]);
 
 
-
-
     }
 
     private AlgorithmFinder()
@@ -86,57 +80,27 @@ public class AlgorithmFinder
 
     public static PBKDF2Strategy getPBKDF2Instance()
     {
-        PBKDF2Strategy strategy;
-        if(STRATS[1] == null)
-        {
-            String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Strategy.DEFAULT_ALGORITHM.name());
-            int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", PBKDF2Strategy.DEFAULT_ITERATIONS);
-            int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Strategy.DEFAULT_LENGTH);
 
-            strategy = new PBKDF2Strategy(algorithm, iterations, length);
-            STRATS[2] = strategy;
-        }
-        else
-        {
-            strategy = (PBKDF2Strategy) STRATS[2];
-        }
-        return strategy;
+        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Strategy.DEFAULT_ALGORITHM.name());
+        int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", PBKDF2Strategy.DEFAULT_ITERATIONS);
+        int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Strategy.DEFAULT_LENGTH);
+
+        return new PBKDF2Strategy(algorithm, iterations, length);
     }
-
 
 
     public static BCryptStrategy getBCryptInstance()
     {
-        BCryptStrategy strategy;
-        if(STRATS[1] == null)
-        {
-            int rounds = PropertyReader.readInt("hash.bcrypt.rounds", BCryptStrategy.DEFAULT_ROUNDS);
-            strategy = new BCryptStrategy(rounds);
-            STRATS[1] = strategy;
-        }
-        else
-        {
-            strategy = (BCryptStrategy) STRATS[1];
-        }
-        return strategy;
+        int rounds = PropertyReader.readInt("hash.bcrypt.rounds", BCryptStrategy.DEFAULT_ROUNDS);
+        return new BCryptStrategy(rounds);
     }
 
     public static SCryptStrategy getSCryptInstance()
     {
-        SCryptStrategy strategy;
-        if(STRATS[1] == null)
-        {
-            int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", SCryptStrategy.DEFAULT_WORKFACTOR);
-            int resources = PropertyReader.readInt("hash.scrypt.resources", SCryptStrategy.DEFAULT_RES);
-            int parallelization = PropertyReader.readInt("hash.scrypt.parallelization", SCryptStrategy.DEFAULT_PARALLELIZATION);
-            strategy = new SCryptStrategy(workFactor, resources, parallelization);
-            STRATS[2] = strategy;
-        }
-        else
-        {
-            strategy = (SCryptStrategy) STRATS[2];
-        }
-        return strategy;
+        int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", SCryptStrategy.DEFAULT_WORKFACTOR);
+        int resources = PropertyReader.readInt("hash.scrypt.resources", SCryptStrategy.DEFAULT_RES);
+        int parallelization = PropertyReader.readInt("hash.scrypt.parallelization", SCryptStrategy.DEFAULT_PARALLELIZATION);
+        return new SCryptStrategy(workFactor, resources, parallelization);
     }
 
 

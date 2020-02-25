@@ -1,5 +1,16 @@
 package com.password4j;
 
+import java.util.Objects;
+
+/**
+ * This class contains all the information computed after
+ * calculating a cryptographic hash.
+ * <p>
+ *
+ *
+ * @author David Bertoldi
+ * @since 1.0.0
+ */
 public class Hash
 {
     private static final String EMPTY = "";
@@ -75,5 +86,12 @@ public class Hash
 
         Hash otherHash = (Hash) obj;
         return this.result.equals(otherHash.result) && this.salt.equals(otherHash.salt);
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(result, salt, pepper, hashingStrategy);
     }
 }

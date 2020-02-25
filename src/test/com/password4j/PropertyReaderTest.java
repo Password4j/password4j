@@ -7,6 +7,6 @@ public class PropertyReaderTest
     @Test
     public void test()
     {
-        System.out.println(PropertyReader.readString("mia.prop"));
+        //
     }
 }

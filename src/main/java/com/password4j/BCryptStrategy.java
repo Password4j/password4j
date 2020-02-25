@@ -7,7 +7,9 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class BCryptStrategy implements HashingStrategy
 {
-    private int logRounds = 10;
+    public static final int DEFAULT_ROUNDS = 10;
+
+    private int logRounds = DEFAULT_ROUNDS;
 
     public BCryptStrategy()
     {

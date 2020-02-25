@@ -14,7 +14,7 @@ public class Password
 
     private Password()
     {
-
+        //
     }
 
     private Password(String plain)
@@ -54,7 +54,6 @@ public class Password
         {
             this.salt = new String(SaltGenerator.generate(length));
         }
-
         return this;
     }
 
@@ -90,8 +89,22 @@ public class Password
         }
 
         hash.setPepper(pepper);
-
         return hash;
+    }
+
+    public Hash withPBKDF2()
+    {
+        return with(AlgorithmFinder.getPBKDF2Instance());
+    }
+
+    public Hash withBCrypt()
+    {
+        return with(AlgorithmFinder.getBCryptInstance());
+    }
+
+    public Hash withSCrypt()
+    {
+        return with(AlgorithmFinder.getSCryptInstance());
     }
 
 

@@ -12,11 +12,17 @@ import javax.crypto.spec.PBEKeySpec;
 
 public final class PBKDF2Strategy implements HashingStrategy
 {
-    private Algorithm algorithm = Algorithm.PBKDF2WithHmacSHA512;
+    public static final Algorithm DEFAULT_ALGORITHM = Algorithm.PBKDF2WithHmacSHA512;
 
-    private int iterations = 64_000;
+    public static final int DEFAULT_ITERATIONS = 64_000;
 
-    private int length = Algorithm.PBKDF2WithHmacSHA512.getBits();
+    public static final int DEFAULT_LENGTH = DEFAULT_ALGORITHM.bits;
+
+    private Algorithm algorithm = DEFAULT_ALGORITHM;
+
+    private int iterations = DEFAULT_ITERATIONS;
+
+    private int length = DEFAULT_LENGTH;
 
     public static PBKDF2Strategy getInstanceFromHash(String hashed)
     {
@@ -135,11 +141,6 @@ public final class PBKDF2Strategy implements HashingStrategy
         return diff == 0;
     }
 
-    public PBKDF2Strategy formattedAs(String format)
-    {
-
-        return this;
-    }
 
     public enum Algorithm
     {

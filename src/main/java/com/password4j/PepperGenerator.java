@@ -8,7 +8,6 @@ public class PepperGenerator
 
     public static String generate(int length)
     {
-
         return RandomStringUtils.random(length, 32, 126, false, false, null, AlgorithmFinder.getSecureRandom());
     }
 
@@ -19,7 +18,7 @@ public class PepperGenerator
 
     public static String get()
     {
-        return PropertyReader.readString("global.pepper");
+        return PropertyReader.readString("global.pepper", null);
     }
 
     public static String get(String context)
@@ -28,7 +27,7 @@ public class PepperGenerator
         {
             return get();
         }
-        return PropertyReader.readString(context + ".pepper");
+        return PropertyReader.readString(context + ".pepper", null);
     }
 
 }

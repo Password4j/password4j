@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class PropertyReader
+class PropertyReader
 {
 
     private static final Properties PROPERTIES;
@@ -26,29 +26,44 @@ public class PropertyReader
         PROPERTIES = props;
     }
 
-    public static int readInt(String key)
+    public static int readInt(String key, int defaultValue)
     {
         String str = readString(key);
-        if(str == null)
+        if (str == null)
         {
-            return 0;
+            return defaultValue;
         }
         return Integer.parseInt(readString(key));
     }
 
-    public static boolean readBoolean(String key)
+    public static boolean readBoolean(String key, boolean defaultValue)
     {
         String str = readString(key);
-        if(str == null)
+        if (str == null)
         {
-            return false;
+            return defaultValue;
         }
         return Boolean.parseBoolean(readString(key));
     }
 
-    public static String readString(String key)
+    private static String readString(String key)
     {
         return PROPERTIES.getProperty(key);
+    }
+
+    public static String readString(String key, String defaultValue)
+    {
+        String value = PROPERTIES.getProperty(key);
+        if (value == null)
+        {
+            return defaultValue;
+        }
+        return value;
+    }
+
+    private PropertyReader()
+    {
+        //
     }
 
 }

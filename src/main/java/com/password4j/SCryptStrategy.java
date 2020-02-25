@@ -1,20 +1,26 @@
 package com.password4j;
 
-import java.security.GeneralSecurityException;
-import java.util.Arrays;
-
 import com.lambdaworks.codec.Base64;
 import com.lambdaworks.crypto.SCrypt;
 import com.lambdaworks.crypto.SCryptUtil;
 
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
+
 
 public class SCryptStrategy implements HashingStrategy
 {
-    private int resources = 8; // r
+    public static final int DEFAULT_RES = 8;
 
-    private int workFactor = 2 << 14; // N
+    public static final int DEFAULT_WORKFACTOR = 2 << 14;
 
-    private int parallelization = 1; // p
+    public static final int DEFAULT_PARALLELIZATION = 1;
+
+    private int resources = DEFAULT_RES; // r
+
+    private int workFactor = DEFAULT_WORKFACTOR; // N
+
+    private int parallelization = DEFAULT_PARALLELIZATION; // p
 
     public SCryptStrategy()
     {
@@ -68,31 +74,7 @@ public class SCryptStrategy implements HashingStrategy
         return 128L * workFactor * resources * parallelization;
     }
 
-    private static int log2(int n)
-    {
-        int log = 0;
-        if ((n & -65536) != 0)
-        {
-            n >>>= 16;
-            log = 16;
-        }
-        if (n >= 256)
-        {
-            n >>>= 8;
-            log += 8;
-        }
-        if (n >= 16)
-        {
-            n >>>= 4;
-            log += 4;
-        }
-        if (n >= 4)
-        {
-            n >>>= 2;
-            log += 2;
-        }
-        return log + (n >>> 1);
-    }
+
 
     @Override
     public boolean equals(Object obj)
@@ -118,5 +100,31 @@ public class SCryptStrategy implements HashingStrategy
     public int hashCode()
     {
         return toString().hashCode();
+    }
+
+    private static int log2(int n)
+    {
+        int log = 0;
+        if ((n & -65536) != 0)
+        {
+            n >>>= 16;
+            log = 16;
+        }
+        if (n >= 256)
+        {
+            n >>>= 8;
+            log += 8;
+        }
+        if (n >= 16)
+        {
+            n >>>= 4;
+            log += 4;
+        }
+        if (n >= 4)
+        {
+            n >>>= 2;
+            log += 2;
+        }
+        return log + (n >>> 1);
     }
 }

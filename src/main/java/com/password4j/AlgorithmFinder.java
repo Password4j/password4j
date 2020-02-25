@@ -8,7 +8,9 @@ import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class AlgorithmFinder
@@ -25,14 +27,12 @@ public class AlgorithmFinder
 
     private static final String[] PBKDF2_VARIANTS;
 
+    private static final HashingStrategy[] STRATS = new HashingStrategy[3];
+
     static
     {
         SecureRandom sr;
-        if (isNonBlockingPRNG())
-        {
-            sr = new SecureRandom();
-        }
-        else
+        if (useStrongRandom())
         {
             try
             {
@@ -43,6 +43,11 @@ public class AlgorithmFinder
                 LOG.warn("No source of strong randomness found for this environment.");
                 sr = new SecureRandom();
             }
+
+        }
+        else
+        {
+            sr = new SecureRandom();
         }
         SR_SOURCE = sr;
 
@@ -58,6 +63,9 @@ public class AlgorithmFinder
             }
         }
         PBKDF2_VARIANTS = result.toArray(new String[0]);
+
+
+
 
     }
 
@@ -76,9 +84,64 @@ public class AlgorithmFinder
         return PBKDF2_VARIANTS;
     }
 
-    private static boolean isNonBlockingPRNG()
+    public static PBKDF2Strategy getPBKDF2Instance()
     {
-        String os = System.getProperty("os.name");
-        return os.contains("nux");
+        PBKDF2Strategy strategy;
+        if(STRATS[1] == null)
+        {
+            String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Strategy.DEFAULT_ALGORITHM.name());
+            int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", PBKDF2Strategy.DEFAULT_ITERATIONS);
+            int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Strategy.DEFAULT_LENGTH);
+
+            strategy = new PBKDF2Strategy(algorithm, iterations, length);
+            STRATS[2] = strategy;
+        }
+        else
+        {
+            strategy = (PBKDF2Strategy) STRATS[2];
+        }
+        return strategy;
+    }
+
+
+
+    public static BCryptStrategy getBCryptInstance()
+    {
+        BCryptStrategy strategy;
+        if(STRATS[1] == null)
+        {
+            int rounds = PropertyReader.readInt("hash.bcrypt.rounds", BCryptStrategy.DEFAULT_ROUNDS);
+            strategy = new BCryptStrategy(rounds);
+            STRATS[1] = strategy;
+        }
+        else
+        {
+            strategy = (BCryptStrategy) STRATS[1];
+        }
+        return strategy;
+    }
+
+    public static SCryptStrategy getSCryptInstance()
+    {
+        SCryptStrategy strategy;
+        if(STRATS[1] == null)
+        {
+            int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", SCryptStrategy.DEFAULT_WORKFACTOR);
+            int resources = PropertyReader.readInt("hash.scrypt.resources", SCryptStrategy.DEFAULT_RES);
+            int parallelization = PropertyReader.readInt("hash.scrypt.parallelization", SCryptStrategy.DEFAULT_PARALLELIZATION);
+            strategy = new SCryptStrategy(workFactor, resources, parallelization);
+            STRATS[2] = strategy;
+        }
+        else
+        {
+            strategy = (SCryptStrategy) STRATS[2];
+        }
+        return strategy;
+    }
+
+
+    private static boolean useStrongRandom()
+    {
+        return PropertyReader.readBoolean("global.random.strong", false);
     }
 }

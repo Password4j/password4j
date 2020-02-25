@@ -73,7 +73,7 @@ public class Password
     public Hash with(HashingStrategy hashingStrategy)
     {
         String peppered = plain;
-        if (StringUtils.isEmpty(this.pepper))
+        if (StringUtils.isNotEmpty(this.pepper))
         {
             peppered = this.pepper + peppered;
         }

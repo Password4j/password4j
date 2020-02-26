@@ -24,7 +24,7 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
 
-public class SCryptStrategy implements HashingStrategy
+public class SCryptFunction implements HashingFunction
 {
     public static final int DEFAULT_RES = 8;
 
@@ -38,12 +38,12 @@ public class SCryptStrategy implements HashingStrategy
 
     private int parallelization = DEFAULT_PARALLELIZATION; // p
 
-    public SCryptStrategy()
+    public SCryptFunction()
     {
         //
     }
 
-    public SCryptStrategy(int resources, int workFactor, int parallelization)
+    public SCryptFunction(int resources, int workFactor, int parallelization)
     {
         this();
         this.resources = resources;
@@ -100,7 +100,7 @@ public class SCryptStrategy implements HashingStrategy
             return false;
         }
 
-        SCryptStrategy otherStrategy = (SCryptStrategy) obj;
+        SCryptFunction otherStrategy = (SCryptFunction) obj;
         return this.workFactor == otherStrategy.workFactor //
                 && this.resources == otherStrategy.resources //
                 && this.parallelization == otherStrategy.parallelization;

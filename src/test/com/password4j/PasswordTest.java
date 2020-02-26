@@ -16,6 +16,7 @@
  */
 package com.password4j;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 
@@ -23,9 +24,41 @@ public class PasswordTest
 {
 
     @Test
-    public void test()
+    public void testCoherence()
     {
-        //
+        // GIVEN
+        String password = "password";
+        String salt = "salt";
+        String pepper = "pepper";
 
+        // WHEN
+        Hash hash1 = Password.hash(password).addPepper(pepper).addSalt(salt).withPBKDF2();
+        Hash hash2 = Password.hash(password).addPepper(pepper).withBCrypt();
+        Hash hash3 = Password.hash(password).addPepper(pepper).addSalt(salt).withSCrypt();
+
+        // THEN
+        Assert.assertTrue(hash1.check(password));
+        Assert.assertTrue(hash2.check(password));
+        Assert.assertTrue(hash3.check(password));
     }
+
+
+    @Test
+    public void rawCheck()
+    {
+        // GIVEN
+        String password = "password";
+        String salt = "salt";
+        String pepper = "pepper";
+        Hash hash = Password.hash(password).addPepper(pepper).addSalt(salt).withPBKDF2();
+        String hashed = hash.getResult();
+
+        // WHEN
+        PBKDF2Function strategy = PBKDF2Function.getInstanceFromHash(hashed);
+
+        // THEN
+        Assert.assertTrue(strategy.check(pepper + password, hashed));
+        Assert.assertTrue(Password.check(hashed, password).addPepper(pepper).withPBKDF2());
+    }
+
 }

@@ -94,29 +94,28 @@ public class AlgorithmFinder
         return PBKDF2_VARIANTS;
     }
 
-    public static PBKDF2Strategy getPBKDF2Instance()
+    public static PBKDF2Function getPBKDF2Instance()
     {
+        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Function.DEFAULT_ALGORITHM.name());
+        int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", PBKDF2Function.DEFAULT_ITERATIONS);
+        int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Function.DEFAULT_LENGTH);
 
-        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Strategy.DEFAULT_ALGORITHM.name());
-        int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", PBKDF2Strategy.DEFAULT_ITERATIONS);
-        int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Strategy.DEFAULT_LENGTH);
-
-        return new PBKDF2Strategy(algorithm, iterations, length);
+        return new PBKDF2Function(algorithm, iterations, length);
     }
 
 
-    public static BCryptStrategy getBCryptInstance()
+    public static BCryptFunction getBCryptInstance()
     {
-        int rounds = PropertyReader.readInt("hash.bcrypt.rounds", BCryptStrategy.DEFAULT_ROUNDS);
-        return new BCryptStrategy(rounds);
+        int rounds = PropertyReader.readInt("hash.bcrypt.rounds", BCryptFunction.DEFAULT_ROUNDS);
+        return new BCryptFunction(rounds);
     }
 
-    public static SCryptStrategy getSCryptInstance()
+    public static SCryptFunction getSCryptInstance()
     {
-        int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", SCryptStrategy.DEFAULT_WORKFACTOR);
-        int resources = PropertyReader.readInt("hash.scrypt.resources", SCryptStrategy.DEFAULT_RES);
-        int parallelization = PropertyReader.readInt("hash.scrypt.parallelization", SCryptStrategy.DEFAULT_PARALLELIZATION);
-        return new SCryptStrategy(workFactor, resources, parallelization);
+        int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", SCryptFunction.DEFAULT_WORKFACTOR);
+        int resources = PropertyReader.readInt("hash.scrypt.resources", SCryptFunction.DEFAULT_RES);
+        int parallelization = PropertyReader.readInt("hash.scrypt.parallelization", SCryptFunction.DEFAULT_PARALLELIZATION);
+        return new SCryptFunction(workFactor, resources, parallelization);
     }
 
 

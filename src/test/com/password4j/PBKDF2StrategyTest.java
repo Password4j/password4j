@@ -31,7 +31,7 @@ public class PBKDF2StrategyTest
     public void testPBKDF2()
     {
         // GIVEN
-        HashingStrategy strategy = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
+        HashingFunction strategy = new PBKDF2Function(PBKDF2Function.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
         String password = "password";
         String salt = "abc";
 
@@ -45,10 +45,10 @@ public class PBKDF2StrategyTest
     @Test
     public void testPBKDF2EachVariants()
     {
-        for(PBKDF2Strategy.Algorithm alg : PBKDF2Strategy.Algorithm.values())
+        for(PBKDF2Function.Algorithm alg : PBKDF2Function.Algorithm.values())
         {
             // GIVEN
-            HashingStrategy strategy = new PBKDF2Strategy(alg.name(), 10_000, 256);
+            HashingFunction strategy = new PBKDF2Function(alg.name(), 10_000, 256);
             String password = "password";
             String salt = "abc";
 
@@ -64,7 +64,7 @@ public class PBKDF2StrategyTest
     public void testPBKDF2WrongAlgorithm()
     {
         // GIVEN
-        HashingStrategy strategy = new PBKDF2Strategy("notAnAlgorithm", 10_000, 256);
+        HashingFunction strategy = new PBKDF2Function("notAnAlgorithm", 10_000, 256);
         String password = "password";
         String salt = "abc";
 
@@ -78,7 +78,7 @@ public class PBKDF2StrategyTest
     public void testPBKDF2WrongSalt()
     {
         // GIVEN
-        HashingStrategy strategy = new PBKDF2Strategy();
+        HashingFunction strategy = new PBKDF2Function();
         String password = "password";
         String salt = new String(new byte[0]);
 
@@ -92,7 +92,7 @@ public class PBKDF2StrategyTest
     public void testPBKDF2WrongAlgorithmSalt()
     {
         // GIVEN
-        HashingStrategy strategy = new PBKDF2Strategy("notAnAlgorithm", 10_000, 256);
+        HashingFunction strategy = new PBKDF2Function("notAnAlgorithm", 10_000, 256);
         String password = "password";
         String salt = new String(new byte[0]);
 
@@ -110,7 +110,7 @@ public class PBKDF2StrategyTest
         String userSubmittedPassword = "password";
 
         // WHEN
-        HashingStrategy strategy = PBKDF2Strategy.getInstanceFromHash(hashed);
+        HashingFunction strategy = PBKDF2Function.getInstanceFromHash(hashed);
 
         // THEN
         Assert.assertTrue(strategy.check(userSubmittedPassword, hashed));
@@ -123,7 +123,7 @@ public class PBKDF2StrategyTest
         String password = "password";
 
         // WHEN
-        Hash hash = new PBKDF2Strategy().hash(password);
+        Hash hash = new PBKDF2Function().hash(password);
 
         // THEN
         Assert.assertTrue(hash.check(password));
@@ -138,7 +138,7 @@ public class PBKDF2StrategyTest
         String userSubmittedPassword = "password";
 
         // WHEN
-        HashingStrategy strategy = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
+        HashingFunction strategy = new PBKDF2Function(PBKDF2Function.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
 
         // THEN
         Assert.assertTrue(strategy.check(userSubmittedPassword, hashed));
@@ -149,16 +149,16 @@ public class PBKDF2StrategyTest
     public void testPBKDF2equality()
     {
         // GIVEN
-        PBKDF2Strategy strategy1 = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
-        PBKDF2Strategy strategy2 = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
-        PBKDF2Strategy strategy3 = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA1.name(), 10_000, 256);
-        PBKDF2Strategy strategy4 = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA256.name(), 64_000, 256);
-        PBKDF2Strategy strategy5 = new PBKDF2Strategy(PBKDF2Strategy.Algorithm.PBKDF2WithHmacSHA256.name(), 64_000, 123);
+        PBKDF2Function strategy1 = new PBKDF2Function(PBKDF2Function.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
+        PBKDF2Function strategy2 = new PBKDF2Function(PBKDF2Function.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
+        PBKDF2Function strategy3 = new PBKDF2Function(PBKDF2Function.Algorithm.PBKDF2WithHmacSHA1.name(), 10_000, 256);
+        PBKDF2Function strategy4 = new PBKDF2Function(PBKDF2Function.Algorithm.PBKDF2WithHmacSHA256.name(), 64_000, 256);
+        PBKDF2Function strategy5 = new PBKDF2Function(PBKDF2Function.Algorithm.PBKDF2WithHmacSHA256.name(), 64_000, 123);
 
 
 
         // WHEN
-        Map<PBKDF2Strategy, String> map =new HashMap<>();
+        Map<PBKDF2Function, String> map =new HashMap<>();
         map.put(strategy1, strategy1.toString());
         map.put(strategy2, strategy2.toString());
         map.put(strategy3, strategy3.toString());

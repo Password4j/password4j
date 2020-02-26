@@ -21,18 +21,18 @@ import java.util.Arrays;
 import org.mindrot.jbcrypt.BCrypt;
 
 
-public class BCryptStrategy implements HashingStrategy
+public class BCryptFunction implements HashingFunction
 {
     public static final int DEFAULT_ROUNDS = 10;
 
     private int logRounds = DEFAULT_ROUNDS;
 
-    public BCryptStrategy()
+    public BCryptFunction()
     {
 
     }
 
-    public BCryptStrategy(int logRounds)
+    public BCryptFunction(int logRounds)
     {
         this();
         this.logRounds = logRounds;
@@ -80,7 +80,7 @@ public class BCryptStrategy implements HashingStrategy
             return false;
         }
 
-        BCryptStrategy otherStrategy = (BCryptStrategy) obj;
+        BCryptFunction otherStrategy = (BCryptFunction) obj;
         return this.logRounds == otherStrategy.logRounds;
     }
 

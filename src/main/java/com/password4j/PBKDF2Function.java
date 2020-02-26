@@ -26,7 +26,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 
-public final class PBKDF2Strategy implements HashingStrategy
+public final class PBKDF2Function implements HashingFunction
 {
     public static final Algorithm DEFAULT_ALGORITHM = Algorithm.PBKDF2WithHmacSHA512;
 
@@ -40,7 +40,7 @@ public final class PBKDF2Strategy implements HashingStrategy
 
     private int length = DEFAULT_LENGTH;
 
-    public static PBKDF2Strategy getInstanceFromHash(String hashed)
+    public static PBKDF2Function getInstanceFromHash(String hashed)
     {
         String[] parts = hashed.split("\\$");
         if (parts.length == 5)
@@ -51,24 +51,24 @@ public final class PBKDF2Strategy implements HashingStrategy
             int iterations = (int) (configuration >> 32);
             int length = (int) configuration;
 
-            return new PBKDF2Strategy(Algorithm.fromCode(algorithm), iterations, length);
+            return new PBKDF2Function(Algorithm.fromCode(algorithm), iterations, length);
         }
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }
 
-    public PBKDF2Strategy()
+    public PBKDF2Function()
     {
         //
     }
 
-    public PBKDF2Strategy(int iterations, int length)
+    public PBKDF2Function(int iterations, int length)
     {
         this();
         this.iterations = iterations;
         this.length = length;
     }
 
-    public PBKDF2Strategy(String algorithm, int iterations, int length)
+    public PBKDF2Function(String algorithm, int iterations, int length)
     {
         this(iterations, length);
         try
@@ -81,7 +81,7 @@ public final class PBKDF2Strategy implements HashingStrategy
         }
     }
 
-    public PBKDF2Strategy(Algorithm algorithm, int iterations, int length)
+    public PBKDF2Function(Algorithm algorithm, int iterations, int length)
     {
         this(iterations, length);
         this.algorithm = algorithm;
@@ -207,7 +207,7 @@ public final class PBKDF2Strategy implements HashingStrategy
             return false;
         }
 
-        PBKDF2Strategy otherStrategy = (PBKDF2Strategy) obj;
+        PBKDF2Function otherStrategy = (PBKDF2Function) obj;
         return this.algorithm.equals(otherStrategy.algorithm) //
                 && this.iterations == otherStrategy.iterations //
                 && this.length == otherStrategy.length;

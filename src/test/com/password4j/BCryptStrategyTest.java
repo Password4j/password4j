@@ -33,7 +33,7 @@ public class BCryptStrategyTest
     public void testBCryptBadParams()
     {
         // GIVEN
-        HashingStrategy strategy = new BCryptStrategy(-1);
+        HashingFunction strategy = new BCryptFunction(-1);
         String password = "password";
 
         // WHEN
@@ -52,7 +52,7 @@ public class BCryptStrategyTest
         String password = "password";
 
         // WHEN
-        Hash hash = new BCryptStrategy().hash(password);
+        Hash hash = new BCryptFunction().hash(password);
 
         // THEN
         Assert.assertTrue(hash.check(password));
@@ -66,7 +66,7 @@ public class BCryptStrategyTest
         String password = "password";
 
         // WHEN
-        Hash hash = new BCryptStrategy(12).hash(password);
+        Hash hash = new BCryptFunction(12).hash(password);
 
         // THEN
         Assert.assertTrue(hash.check(password));
@@ -77,16 +77,16 @@ public class BCryptStrategyTest
     public void testBCryptequality()
     {
         // GIVEN
-        BCryptStrategy strategy1 = new BCryptStrategy();
-        BCryptStrategy strategy2 = new BCryptStrategy();
-        BCryptStrategy strategy3 = new BCryptStrategy(15);
-        BCryptStrategy strategy4 = new BCryptStrategy(15);
-        BCryptStrategy strategy5 = new BCryptStrategy(8);
+        BCryptFunction strategy1 = new BCryptFunction();
+        BCryptFunction strategy2 = new BCryptFunction();
+        BCryptFunction strategy3 = new BCryptFunction(15);
+        BCryptFunction strategy4 = new BCryptFunction(15);
+        BCryptFunction strategy5 = new BCryptFunction(8);
 
 
 
         // WHEN
-        Map<BCryptStrategy, String> map =new HashMap<>();
+        Map<BCryptFunction, String> map =new HashMap<>();
         map.put(strategy1, strategy1.toString());
         map.put(strategy2, strategy2.toString());
         map.put(strategy3, strategy3.toString());

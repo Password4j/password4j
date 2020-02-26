@@ -25,7 +25,7 @@ import java.util.Objects;
  * This class contains all the information computed after
  * calculating a cryptographic hash.
  * <p>
- * The same {@link HashingStrategy} used to generate the hash
+ * The same {@link HashingFunction} used to generate the hash
  * is used to verify the plain password; in addition <i>cryptographic
  * seasoning</i> such as salt and pepper are stored in this object.
  * <p>
@@ -81,15 +81,15 @@ public class Hash
     /**
      * Represents the hashing function used to generate this object.
      *
-     * @see HashingStrategy for more details
+     * @see HashingFunction for more details
      */
-    private HashingStrategy hashingStrategy;
+    private HashingFunction hashingFunction;
 
     /**
      * It is meant to not be used if not internally.
      * The other constructor must be used instead.
      *
-     * @see Hash#Hash(HashingStrategy, String, String)
+     * @see Hash#Hash(HashingFunction, String, String)
      * @since 1.0.0
      */
     @SuppressWarnings("unused")
@@ -106,14 +106,14 @@ public class Hash
      * <p>
      * This constructor populates the object's attributes.
      *
-     * @param hashingStrategy the cryptographic algorithm used to produce the hash.
+     * @param hashingFunction the cryptographic algorithm used to produce the hash.
      * @param result          the result of the computation of the hash. Notice that the format vary depending on the algorithm.
      * @param salt            the salt used for the computation.
      * @since 1.0.0
      */
-    public Hash(HashingStrategy hashingStrategy, String result, String salt)
+    public Hash(HashingFunction hashingFunction, String result, String salt)
     {
-        this.hashingStrategy = hashingStrategy;
+        this.hashingFunction = hashingFunction;
         this.salt = salt;
         this.result = result;
     }
@@ -141,7 +141,7 @@ public class Hash
     }
 
     /**
-     * Retrieved the pepper used together with the password in the hashing function.
+     * Retrieves the pepper used with the password in the hashing function.
      *
      * @return the pepper.
      * @since 1.0.0
@@ -153,6 +153,8 @@ public class Hash
 
     /**
      * Stores the pepper used together with the password in the hashing function.
+     * <p>
+     * This methods should be used just after the creation of this object.
      *
      * @param pepper the pepper used.
      * @since 1.0.0
@@ -163,8 +165,8 @@ public class Hash
     }
 
     /**
-     * Uses the {@link HashingStrategy} used to calculate this {@link Hash}.
-     * Il the password is null, this returns false; otherwise {@link HashingStrategy#check(String, String)} is invoked.
+     * Uses the {@link HashingFunction} used to calculate this {@link Hash}.
+     * Il the password is null, this returns false; otherwise {@link HashingFunction#check(String, String)} is invoked.
      *
      * @param plain the original password.
      * @return true if the check passes, false otherwise.
@@ -177,7 +179,13 @@ public class Hash
             return false;
         }
 
-        return this.hashingStrategy.check(plain, this.getResult());
+        String peppered = plain;
+        if (StringUtils.isNotEmpty(this.pepper))
+        {
+            peppered = this.pepper + peppered;
+        }
+
+        return this.hashingFunction.check(peppered, this.getResult());
     }
 
     /**
@@ -189,18 +197,18 @@ public class Hash
     @Override
     public String toString()
     {
-        return hashingStrategy.getClass()
+        return hashingFunction.getClass()
                 .getSimpleName() + "[salt=" + getSalt() + ", pepper=" + getPepper() + ", hash=" + getResult() + "]";
     }
 
     /**
      * Two {@link Hash}es are considered equals if they contain
      * the same hash, salt, pepper and they are generated with
-     * the same {@link HashingStrategy}
+     * the same {@link HashingFunction}
      *
      * @param obj the object to conpare
      * @return true if equals
-     * @see HashingStrategy#equals(Object)
+     * @see HashingFunction#equals(Object)
      * @since 1.0.0
      */
     @Override
@@ -215,12 +223,12 @@ public class Hash
         return this.result.equals(otherHash.result) //
                 && this.salt.equals(otherHash.salt) //
                 && this.pepper.equals(otherHash.pepper) //
-                && this.hashingStrategy.equals(otherHash.hashingStrategy);
+                && this.hashingFunction.equals(otherHash.hashingFunction);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(result, salt, pepper, hashingStrategy);
+        return Objects.hash(result, salt, pepper, hashingFunction);
     }
 }

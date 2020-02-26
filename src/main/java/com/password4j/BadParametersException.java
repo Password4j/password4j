@@ -16,16 +16,39 @@
  */
 package com.password4j;
 
+/**
+ * This exception is normally thrown when a not well formed parameter
+ * is passed as argument to a function.
+ * <p>
+ * This exception covers all the exceptions raised by underlying logic,
+ * grouping them as one exception.
+ *
+ * @author David Bertoldi
+ * @since 1.0.0
+ */
 public class BadParametersException extends IllegalArgumentException
 {
 
     private static final long serialVersionUID = 9204720180786210237L;
 
+    /**
+     * Constructs the exception.
+     *
+     * @param message the message describing the cause of the exception
+     * @since 1.0.0
+     */
     public BadParametersException(String message)
     {
         super(message);
     }
 
+    /**
+     * Constructs the exception.
+     *
+     * @param message   the message describing the cause of the exception
+     * @param exception the exception masked by this object
+     * @since 1.0.0
+     */
     public BadParametersException(String message, Throwable exception)
     {
         super(message, exception);

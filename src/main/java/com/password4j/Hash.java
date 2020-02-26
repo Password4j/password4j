@@ -206,7 +206,7 @@ public class Hash
      * the same hash, salt, pepper and they are generated with
      * the same {@link HashingFunction}
      *
-     * @param obj the object to conpare
+     * @param obj the object to compare
      * @return true if equals
      * @see HashingFunction#equals(Object)
      * @since 1.0.0

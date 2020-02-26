@@ -14,20 +14,19 @@
  *  limitations under the License.
  *
  */
+
 package com.password4j;
 
-/**
- * This interface is intended as an incapsulation
- * of a particular cryptographic hash function.
- */
-public interface HashingFunction
+public abstract class AbstractHashingFunction implements HashingFunction
 {
-    
-    Hash hash(String plain);
 
-    Hash hash(String plain,String salt);
-
-    boolean check(String plain, String hashed);
-
-    Hash update(String plain, String salt, HashingFunction hashingFunction);
+    @Override
+    public Hash update(String plain, String salt, HashingFunction hashingFunction)
+    {
+        if(plain == null || salt == null)
+        {
+            throw new BadParametersException("");
+        }
+        return hashingFunction.hash(plain, salt);
+    }
 }

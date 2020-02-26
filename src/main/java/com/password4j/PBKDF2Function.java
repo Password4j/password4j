@@ -26,7 +26,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 
-public final class PBKDF2Function implements HashingFunction
+public final class PBKDF2Function extends AbstractHashingFunction
 {
     public static final Algorithm DEFAULT_ALGORITHM = Algorithm.PBKDF2WithHmacSHA512;
 

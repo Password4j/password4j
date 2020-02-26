@@ -21,7 +21,7 @@ import java.util.Arrays;
 import org.mindrot.jbcrypt.BCrypt;
 
 
-public class BCryptFunction implements HashingFunction
+public class BCryptFunction extends AbstractHashingFunction
 {
     public static final int DEFAULT_ROUNDS = 10;
 

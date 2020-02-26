@@ -55,14 +55,15 @@ public class HashChecker
         return with(pbkdf2);
     }
 
-    public boolean withBCrypt()
+    public boolean withSCrypt()
     {
-        return false;
+        SCryptFunction scrypt = SCryptFunction.getInstanceFromHash(hash);
+        return with(scrypt);
     }
 
-    public boolean withScrypt()
+    public boolean withBCrypt()
     {
-        return false;
+        return with(new BCryptFunction());
     }
 
 

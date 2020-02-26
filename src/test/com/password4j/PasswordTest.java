@@ -44,7 +44,7 @@ public class PasswordTest
 
 
     @Test
-    public void rawCheck()
+    public void testRawCheck1()
     {
         // GIVEN
         String password = "password";
@@ -60,5 +60,43 @@ public class PasswordTest
         Assert.assertTrue(strategy.check(pepper + password, hashed));
         Assert.assertTrue(Password.check(hashed, password).addPepper(pepper).withPBKDF2());
     }
+
+    @Test
+    public void testRawCheck2()
+    {
+        // GIVEN
+        String password = "password";
+        String salt = "salt";
+        String pepper = "pepper";
+        Hash hash = Password.hash(password).addPepper(pepper).withBCrypt();
+        String hashed = hash.getResult();
+
+        // WHEN
+        BCryptFunction strategy = new BCryptFunction(12);
+
+        // THEN
+        Assert.assertTrue(strategy.check(pepper + password, hashed));
+        Assert.assertTrue(Password.check(hashed, password).addPepper(pepper).withBCrypt());
+    }
+
+    @Test
+    public void testRawCheck3()
+    {
+        // GIVEN
+        String password = "password";
+        String salt = "salt";
+        String pepper = "pepper";
+        Hash hash = Password.hash(password).addPepper(pepper).addSalt(salt).withSCrypt();
+        String hashed = hash.getResult();
+
+        // WHEN
+        SCryptFunction strategy = SCryptFunction.getInstanceFromHash(hashed);
+
+        // THEN
+        Assert.assertTrue(strategy.check(pepper + password, hashed));
+        Assert.assertTrue(Password.check(hashed, password).addPepper(pepper).withSCrypt());
+    }
+
+
 
 }

@@ -16,15 +16,15 @@
  */
 package com.password4j;
 
-import com.lambdaworks.codec.Base64;
 import com.lambdaworks.crypto.SCrypt;
 import com.lambdaworks.crypto.SCryptUtil;
 
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.Base64;
 
 
-public class SCryptFunction implements HashingFunction
+public class SCryptFunction extends AbstractHashingFunction
 {
     public static final int DEFAULT_RES = 8;
 
@@ -51,6 +51,17 @@ public class SCryptFunction implements HashingFunction
         this.parallelization = parallelization;
     }
 
+    public static SCryptFunction getInstanceFromHash(String hashed)
+    {
+        String[] parts = hashed.split("\\$");
+        long params = Long.parseLong(parts[2], 16);
+        int workFactor = (int)Math.pow(2.0D, (double)(params >> 16 & 65535L));
+        int resources = (int)params >> 8 & 255;
+        int parallelization = (int)params & 255;
+
+        return new SCryptFunction(resources, workFactor, parallelization);
+    }
+
     @Override
     public Hash hash(String plain)
     {
@@ -68,8 +79,8 @@ public class SCryptFunction implements HashingFunction
             String params = Long.toString((long) (log2(workFactor) << 16 | resources << 8 | parallelization), 16);
             StringBuilder sb = new StringBuilder((saltAsBytes.length + derived.length) * 2);
             sb.append("$s0$").append(params).append('$');
-            sb.append(Base64.encode(saltAsBytes)).append('$');
-            sb.append(Base64.encode(derived));
+            sb.append(Base64.getEncoder().encodeToString(saltAsBytes)).append('$');
+            sb.append(Base64.getEncoder().encodeToString(derived));
             return new Hash(this, sb.toString(), salt);
         }
         catch (IllegalArgumentException | GeneralSecurityException e)

@@ -50,15 +50,15 @@ public class PasswordTest
         String password = "password";
         String salt = "salt";
         String pepper = "pepper";
-        Hash hash = Password.hash(password).addPepper(pepper).addSalt(salt).withPBKDF2();
+        Hash hash = Password.hash(password).addPepper(pepper).addSalt(salt).withCompressedPBKDF2();
         String hashed = hash.getResult();
 
         // WHEN
-        PBKDF2Function strategy = PBKDF2Function.getInstanceFromHash(hashed);
+        PBKDF2Function strategy = CompressedPBKDF2Function.getInstanceFromHash(hashed);
 
         // THEN
         Assert.assertTrue(strategy.check(pepper + password, hashed));
-        Assert.assertTrue(Password.check(hashed, password).addPepper(pepper).withPBKDF2());
+        Assert.assertTrue(Password.check(hashed, password).addPepper(pepper).withCompressedPBKDF2());
     }
 
     @Test
@@ -95,6 +95,24 @@ public class PasswordTest
         // THEN
         Assert.assertTrue(strategy.check(pepper + password, hashed));
         Assert.assertTrue(Password.check(hashed, password).addPepper(pepper).withSCrypt());
+    }
+
+    @Test
+    public void testCustomBuilder()
+    {
+        // GIVEN
+        String password = "password";
+        String salt = "salt";
+        String pepper = "pepper";
+
+        // WHEN
+        Hash hash1 = Password.hash(password, CustomHashBuilder::new).addPepper(pepper).addSalt(salt).withTest();
+        Hash hash2 = Password.hash(password, CustomHashBuilder::new).addPepper(pepper).addSalt(salt).withBCrypt();
+
+        // THEN
+        Assert.assertEquals(CustomHashBuilder.SAME_RESULT, hash1.getResult());
+        Assert.assertEquals(CustomHashBuilder.SAME_RESULT, hash2.getResult());
+
     }
 
 

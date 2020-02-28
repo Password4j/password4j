@@ -185,7 +185,7 @@ public class Hash
             peppered = this.pepper + peppered;
         }
 
-        return this.hashingFunction.check(peppered, this.getResult());
+        return this.hashingFunction.check(peppered, this.getResult(), salt);
     }
 
     /**

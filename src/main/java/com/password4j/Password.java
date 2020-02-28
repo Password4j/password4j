@@ -16,6 +16,9 @@
  */
 package com.password4j;
 
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
 public class Password
 {
 
@@ -25,28 +28,43 @@ public class Password
     }
 
 
-
     public static HashBuilder hash(String plain)
     {
+        return hash(plain, HashBuilder::new);
+    }
+
+    public static HashChecker check(String hash, String plain)
+    {
+        return check(hash, plain, HashChecker::new);
+    }
+
+
+    public static <B extends HashBuilder> B hash(String plain, Function<String, B> builderFunction)
+    {
+        if (builderFunction == null)
+        {
+            throw new BadParametersException("HashBuilder construction method cannot be null");
+        }
         if (plain == null)
         {
             throw new BadParametersException("Password cannot be null");
         }
-        return new HashBuilder(plain);
+        return builderFunction.apply(plain);
     }
 
 
-
-    public static HashChecker check(String hash, String plain)
+    public static <C extends HashChecker> C check(String hash, String plain, BiFunction<String, String, C> checkerBiFunction)
     {
+        if (checkerBiFunction == null)
+        {
+            throw new BadParametersException("HashChecker construction method cannot be null");
+        }
         if (hash == null || plain == null)
         {
             throw new BadParametersException("Hash or plain cannot be null");
         }
-        return new HashChecker(hash, plain);
+        return checkerBiFunction.apply(hash, plain);
     }
-
-
 
 
 }

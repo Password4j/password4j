@@ -16,7 +16,7 @@
  */
 package com.password4j;
 
-public class HashChecker
+public class HashChecker<C extends HashChecker<?>>
 {
     private String hash;
 
@@ -35,10 +35,10 @@ public class HashChecker
         this.plain = plain;
     }
 
-    public HashChecker addPepper(String pepper)
+    public C addPepper(String pepper)
     {
         this.pepper = pepper;
-        return this;
+        return (C) this;
     }
 
     public boolean with(HashingFunction hashingFunction)
@@ -51,7 +51,13 @@ public class HashChecker
 
     public boolean withPBKDF2()
     {
-        PBKDF2Function pbkdf2 = PBKDF2Function.getInstanceFromHash(hash);
+        PBKDF2Function pbkdf2 = AlgorithmFinder.getPBKDF2Instance();
+        return with(pbkdf2);
+    }
+
+    public boolean withCompressedPBKDF2()
+    {
+        PBKDF2Function pbkdf2 = AlgorithmFinder.getCompressedPBKDF2Instance();
         return with(pbkdf2);
     }
 

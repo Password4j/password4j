@@ -29,4 +29,10 @@ public abstract class AbstractHashingFunction implements HashingFunction
         }
         return hashingFunction.hash(plain, salt);
     }
+
+    @Override
+    public boolean check(String plain, String hashed, String salt)
+    {
+        return check(plain, hashed);
+    }
 }

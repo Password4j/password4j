@@ -16,17 +16,16 @@
  */
 package com.password4j;
 
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Base64;
 
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 
-
-public final class PBKDF2Function extends AbstractHashingFunction
+public class PBKDF2Function extends AbstractHashingFunction
 {
     public static final Algorithm DEFAULT_ALGORITHM = Algorithm.PBKDF2WithHmacSHA512;
 
@@ -40,21 +39,7 @@ public final class PBKDF2Function extends AbstractHashingFunction
 
     private int length = DEFAULT_LENGTH;
 
-    public static PBKDF2Function getInstanceFromHash(String hashed)
-    {
-        String[] parts = hashed.split("\\$");
-        if (parts.length == 5)
-        {
-            int algorithm = Integer.parseInt(parts[1]);
-            long configuration = Long.parseLong(parts[2]);
 
-            int iterations = (int) (configuration >> 32);
-            int length = (int) configuration;
-
-            return new PBKDF2Function(Algorithm.fromCode(algorithm), iterations, length);
-        }
-        throw new BadParametersException("`" + hashed + "` is not a valid hash");
-    }
 
     public PBKDF2Function()
     {
@@ -102,11 +87,7 @@ public final class PBKDF2Function extends AbstractHashingFunction
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm.name());
             PBEKeySpec spec = new PBEKeySpec(plain.toCharArray(), salt.getBytes(), iterations, length);
             SecretKey key = secretKeyFactory.generateSecret(spec);
-            String params = Long.toString((((long) iterations) << 32) | (length & 0xffffffffL));
-            String salt64 = Base64.getEncoder().encodeToString(salt.getBytes());
-            String hash64 = Base64.getEncoder().encodeToString(key.getEncoded());
-            String hash = "$" + algorithm.getCode() + "$" + params + "$" + salt64 + "$" + hash64;
-            return new Hash(this, hash, salt);
+            return new Hash(this, getHash(key, salt), salt);
         }
         catch (NoSuchAlgorithmException nsae)
         {
@@ -120,25 +101,26 @@ public final class PBKDF2Function extends AbstractHashingFunction
         }
     }
 
-    @Override
-    public boolean check(String password, String hashed)
+    protected String getHash(SecretKey key, String salt)
     {
-        String salt = getSaltFromHash(hashed);
+        return Base64.getEncoder().encodeToString(key.getEncoded());
+    }
 
-        Hash internalHas = hash(password, salt);
 
+    @Override
+    public boolean check(String plain, String hashed, String salt)
+    {
+        Hash internalHas = hash(plain, salt);
         return slowEquals(internalHas.getResult().getBytes(), hashed.getBytes());
     }
 
-    private String getSaltFromHash(String hashed)
+    @Override
+    public boolean check(String password, String hashed)
     {
-        String[] parts = hashed.split("\\$");
-        if (parts.length == 5)
-        {
-            return new String(Base64.getDecoder().decode(parts[3].getBytes()));
-        }
-        throw new BadParametersException("`" + hashed + "` is not a valid hash");
+        throw new UnsupportedOperationException("This implementation requires an explicit salt. Use check(String, String, String) method instead.");
+
     }
+
 
     /**
      * Compares two byte arrays in length-constant time. This comparison method
@@ -149,7 +131,7 @@ public final class PBKDF2Function extends AbstractHashingFunction
      * @param b the second byte array
      * @return true if both byte arrays are the same, false if not
      */
-    private static boolean slowEquals(byte[] a, byte[] b)
+    protected static boolean slowEquals(byte[] a, byte[] b)
     {
         int diff = a.length ^ b.length;
         for (int i = 0; i < a.length && i < b.length; i++)
@@ -157,6 +139,20 @@ public final class PBKDF2Function extends AbstractHashingFunction
         return diff == 0;
     }
 
+    public Algorithm getAlgorithm()
+    {
+        return algorithm;
+    }
+
+    public int getIterations()
+    {
+        return iterations;
+    }
+
+    public int getLength()
+    {
+        return length;
+    }
 
     public enum Algorithm
     {
@@ -216,7 +212,7 @@ public final class PBKDF2Function extends AbstractHashingFunction
     @Override
     public String toString()
     {
-        return getClass().getName() + Arrays.toString(new int[] { algorithm.getCode(), iterations, length });
+        return getClass().getName() + Arrays.toString(new int[]{algorithm.getCode(), iterations, length});
     }
 
     @Override

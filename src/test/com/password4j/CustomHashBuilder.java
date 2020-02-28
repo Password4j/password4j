@@ -14,22 +14,27 @@
  *  limitations under the License.
  *
  */
+
 package com.password4j;
 
-/**
- * This interface is intended as an incapsulation
- * of a particular cryptographic hash function.
- */
-public interface HashingFunction
+public class CustomHashBuilder extends HashBuilder<CustomHashBuilder>
 {
-    
-    Hash hash(String plain);
 
-    Hash hash(String plain,String salt);
+    public static final String SAME_RESULT = "i always produce this hash";
 
-    boolean check(String plain, String hashed);
+    CustomHashBuilder(String plain)
+    {
+        super(plain);
+    }
 
-    boolean check(String plain, String hashed, String salt);
+    public Hash withTest()
+    {
+        return new Hash(null, SAME_RESULT, null);
+    }
 
-    Hash update(String plain, String salt, HashingFunction hashingFunction);
+    @Override
+    public Hash withBCrypt()
+    {
+        return new Hash(null, SAME_RESULT, null);
+    }
 }

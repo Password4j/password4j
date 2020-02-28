@@ -103,6 +103,15 @@ public class AlgorithmFinder
         return new PBKDF2Function(algorithm, iterations, length);
     }
 
+    public static CompressedPBKDF2Function getCompressedPBKDF2Instance()
+    {
+        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Function.DEFAULT_ALGORITHM.name());
+        int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", PBKDF2Function.DEFAULT_ITERATIONS);
+        int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Function.DEFAULT_LENGTH);
+
+        return new CompressedPBKDF2Function(algorithm, iterations, length);
+    }
+
 
     public static BCryptFunction getBCryptInstance()
     {

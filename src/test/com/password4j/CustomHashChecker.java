@@ -14,22 +14,18 @@
  *  limitations under the License.
  *
  */
+
 package com.password4j;
 
-/**
- * This interface is intended as an incapsulation
- * of a particular cryptographic hash function.
- */
-public interface HashingFunction
+public class CustomHashChecker extends HashChecker<CustomHashChecker>
 {
-    
-    Hash hash(String plain);
+    CustomHashChecker(String hash, String plain)
+    {
+        super(hash, plain);
+    }
 
-    Hash hash(String plain,String salt);
-
-    boolean check(String plain, String hashed);
-
-    boolean check(String plain, String hashed, String salt);
-
-    Hash update(String plain, String salt, HashingFunction hashingFunction);
+    public boolean withTest()
+    {
+        return true;
+    }
 }

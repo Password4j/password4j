@@ -18,7 +18,7 @@ package com.password4j;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class HashBuilder
+public class HashBuilder<H extends HashBuilder<?>>
 {
     private String plain;
 
@@ -36,19 +36,19 @@ public class HashBuilder
         this.plain = plain;
     }
 
-    public HashBuilder addSalt(String salt)
+    public H addSalt(String salt)
     {
         this.salt = salt;
-        return this;
+        return (H) this;
     }
 
-    public HashBuilder addRandomSalt()
+    public H addRandomSalt()
     {
         this.salt = new String(SaltGenerator.generate());
-        return this;
+        return (H) this;
     }
 
-    public HashBuilder addRandomSalt(int length)
+    public H addRandomSalt(int length)
     {
         if (length <= 0)
         {
@@ -58,19 +58,19 @@ public class HashBuilder
         {
             this.salt = new String(SaltGenerator.generate(length));
         }
-        return this;
+        return (H) this;
     }
 
-    public HashBuilder addPepper()
+    public H addPepper()
     {
         this.pepper = PepperGenerator.get();
-        return this;
+        return (H) this;
     }
 
-    public HashBuilder addPepper(String pepper)
+    public H addPepper(String pepper)
     {
         this.pepper = pepper;
-        return this;
+        return (H) this;
     }
 
 
@@ -99,6 +99,11 @@ public class HashBuilder
     public Hash withPBKDF2()
     {
         return with(AlgorithmFinder.getPBKDF2Instance());
+    }
+
+    public Hash withCompressedPBKDF2()
+    {
+        return with(AlgorithmFinder.getCompressedPBKDF2Instance());
     }
 
     public Hash withBCrypt()

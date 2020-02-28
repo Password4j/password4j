@@ -31,7 +31,7 @@ public class PBKDF2StrategyTest
     public void testPBKDF2()
     {
         // GIVEN
-        HashingFunction strategy = new PBKDF2Function(PBKDF2Function.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
+        HashingFunction strategy = new CompressedPBKDF2Function(PBKDF2Function.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
         String password = "password";
         String salt = "abc";
 
@@ -48,7 +48,7 @@ public class PBKDF2StrategyTest
         for(PBKDF2Function.Algorithm alg : PBKDF2Function.Algorithm.values())
         {
             // GIVEN
-            HashingFunction strategy = new PBKDF2Function(alg.name(), 10_000, 256);
+            HashingFunction strategy = new CompressedPBKDF2Function(alg.name(), 10_000, 256);
             String password = "password";
             String salt = "abc";
 
@@ -110,7 +110,7 @@ public class PBKDF2StrategyTest
         String userSubmittedPassword = "password";
 
         // WHEN
-        HashingFunction strategy = PBKDF2Function.getInstanceFromHash(hashed);
+        HashingFunction strategy = CompressedPBKDF2Function.getInstanceFromHash(hashed);
 
         // THEN
         Assert.assertTrue(strategy.check(userSubmittedPassword, hashed));
@@ -138,7 +138,7 @@ public class PBKDF2StrategyTest
         String userSubmittedPassword = "password";
 
         // WHEN
-        HashingFunction strategy = new PBKDF2Function(PBKDF2Function.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
+        HashingFunction strategy = new CompressedPBKDF2Function(PBKDF2Function.Algorithm.PBKDF2WithHmacSHA256.name(), 10_000, 256);
 
         // THEN
         Assert.assertTrue(strategy.check(userSubmittedPassword, hashed));

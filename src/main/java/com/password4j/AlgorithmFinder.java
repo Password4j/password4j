@@ -16,21 +16,18 @@
  */
 package com.password4j;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
 import java.security.SecureRandom;
-import java.security.Security;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class AlgorithmFinder
 {
 
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(AlgorithmFinder.class);
 
     /**
      * Make sure to use /dev/urandom instead of /dev/random in your
@@ -38,8 +35,6 @@ public class AlgorithmFinder
      * <code>securerandom.source=file:/dev/urandom</code>
      */
     private static final SecureRandom SR_SOURCE;
-
-    private static final String[] PBKDF2_VARIANTS;
 
     static
     {
@@ -63,20 +58,6 @@ public class AlgorithmFinder
         }
         SR_SOURCE = sr;
 
-        List<String> result = new ArrayList<>();
-        for (Provider provider : Security.getProviders())
-        {
-            for (Provider.Service service : provider.getServices())
-            {
-                if ("SecretKeyFactory".equals(service.getType()) && service.getAlgorithm().startsWith("PBKDF2"))
-                {
-                    result.add(service.getAlgorithm());
-                }
-            }
-        }
-        PBKDF2_VARIANTS = result.toArray(new String[0]);
-
-
     }
 
     private AlgorithmFinder()
@@ -87,11 +68,6 @@ public class AlgorithmFinder
     public static SecureRandom getSecureRandom()
     {
         return SR_SOURCE;
-    }
-
-    public static String[] getPBKDF2Variants()
-    {
-        return PBKDF2_VARIANTS;
     }
 
     public static PBKDF2Function getPBKDF2Instance()

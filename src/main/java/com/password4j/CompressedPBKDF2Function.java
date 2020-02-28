@@ -65,7 +65,6 @@ public class CompressedPBKDF2Function extends PBKDF2Function
     public boolean check(String password, String hashed)
     {
         String salt = getSaltFromHash(hashed);
-
         Hash internalHas = hash(password, salt);
 
         return slowEquals(internalHas.getResult().getBytes(), hashed.getBytes());

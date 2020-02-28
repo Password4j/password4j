@@ -16,6 +16,7 @@
  */
 package com.password4j;
 
+import com.password4j.custom.CustomHashBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -72,7 +73,7 @@ public class PasswordTest
         String hashed = hash.getResult();
 
         // WHEN
-        BCryptFunction strategy = new BCryptFunction(12);
+        BCryptFunction strategy = new BCryptFunction(5);
 
         // THEN
         Assert.assertTrue(strategy.check(pepper + password, hashed));
@@ -112,6 +113,27 @@ public class PasswordTest
         // THEN
         Assert.assertEquals(CustomHashBuilder.SAME_RESULT, hash1.getResult());
         Assert.assertEquals(CustomHashBuilder.SAME_RESULT, hash2.getResult());
+
+    }
+
+    @Test
+    public void testMigration()
+    {
+        // GIVEN
+        String password = "password";
+        String salt = "salt";
+        String pepper = "pepper";
+        Hash oldHash = Password.hash(password).addPepper(pepper).addSalt(salt).withCompressedPBKDF2();
+
+        // WHEN
+        boolean oldCheck = Password.check(oldHash.getResult(), password).addPepper(pepper).withCompressedPBKDF2();
+        Hash newHash = Password.hash(password).addSalt(pepper).withSCrypt();
+        boolean newCheck = Password.check(newHash.getResult(), password).withSCrypt();
+
+
+        // THEN
+        Assert.assertTrue(oldCheck);
+        Assert.assertTrue(newCheck);
 
     }
 

@@ -21,16 +21,6 @@ public abstract class AbstractHashingFunction implements HashingFunction
 {
 
     @Override
-    public Hash update(String plain, String salt, HashingFunction hashingFunction)
-    {
-        if(plain == null || salt == null)
-        {
-            throw new BadParametersException("");
-        }
-        return hashingFunction.hash(plain, salt);
-    }
-
-    @Override
     public boolean check(String plain, String hashed, String salt)
     {
         return check(plain, hashed);

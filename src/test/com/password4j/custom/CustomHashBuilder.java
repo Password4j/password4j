@@ -15,17 +15,29 @@
  *
  */
 
-package com.password4j;
+package com.password4j.custom;
 
-public class CustomHashChecker extends HashChecker<CustomHashChecker>
+import com.password4j.Hash;
+import com.password4j.HashBuilder;
+
+public class CustomHashBuilder extends HashBuilder<CustomHashBuilder>
 {
-    CustomHashChecker(String hash, String plain)
+
+    public static final String SAME_RESULT = "i always produce this hash";
+
+    public CustomHashBuilder(String plain)
     {
-        super(hash, plain);
+        super(plain);
     }
 
-    public boolean withTest()
+    public Hash withTest()
     {
-        return true;
+        return new Hash(null, SAME_RESULT, null);
+    }
+
+    @Override
+    public Hash withBCrypt()
+    {
+        return new Hash(null, SAME_RESULT, null);
     }
 }

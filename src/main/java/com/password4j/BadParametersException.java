@@ -24,7 +24,7 @@ package com.password4j;
  * grouping them as one exception.
  *
  * @author David Bertoldi
- * @since 1.0.0
+ * @since 0.1.0
  */
 public class BadParametersException extends IllegalArgumentException
 {
@@ -35,7 +35,7 @@ public class BadParametersException extends IllegalArgumentException
      * Constructs the exception.
      *
      * @param message the message describing the cause of the exception
-     * @since 1.0.0
+     * @since 0.1.0
      */
     public BadParametersException(String message)
     {
@@ -47,7 +47,7 @@ public class BadParametersException extends IllegalArgumentException
      *
      * @param message   the message describing the cause of the exception
      * @param exception the exception masked by this object
-     * @since 1.0.0
+     * @since 0.1.0
      */
     public BadParametersException(String message, Throwable exception)
     {

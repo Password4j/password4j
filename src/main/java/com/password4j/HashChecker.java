@@ -29,7 +29,7 @@ public class HashChecker<C extends HashChecker<?>>
         //
     }
 
-    HashChecker(String hash, String plain)
+    public HashChecker(String hash, String plain)
     {
         this.hash = hash;
         this.plain = plain;

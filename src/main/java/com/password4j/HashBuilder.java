@@ -31,7 +31,7 @@ public class HashBuilder<H extends HashBuilder<?>>
         //
     }
 
-    HashBuilder(String plain)
+    public HashBuilder(String plain)
     {
         this.plain = plain;
     }

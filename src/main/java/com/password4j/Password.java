@@ -28,18 +28,18 @@ public class Password
     }
 
 
-    public static HashBuilder hash(String plain)
+    public static HashBuilder<?> hash(String plain)
     {
         return hash(plain, HashBuilder::new);
     }
 
-    public static HashChecker check(String hash, String plain)
+    public static HashChecker<?> check(String hash, String plain)
     {
         return check(hash, plain, HashChecker::new);
     }
 
 
-    public static <B extends HashBuilder> B hash(String plain, Function<String, B> builderFunction)
+    public static <B extends HashBuilder<?>> B hash(String plain, Function<String, B> builderFunction)
     {
         if (builderFunction == null)
         {
@@ -53,7 +53,7 @@ public class Password
     }
 
 
-    public static <C extends HashChecker> C check(String hash, String plain, BiFunction<String, String, C> checkerBiFunction)
+    public static <C extends HashChecker<?>> C check(String hash, String plain, BiFunction<String, String, C> checkerBiFunction)
     {
         if (checkerBiFunction == null)
         {

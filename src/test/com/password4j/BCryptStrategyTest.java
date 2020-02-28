@@ -16,8 +16,14 @@
  */
 package com.password4j;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,9 +31,6 @@ import org.junit.Test;
 
 public class BCryptStrategyTest
 {
-
-
-
 
     @Test(expected = BadParametersException.class)
     public void testBCryptBadParams()
@@ -41,9 +44,6 @@ public class BCryptStrategyTest
 
         // THEN
     }
-
-
-
 
     @Test
     public void testBCryptCoherence()
@@ -72,7 +72,6 @@ public class BCryptStrategyTest
         Assert.assertTrue(hash.check(password));
     }
 
-
     @Test
     public void testBCryptequality()
     {
@@ -83,21 +82,34 @@ public class BCryptStrategyTest
         BCryptFunction strategy4 = new BCryptFunction(15);
         BCryptFunction strategy5 = new BCryptFunction(8);
 
-
-
         // WHEN
-        Map<BCryptFunction, String> map =new HashMap<>();
+        Map<BCryptFunction, String> map = new HashMap<>();
         map.put(strategy1, strategy1.toString());
         map.put(strategy2, strategy2.toString());
         map.put(strategy3, strategy3.toString());
         map.put(strategy4, strategy4.toString());
         map.put(strategy5, strategy5.toString());
 
-
-
         // THEN
         Assert.assertEquals(3, map.size());
         Assert.assertEquals(strategy1, strategy2);
         Assert.assertEquals(strategy3, strategy4);
+    }
+
+    @Test
+    public void testLongPassword()
+    {
+        // GIVEN
+        String password1 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor";
+        String password2 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 7€Mp0R";
+        String salt = "$2a$10$bJ2SJm8Xyp8H9KLeyNE5EO";
+
+        // WHEN
+        Hash hash1 = new BCryptFunction().hash(password1, salt);
+        Hash hash2 = new BCryptFunction().hash(password2, salt);
+
+        // THEN
+        Assert.assertEquals(hash1, hash2);
+
     }
 }

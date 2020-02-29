@@ -6,4 +6,4 @@
 [![Pre-release](https://img.shields.io/github/v/tag/firaja/password4j?include_prereleases&label=pre-release)](https://img.shields.io/github/v/tag/firaja/password4j?include_prereleases&label=pre-release)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-![example code](https://i.imgur.com/x6vxV41.png)
+![example code](https://i.imgur.com/tvUDOnW.png)

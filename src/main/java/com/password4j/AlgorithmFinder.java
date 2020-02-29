@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.function.Function;
 
 
 public class AlgorithmFinder
@@ -72,20 +73,21 @@ public class AlgorithmFinder
 
     public static PBKDF2Function getPBKDF2Instance()
     {
-        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Function.DEFAULT_ALGORITHM.name());
-        int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", PBKDF2Function.DEFAULT_ITERATIONS);
-        int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Function.DEFAULT_LENGTH);
-
-        return new PBKDF2Function(algorithm, iterations, length);
+        return getPBKDF2Instance(a -> (i -> l -> (new PBKDF2Function(a, i, l))));
     }
 
     public static CompressedPBKDF2Function getCompressedPBKDF2Instance()
+    {
+        return getPBKDF2Instance(a -> (i -> l -> (new CompressedPBKDF2Function(a, i, l))));
+    }
+
+    private static <T extends PBKDF2Function> T getPBKDF2Instance(Function<String, Function<Integer, Function<Integer, T>>> f)
     {
         String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Function.DEFAULT_ALGORITHM.name());
         int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", PBKDF2Function.DEFAULT_ITERATIONS);
         int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Function.DEFAULT_LENGTH);
 
-        return new CompressedPBKDF2Function(algorithm, iterations, length);
+        return f.apply(algorithm).apply(iterations).apply(length);
     }
 
 

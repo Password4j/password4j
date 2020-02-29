@@ -23,6 +23,10 @@ import java.util.Base64;
 public class CompressedPBKDF2Function extends PBKDF2Function
 {
 
+    CompressedPBKDF2Function()
+    {
+        super();
+    }
 
 
     public CompressedPBKDF2Function(Algorithm fromCode, int iterations, int length)

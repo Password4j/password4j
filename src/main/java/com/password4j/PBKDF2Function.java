@@ -41,14 +41,13 @@ public class PBKDF2Function extends AbstractHashingFunction
 
 
 
-    public PBKDF2Function()
+    PBKDF2Function()
     {
         //
     }
 
     public PBKDF2Function(int iterations, int length)
     {
-        this();
         this.iterations = iterations;
         this.length = length;
     }
@@ -220,4 +219,6 @@ public class PBKDF2Function extends AbstractHashingFunction
     {
         return toString().hashCode();
     }
+
+
 }

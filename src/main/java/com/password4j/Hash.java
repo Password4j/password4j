@@ -221,6 +221,11 @@ public class Hash
         }
 
         Hash otherHash = (Hash) obj;
+        return hasSameValues(otherHash);
+    }
+
+    private boolean hasSameValues(Hash otherHash)
+    {
         return this.result.equals(otherHash.result) //
                 && this.salt.equals(otherHash.salt) //
                 && this.pepper.equals(otherHash.pepper) //

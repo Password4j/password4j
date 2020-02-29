@@ -16,12 +16,13 @@
  */
 package com.password4j;
 
-import com.lambdaworks.crypto.SCrypt;
-import com.lambdaworks.crypto.SCryptUtil;
-
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Objects;
+
+import com.lambdaworks.crypto.SCrypt;
+import com.lambdaworks.crypto.SCryptUtil;
 
 
 public class SCryptFunction extends AbstractHashingFunction
@@ -45,7 +46,6 @@ public class SCryptFunction extends AbstractHashingFunction
 
     public SCryptFunction(int resources, int workFactor, int parallelization)
     {
-        this();
         this.resources = resources;
         this.workFactor = workFactor;
         this.parallelization = parallelization;
@@ -54,12 +54,16 @@ public class SCryptFunction extends AbstractHashingFunction
     public static SCryptFunction getInstanceFromHash(String hashed)
     {
         String[] parts = hashed.split("\\$");
-        long params = Long.parseLong(parts[2], 16);
-        int workFactor = (int)Math.pow(2.0D, (double)(params >> 16 & 65535L));
-        int resources = (int)params >> 8 & 255;
-        int parallelization = (int)params & 255;
+        if (parts.length == 5)
+        {
+            long params = Long.parseLong(parts[2], 16);
+            int workFactor = (int) Math.pow(2.0D, (double) (params >> 16 & 65535L));
+            int resources = (int) params >> 8 & 255;
+            int parallelization = (int) params & 255;
 
-        return new SCryptFunction(resources, workFactor, parallelization);
+            return new SCryptFunction(resources, workFactor, parallelization);
+        }
+        throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }
 
     @Override
@@ -101,8 +105,6 @@ public class SCryptFunction extends AbstractHashingFunction
         return 128L * workFactor * resources * parallelization;
     }
 
-
-
     @Override
     public boolean equals(Object obj)
     {
@@ -126,7 +128,7 @@ public class SCryptFunction extends AbstractHashingFunction
     @Override
     public int hashCode()
     {
-        return toString().hashCode();
+        return Objects.hash(resources, workFactor, parallelization);
     }
 
     private static int log2(int n)

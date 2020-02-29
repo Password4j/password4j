@@ -137,6 +137,36 @@ public class PasswordTest
 
     }
 
+    @Test(expected = BadParametersException.class)
+    public void testBad1()
+    {
+        Password.hash(null);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBad2()
+    {
+        Password.hash("password", null);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBad3()
+    {
+        Password.check(null, null);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBad4()
+    {
+        Password.check("hash", null);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBad5()
+    {
+        Password.check("hash", "password", null);
+    }
+
 
 
 

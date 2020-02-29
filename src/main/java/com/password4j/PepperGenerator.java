@@ -24,6 +24,10 @@ public class PepperGenerator
 
     public static String generate(int length)
     {
+        if(length < 0)
+        {
+            throw new BadParametersException("Pepper length cannot be negative");
+        }
         return RandomStringUtils.random(length, 32, 126, false, false, null, AlgorithmFinder.getSecureRandom());
     }
 
@@ -35,15 +39,6 @@ public class PepperGenerator
     public static String get()
     {
         return PropertyReader.readString("global.pepper", null);
-    }
-
-    public static String get(String context)
-    {
-        if (context == null)
-        {
-            return get();
-        }
-        return PropertyReader.readString(context + ".pepper", null);
     }
 
 }

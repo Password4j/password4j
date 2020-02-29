@@ -23,7 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
-public class PBKDF2StrategyTest
+public class PBKDF2FunctionTest
 {
 
 

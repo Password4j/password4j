@@ -16,20 +16,14 @@
  */
 package com.password4j;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 
-public class BCryptStrategyTest
+public class BCryptFunctionTest
 {
 
     @Test(expected = BadParametersException.class)

@@ -16,13 +16,64 @@
  */
 package com.password4j;
 
+import org.junit.Assert;
 import org.junit.Test;
+
 
 public class PropertyReaderTest
 {
     @Test
-    public void test()
+    public void testInt()
     {
-        //
+        // GIVEN
+        String key = "test.int";
+
+        // WHEN
+        int ten = PropertyReader.readInt(key, -4);
+        int minusNine = PropertyReader.readInt(key + "abc", -9);
+
+        // THEN
+        Assert.assertEquals(10, ten);
+        Assert.assertEquals(-9, minusNine);
+    }
+
+    @Test
+    public void testBool()
+    {
+        // GIVEN
+        String key = "test.bool";
+
+        // WHEN
+        boolean bool1 = PropertyReader.readBoolean(key, false);
+        boolean bool2 = PropertyReader.readBoolean(key + "abc", true);
+
+        // THEN
+        Assert.assertTrue(bool1);
+        Assert.assertTrue(bool2);
+    }
+
+    @Test
+    public void testString()
+    {
+        // GIVEN
+        String key = "test.string";
+
+        // WHEN
+        String testString = PropertyReader.readString(key, "default string");
+        String defaultValue = PropertyReader.readString(key + "abc", "default string");
+
+        // THEN
+        Assert.assertEquals("This is a string", testString);
+        Assert.assertEquals("default string", defaultValue);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testNull()
+    {
+        // GIVEN
+        String key = "test.string";
+
+        // WHEN
+        String testString = PropertyReader.readString(null, "null");
     }
 }

@@ -14,6 +14,7 @@
  *  limitations under the License.
  *
  */
+
 package com.password4j;
 
 import java.security.SecureRandom;
@@ -22,8 +23,17 @@ import java.security.SecureRandom;
 public class SaltGenerator
 {
 
+    private SaltGenerator()
+    {
+        //
+    }
+
     public static byte[] generate(int length)
     {
+        if(length < 0)
+        {
+            throw new BadParametersException("Salt length cannot be negative");
+        }
         byte[] salt = new byte[length];
         SecureRandom sr = AlgorithmFinder.getSecureRandom();
         sr.nextBytes(salt);

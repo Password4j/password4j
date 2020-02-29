@@ -112,4 +112,24 @@ public class BCryptStrategyTest
         Assert.assertEquals(hash1, hash2);
 
     }
+
+    @Test
+    public void testEquality()
+    {
+        // GIVEN
+        int rounds = 8;
+        BCryptFunction bcrypt = new BCryptFunction(rounds);
+
+        // THEN
+        boolean eqNull = bcrypt.equals(null);
+        boolean eqClass = bcrypt.equals(new SCryptFunction());
+        boolean difInst = bcrypt.equals(new BCryptFunction(10));
+        boolean sameInst = bcrypt.equals(new BCryptFunction(rounds));
+
+        // END
+        Assert.assertFalse(eqNull);
+        Assert.assertFalse(eqClass);
+        Assert.assertFalse(difInst);
+        Assert.assertTrue(sameInst);
+    }
 }

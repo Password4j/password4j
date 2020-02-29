@@ -69,6 +69,11 @@ class PropertyReader
 
     public static String readString(String key, String defaultValue)
     {
+        if(key == null)
+        {
+            throw new BadParametersException("Key cannot be null");
+        }
+
         String value = PROPERTIES.getProperty(key);
         if (value == null)
         {

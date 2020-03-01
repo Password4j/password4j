@@ -197,7 +197,7 @@ public class PBKDF2Function extends AbstractHashingFunction
     @Override
     public boolean equals(Object obj)
     {
-        if (obj == null || !this.getClass().equals(obj.getClass()))
+        if (obj == null || !getClass().equals(obj.getClass()))
         {
             return false;
         }

@@ -18,6 +18,17 @@ public class SCryptFunctionTest
 
     }
 
+    @Test(expected = BadParametersException.class)
+    public void testNullPassword()
+    {
+        // GIVEN
+        SCryptFunction scrypt = new SCryptFunction(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+
+        // WHEN
+        scrypt.hash("password", "salt");
+
+    }
+
     @Test
     public void testEquality()
     {
@@ -38,6 +49,18 @@ public class SCryptFunctionTest
         Assert.assertFalse(eqClass);
         Assert.assertFalse(difInst);
         Assert.assertTrue(sameInst);
+    }
+
+    @Test
+    public void testResources()
+    {
+        // GIVEN
+
+        // WHEN
+        SCryptFunction scrypt = new SCryptFunction(3, 5, 7);
+
+        // THEN
+        Assert.assertEquals(13_440, scrypt.getRequiredBytes());
     }
 
 }

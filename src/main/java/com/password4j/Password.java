@@ -28,12 +28,12 @@ public class Password
     }
 
 
-    public static HashBuilder<?> hash(String plain)
+    public static HashBuilder hash(String plain)
     {
         return hash(plain, HashBuilder::new);
     }
 
-    public static HashChecker<?> check(String hash, String plain)
+    public static HashChecker check(String hash, String plain)
     {
         return check(hash, plain, HashChecker::new);
     }

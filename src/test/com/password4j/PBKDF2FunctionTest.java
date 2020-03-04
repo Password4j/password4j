@@ -102,6 +102,19 @@ public class PBKDF2FunctionTest
         // THEN
     }
 
+    @Test(expected = UnsupportedOperationException.class)
+    public void testPBKDF2WrongCheck()
+    {
+        // GIVEN
+        HashingFunction strategy = AlgorithmFinder.getPBKDF2Instance();
+        String password = "password";
+        String salt = "salt";
+        Hash hash = strategy.hash(password, salt);
+
+        // WHEN
+        strategy.check(password, hash.getResult());
+    }
+
     @Test
     public void testPBKDF2Check()
     {
@@ -114,6 +127,28 @@ public class PBKDF2FunctionTest
 
         // THEN
         Assert.assertTrue(strategy.check(userSubmittedPassword, hashed));
+    }
+
+    @Test
+    public void testAlgorithmFromCode()
+    {
+        // GIVEN
+
+        // WHEN
+        PBKDF2Function.Algorithm algNull = PBKDF2Function.Algorithm.fromCode(-100);
+        for(PBKDF2Function.Algorithm enumAlg : PBKDF2Function.Algorithm.values())
+        {
+            PBKDF2Function.Algorithm alg = PBKDF2Function.Algorithm.fromCode(enumAlg.getCode());
+
+
+            // THEN
+            Assert.assertNotNull(alg);
+            Assert.assertEquals(enumAlg.getCode(), alg.getCode());
+            Assert.assertEquals(enumAlg.getBits(), alg.getBits());
+        }
+        Assert.assertNull(algNull);
+
+
     }
 
     @Test

@@ -67,4 +67,27 @@ public class HashTest
         Assert.assertFalse(eq6);
     }
 
+    @Test
+    public void testSecFunc()
+    {
+        // GIVEN
+        Hash hash1 = Password.hash("myPassword").withCompressedPBKDF2();
+        Hash hash2 = Password.hash("myPassword").withPBKDF2();
+        Hash hash3 = Password.hash("myPassword").addPepper().withPBKDF2();
+
+        // WHEN
+        String toString1 = hash1.toString();
+        int hc1 = hash1.hashCode();
+        String toString2 = hash2.toString();
+        int hc2 = hash2.hashCode();
+        String toString3 = hash3.toString();
+
+        // THEN
+        Assert.assertNotNull(toString1);
+        Assert.assertNotNull(toString2);
+        Assert.assertNotEquals(toString1, toString2);
+        Assert.assertNotEquals(toString3, toString2);
+        Assert.assertNotEquals(hc1, hc2);
+    }
+
 }

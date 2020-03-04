@@ -21,7 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
 import java.security.SecureRandom;
+import java.security.Security;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 
@@ -103,6 +107,22 @@ public class AlgorithmFinder
         int resources = PropertyReader.readInt("hash.scrypt.resources", SCryptFunction.DEFAULT_RES);
         int parallelization = PropertyReader.readInt("hash.scrypt.parallelization", SCryptFunction.DEFAULT_PARALLELIZATION);
         return new SCryptFunction(workFactor, resources, parallelization);
+    }
+
+    public static List<String> getAllPBKDF2Variants()
+    {
+        List<String> result = new ArrayList<>();
+        for (Provider provider : Security.getProviders())
+        {
+            for (Provider.Service service : provider.getServices())
+            {
+                if ("SecretKeyFactory".equals(service.getType()) && service.getAlgorithm().startsWith("PBKDF2"))
+                {
+                    result.add(service.getAlgorithm());
+                }
+            }
+        }
+        return result;
     }
 
 

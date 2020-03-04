@@ -30,13 +30,17 @@ class PropertyReader
         InputStream in = PropertyReader.class.getResourceAsStream("/psw4j.properties");
         Properties props = new Properties();
 
-        try
+
+        if (in != null)
         {
-            props.load(in);
-        }
-        catch (IOException e)
-        {
-            //
+            try
+            {
+                props.load(in);
+            }
+            catch (IOException e)
+            {
+                //
+            }
         }
 
         PROPERTIES = props;
@@ -69,7 +73,7 @@ class PropertyReader
 
     public static String readString(String key, String defaultValue)
     {
-        if(key == null)
+        if (key == null)
         {
             throw new BadParametersException("Key cannot be null");
         }

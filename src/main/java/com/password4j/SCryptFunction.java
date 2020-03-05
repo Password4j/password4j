@@ -18,7 +18,6 @@ package com.password4j;
 
 import com.lambdaworks.crypto.SCrypt;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
@@ -118,10 +117,10 @@ public class SCryptFunction extends AbstractHashingFunction
                 long params = Long.parseLong(parts[2], 16);
                 byte[] salt = com.lambdaworks.codec.Base64.decode(parts[3].toCharArray());
                 byte[] derived0 = com.lambdaworks.codec.Base64.decode(parts[4].toCharArray());
-                int N = (int) Math.pow(2.0D, (double) (params >> 16 & 65535L));
+                int n = (int) Math.pow(2.0D, (double) (params >> 16 & 65535L));
                 int r = (int) params >> 8 & 255;
                 int p = (int) params & 255;
-                byte[] derived1 = SCrypt.scrypt(plain.getBytes(StandardCharsets.UTF_8), salt, N, r, p, 64);
+                byte[] derived1 = SCrypt.scrypt(plain.getBytes(StandardCharsets.UTF_8), salt, n, r, p, 64);
                 if (derived0.length != derived1.length)
                 {
                     return false;

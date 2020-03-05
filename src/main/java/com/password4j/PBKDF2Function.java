@@ -113,7 +113,6 @@ public class PBKDF2Function extends AbstractHashingFunction
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm.name());
         PBEKeySpec spec = new PBEKeySpec(plain.toCharArray(), salt.getBytes(), iterations, length);
         return secretKeyFactory.generateSecret(spec);
-
     }
 
     protected String getHash(SecretKey key, String salt)

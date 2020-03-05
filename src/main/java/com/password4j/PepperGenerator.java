@@ -22,6 +22,11 @@ import org.apache.commons.lang3.RandomStringUtils;
 public class PepperGenerator
 {
 
+    private PepperGenerator()
+    {
+        //
+    }
+
     public static String generate(int length)
     {
         if(length < 0)

@@ -16,26 +16,41 @@
  */
 package com.password4j;
 
-import java.util.Arrays;
-
 import org.mindrot.jbcrypt.BCrypt;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 public class BCryptFunction extends AbstractHashingFunction
 {
-    public static final int DEFAULT_ROUNDS = 10;
+    private int logRounds;
 
-    private int logRounds = DEFAULT_ROUNDS;
+    private static ConcurrentMap<Integer, BCryptFunction> instances = new ConcurrentHashMap<>();
 
-    public BCryptFunction()
+    private BCryptFunction()
     {
-
+        //
     }
 
     public BCryptFunction(int logRounds)
     {
         this();
         this.logRounds = logRounds;
+    }
+
+    public static BCryptFunction getInstance(int logRounds)
+    {
+        if (instances.containsKey(logRounds))
+        {
+            return instances.get(logRounds);
+        }
+        else
+        {
+            BCryptFunction function = new BCryptFunction(logRounds);
+            instances.put(logRounds, function);
+            return function;
+        }
     }
 
     @Override
@@ -87,7 +102,7 @@ public class BCryptFunction extends AbstractHashingFunction
     @Override
     public String toString()
     {
-        return getClass().getName() + Arrays.toString(new int[] { logRounds });
+        return getClass().getName() + '[' + this.logRounds + ']';
     }
 
     @Override

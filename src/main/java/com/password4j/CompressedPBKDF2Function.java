@@ -19,25 +19,25 @@ package com.password4j;
 
 import javax.crypto.SecretKey;
 import java.util.Base64;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CompressedPBKDF2Function extends PBKDF2Function
 {
 
-    CompressedPBKDF2Function()
+    private static Map<String, CompressedPBKDF2Function> instances = new ConcurrentHashMap<>();
+
+    protected CompressedPBKDF2Function()
     {
         super();
     }
 
 
-    public CompressedPBKDF2Function(Algorithm fromCode, int iterations, int length)
+    protected CompressedPBKDF2Function(Algorithm fromCode, int iterations, int length)
     {
         super(fromCode, iterations, length);
     }
 
-    public CompressedPBKDF2Function(String algorithm, int iterations, int length)
-    {
-        super(algorithm, iterations, length);
-    }
 
     public static CompressedPBKDF2Function getInstanceFromHash(String hashed)
     {
@@ -50,7 +50,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
             int iterations = (int) (configuration >> 32);
             int length = (int) configuration;
 
-            return new CompressedPBKDF2Function(Algorithm.fromCode(algorithm), iterations, length);
+            return CompressedPBKDF2Function.getInstance(Algorithm.fromCode(algorithm), iterations, length);
         }
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }
@@ -62,7 +62,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         String params = Long.toString((((long) getIterations()) << 32) | (getLength() & 0xffffffffL));
         String salt64 = Base64.getEncoder().encodeToString(salt.getBytes());
         String hash64 = super.getHash(key, salt);
-        return "$" + getAlgorithm().getCode() + "$" + params + "$" + salt64 + "$" + hash64;
+        return "$" + getAlgorithm().code() + "$" + params + "$" + salt64 + "$" + hash64;
     }
 
     @Override
@@ -90,5 +90,32 @@ public class CompressedPBKDF2Function extends PBKDF2Function
             return new String(Base64.getDecoder().decode(parts[3].getBytes()));
         }
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
+    }
+
+    public static CompressedPBKDF2Function getInstance(Algorithm algorithm, int iterations, int length)
+    {
+        String key = getUID(algorithm, iterations, length);
+        if (instances.containsKey(key))
+        {
+            return instances.get(key);
+        }
+        else
+        {
+            CompressedPBKDF2Function function = new CompressedPBKDF2Function(algorithm, iterations, length);
+            instances.put(key, function);
+            return function;
+        }
+    }
+
+    public static CompressedPBKDF2Function getInstance(String algorithm, int iterations, int length)
+    {
+        try
+        {
+            return getInstance(Algorithm.valueOf(algorithm), iterations, length);
+        }
+        catch (IllegalArgumentException iae)
+        {
+            throw new UnsupportedOperationException("Algorithm `" + algorithm + "` is not recognized.", iae);
+        }
     }
 }

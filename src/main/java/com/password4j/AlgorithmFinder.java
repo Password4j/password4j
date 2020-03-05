@@ -77,36 +77,35 @@ public class AlgorithmFinder
 
     public static PBKDF2Function getPBKDF2Instance()
     {
-        return getPBKDF2Instance(a -> (i -> l -> (new PBKDF2Function(a, i, l))));
+        return getPBKDF2Instance(a -> (i -> l -> (PBKDF2Function.getInstance(a, i, l))));
     }
 
     public static CompressedPBKDF2Function getCompressedPBKDF2Instance()
     {
-        return getPBKDF2Instance(a -> (i -> l -> (new CompressedPBKDF2Function(a, i, l))));
+        return getPBKDF2Instance(a -> (i -> l -> (CompressedPBKDF2Function.getInstance(a, i, l))));
     }
 
     private static <T extends PBKDF2Function> T getPBKDF2Instance(Function<String, Function<Integer, Function<Integer, T>>> f)
     {
-        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Function.DEFAULT_ALGORITHM.name());
-        int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", PBKDF2Function.DEFAULT_ITERATIONS);
-        int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Function.DEFAULT_LENGTH);
-
+        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Function.Algorithm.PBKDF2WithHmacSHA512.name());
+        int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", 64_000);
+        int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Function.Algorithm.PBKDF2WithHmacSHA512.bits());
         return f.apply(algorithm).apply(iterations).apply(length);
     }
 
 
     public static BCryptFunction getBCryptInstance()
     {
-        int rounds = PropertyReader.readInt("hash.bcrypt.rounds", BCryptFunction.DEFAULT_ROUNDS);
-        return new BCryptFunction(rounds);
+        int rounds = PropertyReader.readInt("hash.bcrypt.rounds", 10);
+        return BCryptFunction.getInstance(rounds);
     }
 
     public static SCryptFunction getSCryptInstance()
     {
-        int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", SCryptFunction.DEFAULT_WORKFACTOR);
-        int resources = PropertyReader.readInt("hash.scrypt.resources", SCryptFunction.DEFAULT_RES);
-        int parallelization = PropertyReader.readInt("hash.scrypt.parallelization", SCryptFunction.DEFAULT_PARALLELIZATION);
-        return new SCryptFunction(workFactor, resources, parallelization);
+        int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", 32_768);
+        int resources = PropertyReader.readInt("hash.scrypt.resources", 8);
+        int parallelization = PropertyReader.readInt("hash.scrypt.parallelization", 1);
+        return SCryptFunction.getInstance(workFactor, resources, parallelization);
     }
 
     public static List<String> getAllPBKDF2Variants()

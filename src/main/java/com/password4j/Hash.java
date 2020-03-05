@@ -16,9 +16,9 @@
  */
 package com.password4j;
 
-import java.util.Objects;
-
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Objects;
 
 
 /**

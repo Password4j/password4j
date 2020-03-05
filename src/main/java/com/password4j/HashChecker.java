@@ -63,13 +63,13 @@ public class HashChecker<C extends HashChecker<?>>
 
     public boolean withSCrypt()
     {
-        SCryptFunction scrypt = SCryptFunction.getInstanceFromHash(hash);
+        SCryptFunction scrypt = AlgorithmFinder.getSCryptInstance();
         return with(scrypt);
     }
 
     public boolean withBCrypt()
     {
-        return with(new BCryptFunction());
+        return with(AlgorithmFinder.getBCryptInstance());
     }
 
 

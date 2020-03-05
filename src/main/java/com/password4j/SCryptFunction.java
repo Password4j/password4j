@@ -16,35 +16,34 @@
  */
 package com.password4j;
 
+import com.lambdaworks.crypto.SCrypt;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
-
-import com.lambdaworks.crypto.SCrypt;
-import com.lambdaworks.crypto.SCryptUtil;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 public class SCryptFunction extends AbstractHashingFunction
 {
-    public static final int DEFAULT_RES = 8;
 
-    public static final int DEFAULT_WORKFACTOR = 2 << 14;
+    private int resources; // r
 
-    public static final int DEFAULT_PARALLELIZATION = 1;
+    private int workFactor; // N
 
-    private int resources = DEFAULT_RES; // r
+    private int parallelization; // p
 
-    private int workFactor = DEFAULT_WORKFACTOR; // N
+    private static ConcurrentMap<String, SCryptFunction> instances = new ConcurrentHashMap<>();
 
-    private int parallelization = DEFAULT_PARALLELIZATION; // p
-
-    public SCryptFunction()
+    private SCryptFunction()
     {
         //
     }
 
-    public SCryptFunction(int resources, int workFactor, int parallelization)
+    protected SCryptFunction(int resources, int workFactor, int parallelization)
     {
         this.resources = resources;
         this.workFactor = workFactor;
@@ -61,9 +60,24 @@ public class SCryptFunction extends AbstractHashingFunction
             int resources = (int) params >> 8 & 255;
             int parallelization = (int) params & 255;
 
-            return new SCryptFunction(resources, workFactor, parallelization);
+            return SCryptFunction.getInstance(resources, workFactor, parallelization);
         }
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
+    }
+
+    public static SCryptFunction getInstance(int resources, int workFactor, int parallelization)
+    {
+        String key = getUID(resources, workFactor, parallelization);
+        if (instances.containsKey(key))
+        {
+            return instances.get(key);
+        }
+        else
+        {
+            SCryptFunction function = new SCryptFunction(resources, workFactor, parallelization);
+            instances.put(key, function);
+            return function;
+        }
     }
 
     @Override
@@ -78,14 +92,13 @@ public class SCryptFunction extends AbstractHashingFunction
     {
         try
         {
-            byte[] saltAsBytes = salt.getBytes();
-            byte[] derived = SCrypt.scrypt(plain.getBytes(), saltAsBytes, workFactor, resources, parallelization, 32);
-            String params = Long.toString((long) (log2(workFactor) << 16 | resources << 8 | parallelization), 16);
-            StringBuilder sb = new StringBuilder((saltAsBytes.length + derived.length) * 2);
-            sb.append("$s0$").append(params).append('$');
-            sb.append(Base64.getEncoder().encodeToString(saltAsBytes)).append('$');
-            sb.append(Base64.getEncoder().encodeToString(derived));
-            return new Hash(this, sb.toString(), salt);
+            byte[] saltAsBytes = salt.getBytes(StandardCharsets.UTF_8);
+            byte[] derived = SCrypt.scrypt(plain.getBytes(StandardCharsets.UTF_8), saltAsBytes, workFactor, resources, parallelization, 64);
+            String params = Long.toString(log2(workFactor) << 16 | resources << 8 | parallelization, 16);
+            String sb = "$s0$" + params + '$' +
+                    Base64.getEncoder().encodeToString(saltAsBytes) + '$' +
+                    Base64.getEncoder().encodeToString(derived);
+            return new Hash(this, sb, salt);
         }
         catch (IllegalArgumentException | GeneralSecurityException e)
         {
@@ -97,7 +110,43 @@ public class SCryptFunction extends AbstractHashingFunction
     @Override
     public boolean check(String plain, String hashed)
     {
-        return SCryptUtil.check(plain, hashed);
+        try
+        {
+            String[] parts = hashed.split("\\$");
+            if (parts.length == 5 && parts[1].equals("s0"))
+            {
+                long params = Long.parseLong(parts[2], 16);
+                byte[] salt = com.lambdaworks.codec.Base64.decode(parts[3].toCharArray());
+                byte[] derived0 = com.lambdaworks.codec.Base64.decode(parts[4].toCharArray());
+                int N = (int) Math.pow(2.0D, (double) (params >> 16 & 65535L));
+                int r = (int) params >> 8 & 255;
+                int p = (int) params & 255;
+                byte[] derived1 = SCrypt.scrypt(plain.getBytes(StandardCharsets.UTF_8), salt, N, r, p, 64);
+                if (derived0.length != derived1.length)
+                {
+                    return false;
+                }
+                else
+                {
+                    int result = 0;
+
+                    for (int i = 0; i < derived0.length; ++i)
+                    {
+                        result |= derived0[i] ^ derived1[i];
+                    }
+
+                    return result == 0;
+                }
+            }
+            else
+            {
+                throw new BadParametersException("Invalid hashed value");
+            }
+        }
+        catch (GeneralSecurityException var14)
+        {
+            throw new IllegalStateException("JVM doesn't support SHA1PRNG or HMAC_SHA256?");
+        }
     }
 
     public long getRequiredBytes()
@@ -122,13 +171,18 @@ public class SCryptFunction extends AbstractHashingFunction
     @Override
     public String toString()
     {
-        return getClass().getName() + Arrays.toString(new int[] { workFactor, resources, parallelization });
+        return getClass().getName() + '[' + getUID(this.resources, this.workFactor, this.parallelization) + ']';
     }
 
     @Override
     public int hashCode()
     {
         return Objects.hash(resources, workFactor, parallelization);
+    }
+
+    protected static String getUID(int resources, int workFactor, int parallelization)
+    {
+        return String.valueOf(resources + '|' + workFactor + '|' + parallelization);
     }
 
     private static int log2(int n)

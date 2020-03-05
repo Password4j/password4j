@@ -46,7 +46,7 @@ public class BCryptFunctionTest
         String password = "password";
 
         // WHEN
-        Hash hash = new BCryptFunction().hash(password);
+        Hash hash = new BCryptFunction(10).hash(password);
 
         // THEN
         Assert.assertTrue(hash.check(password));
@@ -70,8 +70,8 @@ public class BCryptFunctionTest
     public void testBCryptequality()
     {
         // GIVEN
-        BCryptFunction strategy1 = new BCryptFunction();
-        BCryptFunction strategy2 = new BCryptFunction();
+        BCryptFunction strategy1 = new BCryptFunction(10);
+        BCryptFunction strategy2 = new BCryptFunction(10);
         BCryptFunction strategy3 = new BCryptFunction(15);
         BCryptFunction strategy4 = new BCryptFunction(15);
         BCryptFunction strategy5 = new BCryptFunction(8);
@@ -99,8 +99,8 @@ public class BCryptFunctionTest
         String salt = "$2a$10$bJ2SJm8Xyp8H9KLeyNE5EO";
 
         // WHEN
-        Hash hash1 = new BCryptFunction().hash(password1, salt);
-        Hash hash2 = new BCryptFunction().hash(password2, salt);
+        Hash hash1 = new BCryptFunction(10).hash(password1, salt);
+        Hash hash2 = new BCryptFunction(10).hash(password2, salt);
 
         // THEN
         Assert.assertEquals(hash1, hash2);
@@ -116,7 +116,7 @@ public class BCryptFunctionTest
 
         // THEN
         boolean eqNull = bcrypt.equals(null);
-        boolean eqClass = bcrypt.equals(new SCryptFunction());
+        boolean eqClass = bcrypt.equals(new BCryptFunction(10));
         boolean difInst = bcrypt.equals(new BCryptFunction(10));
         boolean sameInst = bcrypt.equals(new BCryptFunction(rounds));
 

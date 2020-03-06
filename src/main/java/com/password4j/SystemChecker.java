@@ -21,17 +21,16 @@ import java.util.List;
 
 public class SystemChecker
 {
-
-    private SystemChecker()
-    {
-        //
-    }
-
     private static final String TO_BE_HASHED = "abcDEF123@~# xyz+-*/=456spqr";
 
     private static final String SALT = new String(SaltGenerator.generate());
 
     private static final int WARMUP_ROUNDS = 20;
+
+    private SystemChecker()
+    {
+        //
+    }
 
 
     public static boolean isPBKDF2Supported(PBKDF2Function.Algorithm algorithm)

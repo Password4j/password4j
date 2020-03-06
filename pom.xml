@@ -12,7 +12,7 @@
 
     <name>Password4j</name>
     <description>
-        Password4j is a facade used for hashing and checking passwords
+        Password4j is a Java facade for hashing and checking passwords
         with different Crypto Hashing Functions (CHF).
     </description>
     <url>https://password4j.com/</url>

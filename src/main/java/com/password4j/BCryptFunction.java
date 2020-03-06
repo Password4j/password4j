@@ -26,6 +26,8 @@ import java.util.concurrent.ConcurrentMap;
 public class BCryptFunction extends AbstractHashingFunction
 {
 
+    private static ConcurrentMap<Integer, BCryptFunction> instances = new ConcurrentHashMap<>();
+
     private static final int BCRYPT_SALT_LEN = 16;
 
     private static final int BLOWFISH_NUM_ROUNDS = 16;
@@ -164,13 +166,11 @@ public class BCryptFunction extends AbstractHashingFunction
             27, -1, -1, -1, -1, -1, -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
             50, 51, 52, 53, -1, -1, -1, -1, -1 };
 
-    private int[] P;
+    private int[] pArray;
 
-    private int[] S;
+    private int[] sBox;
 
     private int logRounds;
-
-    private static ConcurrentMap<Integer, BCryptFunction> instances = new ConcurrentHashMap<>();
 
     private BCryptFunction()
     {
@@ -200,7 +200,7 @@ public class BCryptFunction extends AbstractHashingFunction
     @Override
     public Hash hash(String plain)
     {
-        String salt = gensalt(logRounds);
+        String salt = genSalt(logRounds);
         return hash(plain, salt);
     }
 
@@ -213,14 +213,14 @@ public class BCryptFunction extends AbstractHashingFunction
     @Override
     public boolean check(String password, String hashed)
     {
-        return checkpw(password, hashed);
+        return checkPw(password, hashed);
     }
 
     private Hash internalHash(String plain, String salt)
     {
         try
         {
-            String hash = hashpw(plain, salt);
+            String hash = hashPw(plain, salt);
             return new Hash(this, hash, salt);
         }
         catch (IllegalArgumentException iae)
@@ -255,7 +255,7 @@ public class BCryptFunction extends AbstractHashingFunction
         return toString().hashCode();
     }
 
-    static void encodeBase64(byte d[], int len, StringBuilder rs) throws IllegalArgumentException
+    private static void encodeBase64(byte[] d, int len, StringBuilder rs) throws IllegalArgumentException
     {
         int off = 0;
         int c1;
@@ -299,7 +299,7 @@ public class BCryptFunction extends AbstractHashingFunction
         return INDEX_64[(int) x];
     }
 
-    static byte[] decodeBase64(String s, int maxolen) throws IllegalArgumentException
+    private static byte[] decodeBase64(String s, int maxolen) throws IllegalArgumentException
     {
         StringBuilder rs = new StringBuilder();
         int off = 0;
@@ -313,7 +313,7 @@ public class BCryptFunction extends AbstractHashingFunction
         byte o;
 
         if (maxolen <= 0)
-            throw new IllegalArgumentException("Invalid maxolen");
+            throw new BadParametersException("Invalid maxolen");
 
         while (off < slen - 1 && olen < maxolen)
         {
@@ -354,27 +354,26 @@ public class BCryptFunction extends AbstractHashingFunction
         int l = lr[off];
         int r = lr[off + 1];
 
-        l ^= P[0];
+        l ^= pArray[0];
         for (i = 0; i <= BLOWFISH_NUM_ROUNDS - 2; )
         {
-            // Feistel substitution on left word
-            n = feistelSubstituition(l);
-            r ^= n ^ P[++i];
 
-            // Feistel substitution on right word
-            n = feistelSubstituition(r);
-            l ^= n ^ P[++i];
+            n = feistelSubstitution(l);
+            r ^= n ^ pArray[++i];
+
+            n = feistelSubstitution(r);
+            l ^= n ^ pArray[++i];
         }
-        lr[off] = r ^ P[BLOWFISH_NUM_ROUNDS + 1];
+        lr[off] = r ^ pArray[BLOWFISH_NUM_ROUNDS + 1];
         lr[off + 1] = l;
     }
 
-    private int feistelSubstituition(int p)
+    private int feistelSubstitution(int p)
     {
-        int x = S[(p >> 24) & 0xff];
-        x += S[0x100 | ((p >> 16) & 0xff)];
-        x ^= S[0x200 | ((p >> 8) & 0xff)];
-        x += S[0x300 | (p & 0xff)];
+        int x = sBox[(p >> 24) & 0xff];
+        x += sBox[0x100 | ((p >> 16) & 0xff)];
+        x ^= sBox[0x200 | ((p >> 8) & 0xff)];
+        x += sBox[0x300 | (p & 0xff)];
         return x;
     }
 
@@ -413,8 +412,8 @@ public class BCryptFunction extends AbstractHashingFunction
 
     private void initKey()
     {
-        P = P_ORIG.clone();
-        S = S_ORIG.clone();
+        pArray = P_ORIG.clone();
+        sBox = S_ORIG.clone();
     }
 
     private void key(byte[] key, boolean signExtBug)
@@ -422,27 +421,27 @@ public class BCryptFunction extends AbstractHashingFunction
         int i;
         int[] koffp = { 0 };
         int[] lr = { 0, 0 };
-        int plen = P.length;
-        int slen = S.length;
+        int plen = pArray.length;
+        int slen = sBox.length;
 
         for (i = 0; i < plen; i++)
             if (!signExtBug)
-                P[i] = P[i] ^ streamToWord(key, koffp);
+                pArray[i] = pArray[i] ^ streamToWord(key, koffp);
             else
-                P[i] = P[i] ^ streamToWordBug(key, koffp);
+                pArray[i] = pArray[i] ^ streamToWordBug(key, koffp);
 
         for (i = 0; i < plen; i += 2)
         {
             encipher(lr, 0);
-            P[i] = lr[0];
-            P[i + 1] = lr[1];
+            pArray[i] = lr[0];
+            pArray[i + 1] = lr[1];
         }
 
         for (i = 0; i < slen; i += 2)
         {
             encipher(lr, 0);
-            S[i] = lr[0];
-            S[i + 1] = lr[1];
+            sBox[i] = lr[0];
+            sBox[i + 1] = lr[1];
         }
     }
 
@@ -452,8 +451,8 @@ public class BCryptFunction extends AbstractHashingFunction
         int[] koffp = { 0 };
         int[] doffp = { 0 };
         int[] lr = { 0, 0 };
-        int plen = P.length;
-        int slen = S.length;
+        int plen = pArray.length;
+        int slen = sBox.length;
         int[] signp = { 0 }; // non-benign sign-extension flag
         int diff = 0;        // zero iff correct and buggy are same
 
@@ -461,46 +460,26 @@ public class BCryptFunction extends AbstractHashingFunction
         {
             int[] words = streamToWords(key, koffp, signp);
             diff |= words[0] ^ words[1];
-            P[i] = P[i] ^ words[signExtBug ? 1 : 0];
+            pArray[i] = pArray[i] ^ words[signExtBug ? 1 : 0];
         }
 
         int sign = signp[0];
 
-        /*
-         * At this point, "diff" is zero iff the correct and buggy algorithms produced
-         * exactly the same result.  If so and if "sign" is non-zero, which indicates
-         * that there was a non-benign sign extension, this means that we have a
-         * collision between the correctly computed hash for this password and a set of
-         * passwords that could be supplied to the buggy algorithm.  Our safety measure
-         * is meant to protect from such many-buggy to one-correct collisions, by
-         * deviating from the correct algorithm in such cases.  Let's check for this.
-         */
-        diff |= diff >> 16; /* still zero iff exact match */
-        diff &= 0xffff; /* ditto */
-        diff += 0xffff; /* bit 16 set iff "diff" was non-zero (on non-match) */
-        sign <<= 9; /* move the non-benign sign extension flag to bit 16 */
+        diff |= diff >> 16;
+        diff &= 0xffff;
+        diff += 0xffff;
+        sign <<= 9;
         sign &= ~diff & safety; /* action needed? */
 
-        /*
-         * If we have determined that we need to deviate from the correct algorithm,
-         * flip bit 16 in initial expanded key.  (The choice of 16 is arbitrary, but
-         * let's stick to it now.  It came out of the approach we used above, and it's
-         * not any worse than any other choice we could make.)
-         *
-         * It is crucial that we don't do the same to the expanded key used in the main
-         * Eksblowfish loop.  By doing it to only one of these two, we deviate from a
-         * state that could be directly specified by a password to the buggy algorithm
-         * (and to the fully correct one as well, but that's a side-effect).
-         */
-        P[0] ^= sign;
+        pArray[0] ^= sign;
 
         for (i = 0; i < plen; i += 2)
         {
             lr[0] ^= streamToWord(data, doffp);
             lr[1] ^= streamToWord(data, doffp);
             encipher(lr, 0);
-            P[i] = lr[0];
-            P[i + 1] = lr[1];
+            pArray[i] = lr[0];
+            pArray[i + 1] = lr[1];
         }
 
         for (i = 0; i < slen; i += 2)
@@ -508,8 +487,8 @@ public class BCryptFunction extends AbstractHashingFunction
             lr[0] ^= streamToWord(data, doffp);
             lr[1] ^= streamToWord(data, doffp);
             encipher(lr, 0);
-            S[i] = lr[0];
-            S[i + 1] = lr[1];
+            sBox[i] = lr[0];
+            sBox[i + 1] = lr[1];
         }
     }
 
@@ -554,14 +533,14 @@ public class BCryptFunction extends AbstractHashingFunction
         return ret;
     }
 
-    private String hashpw(String password, String salt)
+    private String hashPw(String password, String salt)
     {
         byte[] passwordb = password.getBytes(StandardCharsets.UTF_8);
 
-        return hashpw(passwordb, salt);
+        return hashPw(passwordb, salt);
     }
 
-    private String hashpw(byte[] passwordb, String salt)
+    private String hashPw(byte[] passwordb, String salt)
     {
         String realSalt;
         byte[] saltb;
@@ -616,17 +595,17 @@ public class BCryptFunction extends AbstractHashingFunction
         rs.append("$2");
         if (minor >= 'a')
             rs.append(minor);
-        rs.append("$");
+        rs.append('$');
         if (rounds < 10)
-            rs.append("0");
+            rs.append('0');
         rs.append(rounds);
-        rs.append("$");
+        rs.append('$');
         encodeBase64(saltb, saltb.length, rs);
         encodeBase64(hashed, BF_CRYPT_CIPHERTEXT.length * 4 - 1, rs);
         return rs.toString();
     }
 
-    private static String gensalt(String prefix, int logRounds) throws IllegalArgumentException
+    private static String genSalt(String prefix, int logRounds) throws IllegalArgumentException
     {
         StringBuilder rs = new StringBuilder();
         byte[] rnd = new byte[BCRYPT_SALT_LEN];
@@ -644,26 +623,26 @@ public class BCryptFunction extends AbstractHashingFunction
 
         rs.append("$2");
         rs.append(prefix.charAt(2));
-        rs.append("$");
+        rs.append('$');
         if (logRounds < 10)
-            rs.append("0");
+            rs.append('0');
         rs.append(logRounds);
-        rs.append("$");
+        rs.append('$');
         encodeBase64(rnd, rnd.length, rs);
         return rs.toString();
     }
 
-    private static String gensalt(int logRounds) throws IllegalArgumentException
+    private static String genSalt(int logRounds) throws IllegalArgumentException
     {
-        return gensalt("$2a", logRounds);
+        return genSalt("$2a", logRounds);
     }
 
-    private boolean checkpw(String plaintext, String hashed)
+    private boolean checkPw(String plaintext, String hashed)
     {
-        return equalsNoEarlyReturn(hashed, hashpw(plaintext, hashed));
+        return equalsNoEarlyReturn(hashed, hashPw(plaintext, hashed));
     }
 
-    static boolean equalsNoEarlyReturn(String a, String b)
+    private static boolean equalsNoEarlyReturn(String a, String b)
     {
         return MessageDigest.isEqual(a.getBytes(StandardCharsets.UTF_8), b.getBytes(StandardCharsets.UTF_8));
     }

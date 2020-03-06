@@ -46,7 +46,7 @@ class PropertyReader
         PROPERTIES = props;
     }
 
-    public static int readInt(String key, int defaultValue)
+    static int readInt(String key, int defaultValue)
     {
         String str = readString(key);
         if (str == null)
@@ -56,7 +56,7 @@ class PropertyReader
         return Integer.parseInt(readString(key));
     }
 
-    public static boolean readBoolean(String key, boolean defaultValue)
+    static boolean readBoolean(String key, boolean defaultValue)
     {
         String str = readString(key);
         if (str == null)
@@ -71,7 +71,7 @@ class PropertyReader
         return PROPERTIES.getProperty(key);
     }
 
-    public static String readString(String key, String defaultValue)
+    static String readString(String key, String defaultValue)
     {
         if (key == null)
         {

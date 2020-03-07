@@ -6,7 +6,7 @@
 
     <groupId>org.password4j</groupId>
     <artifactId>password4j-core</artifactId>
-    <version>0.3.1</version>
+    <version>0.3.2</version>
     <packaging>jar</packaging>
 
 

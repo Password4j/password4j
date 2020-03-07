@@ -633,12 +633,12 @@ public class BCryptFunction extends AbstractHashingFunction
         return genSalt("$2a", logRounds);
     }
 
-    private boolean checkPw(String plaintext, String hashed)
+    boolean checkPw(String plaintext, String hashed)
     {
         return equalsNoEarlyReturn(hashed, hashPw(plaintext, hashed));
     }
 
-    private static boolean equalsNoEarlyReturn(String a, String b)
+    static boolean equalsNoEarlyReturn(String a, String b)
     {
         return MessageDigest.isEqual(a.getBytes(StandardCharsets.UTF_8), b.getBytes(StandardCharsets.UTF_8));
     }

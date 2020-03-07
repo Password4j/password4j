@@ -166,10 +166,6 @@ public class BCryptFunction extends AbstractHashingFunction
             27, -1, -1, -1, -1, -1, -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
             50, 51, 52, 53, -1, -1, -1, -1, -1 };
 
-    private int[] pArray;
-
-    private int[] sBox;
-
     private int logRounds;
 
     private BCryptFunction()
@@ -255,23 +251,23 @@ public class BCryptFunction extends AbstractHashingFunction
         return toString().hashCode();
     }
 
-    private static void encodeBase64(byte[] d, int len, StringBuilder rs) throws IllegalArgumentException
+    static void encodeBase64(byte[] d, int length, StringBuilder rs)
     {
         int off = 0;
         int c1;
         int c2;
 
-        if (len <= 0 || len > d.length)
+        if (length <= 0 || length > d.length)
         {
-            throw new IllegalArgumentException("Invalid len");
+            throw new BadParametersException("Invalid length");
         }
 
-        while (off < len)
+        while (off < length)
         {
             c1 = d[off++] & 0xff;
             rs.append(BASE_64_CODE[(c1 >> 2) & 0x3f]);
             c1 = (c1 & 0x03) << 4;
-            if (off >= len)
+            if (off >= length)
             {
                 rs.append(BASE_64_CODE[c1 & 0x3f]);
                 break;
@@ -280,7 +276,7 @@ public class BCryptFunction extends AbstractHashingFunction
             c1 |= (c2 >> 4) & 0x0f;
             rs.append(BASE_64_CODE[c1 & 0x3f]);
             c1 = (c2 & 0x0f) << 2;
-            if (off >= len)
+            if (off >= length)
             {
                 rs.append(BASE_64_CODE[c1 & 0x3f]);
                 break;
@@ -299,7 +295,7 @@ public class BCryptFunction extends AbstractHashingFunction
         return INDEX_64[(int) x];
     }
 
-    private static byte[] decodeBase64(String s, int maxolen) throws IllegalArgumentException
+    static byte[] decodeBase64(String s, int maxOLength)
     {
         StringBuilder rs = new StringBuilder();
         int off = 0;
@@ -312,10 +308,10 @@ public class BCryptFunction extends AbstractHashingFunction
         byte c4;
         byte o;
 
-        if (maxolen <= 0)
-            throw new BadParametersException("Invalid maxolen");
+        if (maxOLength <= 0)
+            throw new BadParametersException("Invalid maxOLength");
 
-        while (off < slen - 1 && olen < maxolen)
+        while (off < slen - 1 && olen < maxOLength)
         {
             c1 = char64(s.charAt(off++));
             c2 = char64(s.charAt(off++));
@@ -324,7 +320,7 @@ public class BCryptFunction extends AbstractHashingFunction
             o = (byte) (c1 << 2);
             o |= (c2 & 0x30) >> 4;
             rs.append((char) o);
-            if (++olen >= maxolen || off >= slen)
+            if (++olen >= maxOLength || off >= slen)
                 break;
             c3 = char64(s.charAt(off++));
             if (c3 == -1)
@@ -332,7 +328,7 @@ public class BCryptFunction extends AbstractHashingFunction
             o = (byte) ((c2 & 0x0f) << 4);
             o |= (c3 & 0x3c) >> 2;
             rs.append((char) o);
-            if (++olen >= maxolen || off >= slen)
+            if (++olen >= maxOLength || off >= slen)
                 break;
             c4 = char64(s.charAt(off++));
             o = (byte) ((c3 & 0x03) << 6);
@@ -347,7 +343,7 @@ public class BCryptFunction extends AbstractHashingFunction
         return ret;
     }
 
-    private void encipher(int[] lr, int off)
+    private void encipher(int[] lr, int off, int[] pArray, int[] sBox)
     {
         int i;
         int n;
@@ -358,17 +354,17 @@ public class BCryptFunction extends AbstractHashingFunction
         for (i = 0; i <= BLOWFISH_NUM_ROUNDS - 2; )
         {
 
-            n = feistelSubstitution(l);
+            n = feistelSubstitution(l, sBox);
             r ^= n ^ pArray[++i];
 
-            n = feistelSubstitution(r);
+            n = feistelSubstitution(r, sBox);
             l ^= n ^ pArray[++i];
         }
         lr[off] = r ^ pArray[BLOWFISH_NUM_ROUNDS + 1];
         lr[off + 1] = l;
     }
 
-    private int feistelSubstitution(int p)
+    private int feistelSubstitution(int p, int[] sBox)
     {
         int x = sBox[(p >> 24) & 0xff];
         x += sBox[0x100 | ((p >> 16) & 0xff)];
@@ -410,13 +406,12 @@ public class BCryptFunction extends AbstractHashingFunction
         return streamToWords(data, offp, signp)[1];
     }
 
-    private void initKey()
+    private void initKey(int[] pArray, int[] sBox)
     {
-        pArray = P_ORIG.clone();
-        sBox = S_ORIG.clone();
+
     }
 
-    private void key(byte[] key, boolean signExtBug)
+    private void key(byte[] key, boolean signExtBug, int[] pArray, int[] sBox)
     {
         int i;
         int[] koffp = { 0 };
@@ -432,20 +427,20 @@ public class BCryptFunction extends AbstractHashingFunction
 
         for (i = 0; i < plen; i += 2)
         {
-            encipher(lr, 0);
+            encipher(lr, 0, pArray, sBox);
             pArray[i] = lr[0];
             pArray[i + 1] = lr[1];
         }
 
         for (i = 0; i < slen; i += 2)
         {
-            encipher(lr, 0);
+            encipher(lr, 0, pArray, sBox);
             sBox[i] = lr[0];
             sBox[i + 1] = lr[1];
         }
     }
 
-    private void eksKey(byte[] data, byte[] key, boolean signExtBug, int safety)
+    private void eksKey(byte[] data, byte[] key, boolean signExtBug, int safety, int[] pArray, int[] sBox)
     {
         int i;
         int[] koffp = { 0 };
@@ -477,7 +472,7 @@ public class BCryptFunction extends AbstractHashingFunction
         {
             lr[0] ^= streamToWord(data, doffp);
             lr[1] ^= streamToWord(data, doffp);
-            encipher(lr, 0);
+            encipher(lr, 0, pArray, sBox);
             pArray[i] = lr[0];
             pArray[i + 1] = lr[1];
         }
@@ -486,7 +481,7 @@ public class BCryptFunction extends AbstractHashingFunction
         {
             lr[0] ^= streamToWord(data, doffp);
             lr[1] ^= streamToWord(data, doffp);
-            encipher(lr, 0);
+            encipher(lr, 0, pArray, sBox);
             sBox[i] = lr[0];
             sBox[i + 1] = lr[1];
         }
@@ -508,18 +503,19 @@ public class BCryptFunction extends AbstractHashingFunction
         if (salt.length != BCRYPT_SALT_LEN)
             throw new IllegalArgumentException("Bad salt length");
 
-        initKey();
-        eksKey(salt, password, sign, safety);
+        int[] pArray = P_ORIG.clone();
+        int[] sBox = S_ORIG.clone();
+        eksKey(salt, password, sign, safety, pArray, sBox);
         for (i = 0; i < rounds; i++)
         {
-            key(password, sign);
-            key(salt, false);
+            key(password, sign, pArray, sBox);
+            key(salt, false, pArray, sBox);
         }
 
         for (i = 0; i < 64; i++)
         {
             for (j = 0; j < (clen >> 1); j++)
-                encipher(cdata, j << 1);
+                encipher(cdata, j << 1, pArray, sBox);
         }
 
         ret = new byte[clen * 4];
@@ -605,7 +601,7 @@ public class BCryptFunction extends AbstractHashingFunction
         return rs.toString();
     }
 
-    private static String genSalt(String prefix, int logRounds) throws IllegalArgumentException
+    private static String genSalt(String prefix, int logRounds)
     {
         StringBuilder rs = new StringBuilder();
         byte[] rnd = new byte[BCRYPT_SALT_LEN];
@@ -632,7 +628,7 @@ public class BCryptFunction extends AbstractHashingFunction
         return rs.toString();
     }
 
-    private static String genSalt(int logRounds) throws IllegalArgumentException
+    static String genSalt(int logRounds)
     {
         return genSalt("$2a", logRounds);
     }

@@ -16,14 +16,15 @@
  */
 package com.password4j;
 
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 
 public class PBKDF2Function extends AbstractHashingFunction
@@ -35,7 +36,6 @@ public class PBKDF2Function extends AbstractHashingFunction
     private int length;
 
     private static Map<String, PBKDF2Function> instances = new ConcurrentHashMap<>();
-
 
     protected PBKDF2Function()
     {
@@ -108,10 +108,17 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
     }
 
-    protected static SecretKey internalHash(String plain, String salt, Algorithm algorithm, int iterations, int length) throws NoSuchAlgorithmException, InvalidKeySpecException
+    protected static SecretKey internalHash(String plain, String salt, Algorithm algorithm, int iterations, int length)
+            throws NoSuchAlgorithmException, InvalidKeySpecException
+    {
+        return internalHash(plain.toCharArray(), salt.getBytes(), algorithm, iterations, length);
+    }
+
+    protected static SecretKey internalHash(char[] plain, byte[] salt, Algorithm algorithm, int iterations, int length)
+            throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm.name());
-        PBEKeySpec spec = new PBEKeySpec(plain.toCharArray(), salt.getBytes(), iterations, length);
+        PBEKeySpec spec = new PBEKeySpec(plain, salt, iterations, length);
         return secretKeyFactory.generateSecret(spec);
     }
 
@@ -119,7 +126,6 @@ public class PBKDF2Function extends AbstractHashingFunction
     {
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
-
 
     @Override
     public boolean check(String plain, String hashed, String salt)
@@ -131,10 +137,10 @@ public class PBKDF2Function extends AbstractHashingFunction
     @Override
     public boolean check(String password, String hashed)
     {
-        throw new UnsupportedOperationException("This implementation requires an explicit salt. Use check(String, String, String) method instead.");
+        throw new UnsupportedOperationException(
+                "This implementation requires an explicit salt. Use check(String, String, String) method instead.");
 
     }
-
 
     /**
      * Compares two byte arrays in length-constant time. This comparison method
@@ -239,6 +245,5 @@ public class PBKDF2Function extends AbstractHashingFunction
     {
         return String.valueOf(algorithm.code()) + '|' + iterations + '|' + length;
     }
-
 
 }

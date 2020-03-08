@@ -196,7 +196,7 @@ public class BCryptFunction extends AbstractHashingFunction
     @Override
     public Hash hash(String plain)
     {
-        String salt = genSalt(logRounds);
+        String salt = generateSalt(logRounds);
         return hash(plain, salt);
     }
 
@@ -316,20 +316,28 @@ public class BCryptFunction extends AbstractHashingFunction
             c1 = char64(s.charAt(off++));
             c2 = char64(s.charAt(off++));
             if (c1 == -1 || c2 == -1)
+            {
                 break;
+            }
             o = (byte) (c1 << 2);
             o |= (c2 & 0x30) >> 4;
             rs.append((char) o);
             if (++olen >= maxOLength || off >= slen)
+            {
                 break;
+            }
             c3 = char64(s.charAt(off++));
             if (c3 == -1)
+            {
                 break;
+            }
             o = (byte) ((c2 & 0x0f) << 4);
             o |= (c3 & 0x3c) >> 2;
             rs.append((char) o);
             if (++olen >= maxOLength || off >= slen)
+            {
                 break;
+            }
             c4 = char64(s.charAt(off++));
             o = (byte) ((c3 & 0x03) << 6);
             o |= c4;
@@ -404,11 +412,6 @@ public class BCryptFunction extends AbstractHashingFunction
     {
         int[] signp = { 0 };
         return streamToWords(data, offp, signp)[1];
-    }
-
-    private void initKey(int[] pArray, int[] sBox)
-    {
-
     }
 
     private void key(byte[] key, boolean signExtBug, int[] pArray, int[] sBox)
@@ -486,7 +489,6 @@ public class BCryptFunction extends AbstractHashingFunction
             sBox[i + 1] = lr[1];
         }
     }
-
 
     private byte[] cryptRaw(byte[] password, byte[] salt, int logRounds, boolean sign, int safety)
     {
@@ -601,7 +603,7 @@ public class BCryptFunction extends AbstractHashingFunction
         return rs.toString();
     }
 
-    private static String genSalt(String prefix, int logRounds)
+    private static String generateSalt(String prefix, int logRounds)
     {
         StringBuilder rs = new StringBuilder();
         byte[] rnd = new byte[BCRYPT_SALT_LEN];
@@ -628,12 +630,12 @@ public class BCryptFunction extends AbstractHashingFunction
         return rs.toString();
     }
 
-    static String genSalt(int logRounds)
+    static String generateSalt(int logRounds)
     {
-        return genSalt("$2a", logRounds);
+        return generateSalt("$2a", logRounds);
     }
 
-    boolean checkPw(String plaintext, String hashed)
+    private boolean checkPw(String plaintext, String hashed)
     {
         return equalsNoEarlyReturn(hashed, hashPw(plaintext, hashed));
     }

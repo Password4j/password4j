@@ -259,7 +259,7 @@ public class BCryptFunctionTest
             {
                 String plain = testObjectsString.get(j).password;
                 BCryptFunction function = BCryptFunction.getInstance(10);
-                String salt = BCryptFunction.genSalt(i);
+                String salt = BCryptFunction.generateSalt(i);
                 Hash hashed1 = function.hash(plain, salt);
                 Hash hashed2 = function.hash(plain, hashed1.getResult());
                 Assert.assertEquals(hashed2.getResult(), hashed1.getResult());
@@ -402,20 +402,20 @@ public class BCryptFunctionTest
     @Test(expected = BadParametersException.class)
     public void genSaltFailsWithTooFewRounds()
     {
-        BCryptFunction.genSalt(3);
+        BCryptFunction.generateSalt(3);
     }
 
     @Test(expected = BadParametersException.class)
     public void genSaltFailsWithTooManyRounds()
     {
-        BCryptFunction.genSalt(32);
+        BCryptFunction.generateSalt(32);
     }
 
     @Test
     public void genSaltGeneratesCorrectSaltPrefix()
     {
-        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.genSalt(4), "$2a$04$"));
-        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.genSalt(31), "$2a$31$"));
+        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.generateSalt(4), "$2a$04$"));
+        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.generateSalt(31), "$2a$31$"));
     }
 
     @Test(expected = BadParametersException.class)

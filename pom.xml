@@ -6,7 +6,7 @@
 
     <groupId>org.password4j</groupId>
     <artifactId>password4j-core</artifactId>
-    <version>0.3.2</version>
+    <version>0.4.0</version>
     <packaging>jar</packaging>
 
 
@@ -96,8 +96,16 @@
                     </execution>
                 </executions>
             </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.1</version>
+            </plugin>
         </plugins>
     </build>
+
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

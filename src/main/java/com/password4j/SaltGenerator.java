@@ -19,7 +19,16 @@ package com.password4j;
 
 import java.security.SecureRandom;
 
-
+/**
+ * This class contains static functions that
+ * help to create a secure salt.
+ * <p>
+ * In cryptography, a salt is random data that is used as
+ * an additional input to a CHF.
+ *
+ * @author David Bertoldi
+ * @since 0.1.0
+ */
 public class SaltGenerator
 {
 
@@ -28,9 +37,23 @@ public class SaltGenerator
         //
     }
 
+    /**
+     * Generates an array of {@code byte}s that can be used
+     * as salt by the CHFs.
+     * The generated salt is created by a cryptographically
+     * strong random number generator (RNG).
+     * <p>
+     * The parameter length must be a non-negative number,
+     * otherwise a {@link BadParametersException} is thrown.
+     *
+     * @param length of the returned byte array
+     * @return a salt as array of {@code byte}s
+     * @throws BadParametersException if the length is negative
+     * @since 0.1.0
+     */
     public static byte[] generate(int length)
     {
-        if(length < 0)
+        if (length < 0)
         {
             throw new BadParametersException("Salt length cannot be negative");
         }
@@ -40,6 +63,17 @@ public class SaltGenerator
         return salt;
     }
 
+    /**
+     * Generates an array of {@code byte}s that can be used
+     * as salt by the CHFs.
+     * The generated salt is created by a cryptographically
+     * strong random number generator (RNG).
+     * <p>
+     * The length of the array is 64.
+     *
+     * @return a salt as array of {@code byte}s
+     * @since 0.1.0
+     */
     public static byte[] generate()
     {
         return generate(64);

@@ -17,10 +17,15 @@
 
 package com.password4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 public class SystemChecker
 {
+    private static final Logger LOG = LoggerFactory.getLogger(SystemChecker.class);
+
     private static final String TO_BE_HASHED = "abcDEF123@~# xyz+-*/=456spqr";
 
     private static final String SALT = new String(SaltGenerator.generate());
@@ -69,11 +74,22 @@ public class SystemChecker
     {
         warmUpPBKDF2(algorithm, length);
 
+        StringBuilder report = new StringBuilder()
+                .append("PBKDF2 with PBKDF2WithHmac")
+                .append(algorithm.name())
+                .append(" and length ")
+                .append(length)
+                .append(" under ")
+                .append(maxMilliseconds)
+                .append("ms")
+                .append(System.lineSeparator()).append(System.lineSeparator());
+
+
         long elapsed;
         int iterations = 1;
         do
         {
-            iterations += 100;
+            iterations += 150;
             long start = System.currentTimeMillis();
 
             new PBKDF2Function(algorithm, iterations, length).hash(TO_BE_HASHED, SALT);
@@ -81,9 +97,22 @@ public class SystemChecker
             long end = System.currentTimeMillis();
             elapsed = end - start;
 
+            report.append(" - iterations: ")
+                    .append(iterations)
+                    .append(" -> ")
+                    .append(elapsed)
+                    .append("ms")
+                    .append(System.lineSeparator());
+
         } while (elapsed <= maxMilliseconds);
 
-        return iterations - 100;
+        int finalIterations = iterations - 100;
+
+        report.append(System.lineSeparator()).append("Final result: ").append(finalIterations).append(" iterations under ").append(maxMilliseconds).append("ms");
+
+        LOG.info(report.toString());
+
+        return finalIterations;
     }
 
     public static int findWorkingFactoryForSCrypt(long maxMilliseconds, int resources, int parallelization)
@@ -126,7 +155,7 @@ public class SystemChecker
 
         } while (elapsed <= maxMilliseconds);
 
-        return resources  - 1;
+        return resources - 1;
     }
 
 
@@ -153,5 +182,6 @@ public class SystemChecker
             SCryptFunction.getInstance(workFactor, resources, parallelization).hash(TO_BE_HASHED);
         }
     }
+
 
 }

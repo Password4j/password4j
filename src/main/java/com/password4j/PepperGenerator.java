@@ -14,11 +14,21 @@
  *  limitations under the License.
  *
  */
+
 package com.password4j;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-
+/**
+ * This class contains static functions that
+ * help to create a secure pepper.
+ * <p>
+ * In cryptography, a pepper is a secret added to a password
+ * prior to being hashed with a CHF.
+ *
+ * @author David Bertoldi
+ * @since 0.1.1
+ */
 public class PepperGenerator
 {
 
@@ -27,20 +37,59 @@ public class PepperGenerator
         //
     }
 
+    /**
+     * Generates a {@link String} that can be used as pepper
+     * by a CHF.
+     * The generated pepper is created by a cryptographically
+     * strong random number generator (RNG).
+     * <p>
+     * The parameter length must be a non-negative number,
+     * otherwise a {@link BadParametersException} is thrown.
+     *
+     * @param length of the returned string
+     * @return a pepper of the given length
+     * @throws BadParametersException if the length is negative
+     * @since 0.1.1
+     */
     public static String generate(int length)
     {
-        if(length < 0)
+        if (length < 0)
         {
             throw new BadParametersException("Pepper length cannot be negative");
         }
         return RandomStringUtils.random(length, 32, 126, false, false, null, AlgorithmFinder.getSecureRandom());
     }
 
+    /**
+     * Generates a {@link String} that can be used as pepper
+     * by a CHF.
+     * The generated pepper is created by a cryptographically
+     * strong random number generator (RNG).
+     * <p>
+     * The pepper generated is 24 characters long.
+     *
+     * @return a pepper as {@link String}
+     * @since 0.1.1
+     */
     public static String generate()
     {
         return generate(24);
     }
 
+    /**
+     * Peppers by definition are shared between all passwords and
+     * must be stored in a location different from the one used
+     * for the passwords.
+     * <p>
+     * It can be set in the <i>psw4j.properties</i> file with
+     * the property {@code global.pepper}.
+     * <p>
+     * If the <i>psw4j.properties</i> or the property {@code global.pepper}
+     * are not found, {@code null} is returned.
+     *
+     * @return a shared pepper set in the <i>psw4j.properties</i> file.
+     * @since 0.1.1
+     */
     public static String get()
     {
         return PropertyReader.readString("global.pepper", null);

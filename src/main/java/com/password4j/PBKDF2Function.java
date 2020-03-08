@@ -16,15 +16,14 @@
  */
 package com.password4j;
 
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 
 
 public class PBKDF2Function extends AbstractHashingFunction
@@ -36,6 +35,8 @@ public class PBKDF2Function extends AbstractHashingFunction
     private int length;
 
     private static Map<String, PBKDF2Function> instances = new ConcurrentHashMap<>();
+
+    private static final String ALGORITHM_PREFIX = "PBKDF2WithHmac";
 
     protected PBKDF2Function()
     {
@@ -117,7 +118,7 @@ public class PBKDF2Function extends AbstractHashingFunction
     protected static SecretKey internalHash(char[] plain, byte[] salt, Algorithm algorithm, int iterations, int length)
             throws NoSuchAlgorithmException, InvalidKeySpecException
     {
-        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm.name());
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(ALGORITHM_PREFIX + algorithm.name());
         PBEKeySpec spec = new PBEKeySpec(plain, salt, iterations, length);
         return secretKeyFactory.generateSecret(spec);
     }
@@ -130,8 +131,8 @@ public class PBKDF2Function extends AbstractHashingFunction
     @Override
     public boolean check(String plain, String hashed, String salt)
     {
-        Hash internalHas = hash(plain, salt);
-        return slowEquals(internalHas.getResult().getBytes(), hashed.getBytes());
+        Hash internalHash = hash(plain, salt);
+        return slowEquals(internalHash.getResult().getBytes(), hashed.getBytes());
     }
 
     @Override
@@ -176,11 +177,11 @@ public class PBKDF2Function extends AbstractHashingFunction
 
     public enum Algorithm
     {
-        PBKDF2WithHmacSHA1(160, 1), //
-        PBKDF2WithHmacSHA224(224, 2), //
-        PBKDF2WithHmacSHA256(256, 3), //
-        PBKDF2WithHmacSHA384(384, 4), //
-        PBKDF2WithHmacSHA512(512, 5);
+        SHA1(160, 1), //
+        SHA224(224, 2), //
+        SHA256(256, 3), //
+        SHA384(384, 4), //
+        SHA512(512, 5);
 
         private int bits;
 

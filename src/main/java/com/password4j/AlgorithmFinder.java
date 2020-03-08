@@ -31,6 +31,9 @@ import java.util.function.Function;
 /**
  * This utility class finds algorithms with their configuration
  * based on the environment.
+ * <p>
+ * In this context, by environment is intended the set of
+ * parameters set in the JVM and in the <i>psw4j.properties</i> file.
  *
  * @author David Bertoldi
  * @since 0.1.0
@@ -41,9 +44,14 @@ public class AlgorithmFinder
     private static final Logger LOG = LoggerFactory.getLogger(AlgorithmFinder.class);
 
     /**
-     * Make sure to use /dev/urandom instead of /dev/random in your
-     * `java.security` file.
-     * <code>securerandom.source=file:/dev/urandom</code>
+     * Singleton instance of {@link SecureRandom}.
+     * <p>
+     * By definition this instance does not need
+     * to be re-instantiated in order to generate
+     * non-deterministic output.
+     *
+     * @see #getSecureRandom()
+     * @since 0.1.0
      */
     private static final SecureRandom SR_SOURCE;
 
@@ -58,6 +66,8 @@ public class AlgorithmFinder
             }
             catch (NoSuchAlgorithmException nsae)
             {
+                /* Even if there's no strong instance, execution
+                 * must continue with a less strong SecureRandom instance */
                 LOG.warn("No source of strong randomness found for this environment.");
                 sr = new SecureRandom();
             }
@@ -176,9 +186,9 @@ public class AlgorithmFinder
 
     private static <T extends PBKDF2Function> T getPBKDF2Instance(Function<String, Function<Integer, Function<Integer, T>>> f)
     {
-        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Function.Algorithm.PBKDF2WithHmacSHA512.name());
+        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Function.Algorithm.SHA512.name());
         int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", 64_000);
-        int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Function.Algorithm.PBKDF2WithHmacSHA512.bits());
+        int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Function.Algorithm.SHA512.bits());
         return f.apply(algorithm).apply(iterations).apply(length);
     }
 
@@ -253,7 +263,11 @@ public class AlgorithmFinder
     }
 
     /**
-     * @return
+     * Finds the list of supported PBKDF2 algorithms by
+     * the environment's {@link Provider}s.
+     *
+     * @return the list of supported PBKDF2 algorithms
+     * @since 0.2.0
      */
     public static List<String> getAllPBKDF2Variants()
     {

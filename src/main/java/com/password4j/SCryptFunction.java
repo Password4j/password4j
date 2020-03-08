@@ -220,7 +220,7 @@ public class SCryptFunction extends AbstractHashingFunction
                 byte[] xyArray = new byte[256 * resources];
                 byte[] vArray = new byte[128 * resources * workFactor];
                 byte[] intensiveSalt = PBKDF2Function
-                        .internalHash(new String(passwd).toCharArray(), salt, PBKDF2Function.Algorithm.PBKDF2WithHmacSHA256, 1,
+                        .internalHash(new String(passwd).toCharArray(), salt, PBKDF2Function.Algorithm.SHA256, 1,
                                 8 * parallelization * 128 * resources).getEncoded();
 
                 for (int i = 0; i < parallelization; ++i)
@@ -229,7 +229,7 @@ public class SCryptFunction extends AbstractHashingFunction
                 }
 
                 return PBKDF2Function
-                        .internalHash(new String(passwd).toCharArray(), intensiveSalt, PBKDF2Function.Algorithm.PBKDF2WithHmacSHA256, 1,
+                        .internalHash(new String(passwd).toCharArray(), intensiveSalt, PBKDF2Function.Algorithm.SHA256, 1,
                                 8 * dkLen).getEncoded();
             }
         }

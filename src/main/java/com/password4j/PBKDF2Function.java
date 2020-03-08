@@ -103,7 +103,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
         catch (IllegalArgumentException | InvalidKeySpecException e)
         {
-            String message = "Invalid specification with salt=" + salt + ", #iterations=`" + iterations + "` and length=`" + length + "`";
+            String message = "Invalid specification with salt=" + salt + ", #iterations=" + iterations + " and length=" + length;
             throw new BadParametersException(message, e);
         }
     }

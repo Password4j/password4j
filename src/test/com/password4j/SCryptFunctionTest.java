@@ -38,7 +38,7 @@ public class SCryptFunctionTest
         String salt = "salt";
 
         // WHEN
-        Hash hash = new SCryptFunction(8, 16384, 1).hash(password, salt);
+        Hash hash = new SCryptFunction(16384, 8, 1).hash(password, salt);
 
         // THEN
         Assert.assertEquals("$s0$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==", hash.getResult());
@@ -49,7 +49,7 @@ public class SCryptFunctionTest
     {
         // GIVEN
         String password = "password";
-        SCryptFunction sCryptFunction = new SCryptFunction(8, 16384, 1);
+        SCryptFunction sCryptFunction = new SCryptFunction(16384, 8, 1);
 
         // WHEN
         Hash hash = sCryptFunction.hash(password);
@@ -66,13 +66,13 @@ public class SCryptFunctionTest
         int r = 1;
         int N = 2;
         int p = 3;
-        SCryptFunction scrypt = SCryptFunction.getInstance(r, N, p);
+        SCryptFunction scrypt = SCryptFunction.getInstance(N, r, p);
 
         // THEN
         boolean eqNull = scrypt.equals(null);
         boolean eqClass = scrypt.equals(new BCryptFunction(10));
-        boolean difInst = scrypt.equals(SCryptFunction.getInstance(4, 5, 6));
-        boolean sameInst = scrypt.equals(SCryptFunction.getInstance(r, N, p));
+        boolean difInst = scrypt.equals(SCryptFunction.getInstance(5, 4, 6));
+        boolean sameInst = scrypt.equals(SCryptFunction.getInstance(N, r, p));
         String toString = scrypt.toString();
         int hashCode = scrypt.hashCode();
 
@@ -81,8 +81,8 @@ public class SCryptFunctionTest
         Assert.assertFalse(eqClass);
         Assert.assertFalse(difInst);
         Assert.assertTrue(sameInst);
-        Assert.assertNotEquals(toString, new SCryptFunction(4, 5, 6).toString());
-        Assert.assertNotEquals(hashCode, new SCryptFunction(4, 5, 6).hashCode());
+        Assert.assertNotEquals(toString, new SCryptFunction(5, 4, 6).toString());
+        Assert.assertNotEquals(hashCode, new SCryptFunction(5, 4, 6).hashCode());
     }
 
     @Test
@@ -91,7 +91,7 @@ public class SCryptFunctionTest
         // GIVEN
 
         // WHEN
-        SCryptFunction scrypt = SCryptFunction.getInstance(3, 5, 7);
+        SCryptFunction scrypt = SCryptFunction.getInstance(5, 3, 7);
 
         // THEN
         Assert.assertEquals(13_440, scrypt.getRequiredBytes());

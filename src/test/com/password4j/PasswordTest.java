@@ -38,6 +38,7 @@ public class PasswordTest
         Hash hash3 = Password.hash(password).addPepper(pepper).addSalt(salt).withSCrypt();
 
         // THEN
+        System.out.println(hash2.getResult());
         Assert.assertTrue(hash1.check(password));
         Assert.assertTrue(hash2.check(password));
         Assert.assertTrue(hash3.check(password));

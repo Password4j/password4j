@@ -48,6 +48,20 @@ public class SystemCheckTest
         Assert.assertTrue(result > 0);
     }
 
+    @Test
+    public void testSCryptRounds()
+    {
+        // GIVEN
+
+        // WHEN
+        int result1 = SystemChecker.findWorkingFactoryForSCrypt(100, 16, 1);
+        int result2 = SystemChecker.findResourcesForSCrypt(100, 16384, 1);
+
+        // THEN
+        Assert.assertTrue(result1 > 0);
+        Assert.assertTrue(result2 > 0);
+    }
+
     @Test(expected = BadParametersException.class)
     public void testWrongVariants()
     {

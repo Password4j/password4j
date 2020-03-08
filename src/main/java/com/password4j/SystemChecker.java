@@ -83,7 +83,50 @@ public class SystemChecker
 
         } while (elapsed <= maxMilliseconds);
 
-        return iterations - 1;
+        return iterations - 100;
+    }
+
+    public static int findWorkingFactoryForSCrypt(long maxMilliseconds, int resources, int parallelization)
+    {
+
+        warmUpSCrypt(2, resources, parallelization);
+
+        long elapsed;
+        int workFactor = 1;
+        do
+        {
+            workFactor *= 2;
+            long start = System.currentTimeMillis();
+
+            new SCryptFunction(workFactor, resources, parallelization).hash(TO_BE_HASHED, SALT);
+
+            long end = System.currentTimeMillis();
+            elapsed = end - start;
+
+        } while (elapsed <= maxMilliseconds);
+
+        return workFactor / 2;
+    }
+
+    public static int findResourcesForSCrypt(long maxMilliseconds, int workFactor, int parallelization)
+    {
+        warmUpSCrypt(workFactor, 1, parallelization);
+
+        long elapsed;
+        int resources = 0;
+        do
+        {
+            resources += 1;
+            long start = System.currentTimeMillis();
+
+            new SCryptFunction(workFactor, resources, parallelization).hash(TO_BE_HASHED, SALT);
+
+            long end = System.currentTimeMillis();
+            elapsed = end - start;
+
+        } while (elapsed <= maxMilliseconds);
+
+        return resources  - 1;
     }
 
 
@@ -100,6 +143,14 @@ public class SystemChecker
         for (int i = 0; i < WARMUP_ROUNDS; i++)
         {
             PBKDF2Function.getInstance(algorithm, 1, length).hash(TO_BE_HASHED, SALT);
+        }
+    }
+
+    private static void warmUpSCrypt(int workFactor, int resources, int parallelization)
+    {
+        for (int i = 0; i < WARMUP_ROUNDS; i++)
+        {
+            SCryptFunction.getInstance(workFactor, resources, parallelization).hash(TO_BE_HASHED);
         }
     }
 

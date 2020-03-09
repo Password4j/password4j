@@ -91,10 +91,17 @@ public class SCryptFunctionTest
         // GIVEN
 
         // WHEN
-        SCryptFunction scrypt = SCryptFunction.getInstance(5, 3, 7);
+        SCryptFunction scrypt1 = SCryptFunction.getInstance(5, 3, 7);
+        SCryptFunction scrypt2 = SCryptFunction.getInstance(25, 30, 14);
+        SCryptFunction scrypt3 = SCryptFunction.getInstance(1, 1, 1);
 
         // THEN
-        Assert.assertEquals(13_440, scrypt.getRequiredBytes());
+        Assert.assertEquals(13_440, scrypt1.getRequiredBytes());
+        Assert.assertTrue(StringUtils.contains(scrypt1.getRequiredMemory(), "KB"));
+        Assert.assertEquals(1_344_000, scrypt2.getRequiredBytes());
+        Assert.assertTrue(StringUtils.contains(scrypt2.getRequiredMemory(), "MB"));
+        Assert.assertEquals(128, scrypt3.getRequiredBytes());
+        Assert.assertEquals("128B", scrypt3.getRequiredMemory());
     }
 
 }

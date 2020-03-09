@@ -29,7 +29,7 @@ public class SystemCheckTest
         // GIVEN
 
         // WHEN
-        int result = SystemChecker.findIterationsForPBKDF2(100, PBKDF2Function.Algorithm.SHA256, 256);
+        int result = SystemChecker.findIterationsForPBKDF2(1, PBKDF2Function.Algorithm.SHA256, 256);
 
         // THEN
         Assert.assertTrue(result > 0);
@@ -42,7 +42,7 @@ public class SystemCheckTest
         // GIVEN
 
         // WHEN
-        int result = SystemChecker.findRoundsForBCrypt(100);
+        int result = SystemChecker.findRoundsForBCrypt(1);
 
         // THEN
         Assert.assertTrue(result > 0);
@@ -52,7 +52,7 @@ public class SystemCheckTest
     public void testSCryptRounds()
     {
         // GIVEN
-        long maxMilliseconds = 100L;
+        long maxMilliseconds = 1;
 
         // WHEN
         int result1 = SystemChecker.findWorkingFactoryForSCrypt(maxMilliseconds, 16, 1);

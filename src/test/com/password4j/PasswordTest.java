@@ -156,6 +156,48 @@ public class PasswordTest
         Assert.assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
     }
 
+
+    @Test
+    public void testCustomSalt()
+    {
+        // GIVEN
+        String password = "password";
+        String salt = "salt";
+        String pepper = "pepper";
+        Hash hash = Password.hash(password).addPepper(pepper).addSalt(salt).withPBKDF2();
+
+        // WHEN
+        boolean check1 = Password.check(hash.getResult(), password).addPepper(pepper).addSalt(salt).withPBKDF2();
+
+
+        // THEN
+        Assert.assertTrue(check1);
+        Assert.assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
+    }
+
+
+    @Test
+    public void testHashingFunction()
+    {
+        // GIVEN
+        String password = "password";
+        String pepper = "pepper";
+
+
+        // WHEN
+        Hash hash1 = Password.hash(password).withPBKDF2();
+        Hash hash2 = Password.hash(password).withBCrypt();
+        Hash hash3 = Password.hash(password).withSCrypt();
+        Hash hash4 = Password.hash(password).withCompressedPBKDF2();
+
+
+        // THEN
+        Assert.assertTrue(hash1.getHashingFunction() instanceof PBKDF2Function);
+        Assert.assertTrue(hash2.getHashingFunction() instanceof BCryptFunction);
+        Assert.assertTrue(hash3.getHashingFunction() instanceof SCryptFunction);
+        Assert.assertTrue(hash4.getHashingFunction() instanceof CompressedPBKDF2Function);
+    }
+
     @Test(expected = BadParametersException.class)
     public void testBad1()
     {

@@ -17,6 +17,7 @@
 
 package com.password4j;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -379,7 +380,7 @@ public class SystemChecker
     private static String ask(String message)
     {
         System.out.print(message); // NOSONAR
-        return SCANNER.nextLine();
+        return StringEscapeUtils.escapeJava(SCANNER.nextLine());
     }
 
 

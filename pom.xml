@@ -101,11 +101,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <excludes>
-                        <exclude>com/password4j/SystemChecker.class</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
 
 

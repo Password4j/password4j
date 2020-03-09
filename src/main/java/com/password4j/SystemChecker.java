@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Scanner;
 
 public class SystemChecker
 {
@@ -32,9 +33,95 @@ public class SystemChecker
 
     private static final int WARMUP_ROUNDS = 20;
 
+    private static final Scanner SCANNER = new Scanner(System.in);
+
     private SystemChecker()
     {
         //
+    }
+
+    public static void main(String... args)
+    {
+        println("Please choose the CHF you want to optimize for your system.");
+        println(" - PBKDF2");
+        println(" - BCrypt");
+        println(" - SCrypt");
+        String choice = ask("Choice: ");
+
+        switch (choice)
+        {
+            case "PBKDF2":
+                managePBKDF2();
+                break;
+            case "BCrypt":
+                manageBCrypt();
+                break;
+            case "SCrypt":
+                manageSCrypt();
+                break;
+            default:
+                println(choice + " is not a supported CHF.");
+                System.exit(1);
+        }
+        System.exit(0);
+    }
+
+    private static void managePBKDF2()
+    {
+        println("These are the supported PBKDF2 algorithms by your environment");
+        List<String> variants = AlgorithmFinder.getAllPBKDF2Variants();
+        StringBuilder listSB = new StringBuilder(variants.size());
+        for (String variant : variants)
+        {
+            listSB.append(" - ").append(variant).append(System.lineSeparator());
+        }
+        println(listSB.toString());
+        String chosenVariant = ask("Please choose one: ");
+        String suffix  = chosenVariant.replace("PBKDF2WithHmac", "");
+        PBKDF2Function.Algorithm algorithm = PBKDF2Function.Algorithm.valueOf(suffix);
+        println("The recommended length of the derived key is " + algorithm.bits() + " bits.");
+        String millis = ask("Please enter a maximum execution time for password hashing (in milliseconds): ");
+        long maxMillis = Long.parseLong(millis);
+        int iterations = findIterationsForPBKDF2(maxMillis, algorithm, algorithm.bits());
+
+        println("Use the following configurations in your psw4j.properties file" + System.lineSeparator());
+
+        println("   hash.pbkdf2.algorithm=" + suffix);
+        println("   hash.pbkdf2.iterations=" + iterations);
+        println("   hash.pbkdf2.length=" + algorithm.bits());
+
+    }
+
+    private static void manageBCrypt()
+    {
+        String millis = ask("Please enter a maximum execution time for password hashing (in milliseconds): ");
+        long maxMillis = Long.parseLong(millis);
+        int logRounds = findRoundsForBCrypt(maxMillis);
+
+        println("Use the following configurations in your psw4j.properties file" + System.lineSeparator());
+
+        println("   hash.bcrypt.rounds=" + logRounds);
+    }
+
+    private static void manageSCrypt()
+    {
+        String parallelization = ask("Please choose the parallelization (p) parameter: ");
+        int p = Integer.parseInt(parallelization);
+
+        String millis = ask("Please enter a maximum execution time for password hashing (in milliseconds): ");
+        long maxMillis = Long.parseLong(millis);
+
+        int n = findWorkingFactoryForSCrypt(maxMillis, 14, p);
+        int r = findResourcesForSCrypt(maxMillis, n, p);
+
+        println("Estimated memory required for this configuration: " + new SCryptFunction(n, r, p).getRequiredMemory());
+
+
+        println("Use the following configurations in your psw4j.properties file" + System.lineSeparator());
+
+        println("   hash.scrypt.workfactor=" + n);
+        println("   hash.scrypt.resources=" + r);
+        println("   hash.scrypt.parallelization=" + p);
     }
 
 
@@ -52,6 +139,14 @@ public class SystemChecker
     {
         warmUpBCrypt();
 
+        StringBuilder report = new StringBuilder()
+                .append(System.lineSeparator())
+                .append("BCrypt")
+                .append(" under ")
+                .append(maxMilliseconds)
+                .append("ms")
+                .append(System.lineSeparator());
+
         long elapsed;
         int rounds = 3;
         do
@@ -64,9 +159,31 @@ public class SystemChecker
             long end = System.currentTimeMillis();
             elapsed = end - start;
 
+            report.append(" * logRounds: ")
+                    .append(rounds)
+                    .append(" -> ")
+                    .append(elapsed)
+                    .append("ms")
+                    .append(System.lineSeparator());
+
         } while (elapsed <= maxMilliseconds);
 
-        return rounds - 1;
+        int finalRounds = rounds - 1;
+
+        report.append("*** Final result: ")
+                .append(finalRounds)
+                .append(" logRounds under ")
+                .append(maxMilliseconds)
+                .append("ms ***")
+                .append(System.lineSeparator());
+
+        if (LOG.isInfoEnabled())
+        {
+            LOG.info(report.toString());
+        }
+        println(report.toString()); // NOSONAR
+
+        return finalRounds;
     }
 
 
@@ -74,15 +191,16 @@ public class SystemChecker
     {
         warmUpPBKDF2(algorithm, length);
 
-        StringBuilder report = new StringBuilder()
-                .append("PBKDF2 with PBKDF2WithHmac")
-                .append(algorithm.name())
-                .append(" and length ")
-                .append(length)
-                .append(" under ")
-                .append(maxMilliseconds)
-                .append("ms")
-                .append(System.lineSeparator()).append(System.lineSeparator());
+        String title = System.lineSeparator() +
+                "Finding the number of iterations for PBKDF2 with algorithm=PBKDF2WithHmac" +
+                algorithm.name() +
+                " and length=" +
+                length +
+                " under " +
+                maxMilliseconds +
+                "ms" +
+                System.lineSeparator();
+        println(title);
 
 
         long elapsed;
@@ -97,20 +215,23 @@ public class SystemChecker
             long end = System.currentTimeMillis();
             elapsed = end - start;
 
-            report.append(" - iterations: ")
-                    .append(iterations)
-                    .append(" -> ")
-                    .append(elapsed)
-                    .append("ms")
-                    .append(System.lineSeparator());
-
         } while (elapsed <= maxMilliseconds);
 
         int finalIterations = iterations - 100;
 
-        report.append(System.lineSeparator()).append("Final result: ").append(finalIterations).append(" iterations under ").append(maxMilliseconds).append("ms");
+        StringBuilder result = new StringBuilder()
+                .append("*** Final result: ")
+                .append(finalIterations)
+                .append(" iterations under ")
+                .append(maxMilliseconds)
+                .append("ms ***")
+                .append(System.lineSeparator());
 
-        LOG.info(report.toString());
+        if (LOG.isInfoEnabled())
+        {
+            LOG.info(result.toString());
+        }
+        println(result.toString());
 
         return finalIterations;
     }
@@ -119,6 +240,17 @@ public class SystemChecker
     {
 
         warmUpSCrypt(2, resources, parallelization);
+
+        StringBuilder report = new StringBuilder()
+                .append(System.lineSeparator())
+                .append("SCrypt with r=")
+                .append(resources)
+                .append(" and p=")
+                .append(parallelization)
+                .append(" under ")
+                .append(maxMilliseconds)
+                .append("ms")
+                .append(System.lineSeparator());
 
         long elapsed;
         int workFactor = 1;
@@ -132,14 +264,47 @@ public class SystemChecker
             long end = System.currentTimeMillis();
             elapsed = end - start;
 
+            report.append(" - workFactor: ")
+                    .append(workFactor)
+                    .append(" -> ")
+                    .append(elapsed)
+                    .append("ms")
+                    .append(System.lineSeparator());
+
         } while (elapsed <= maxMilliseconds);
 
-        return workFactor / 2;
+
+        int finalWorkFactor = workFactor / 2;
+
+        report.append("*** Final result: ")
+                .append(finalWorkFactor)
+                .append(" workFactor (N) under ")
+                .append(maxMilliseconds)
+                .append("ms ***");
+
+        if (LOG.isInfoEnabled())
+        {
+            LOG.info(report.toString());
+        }
+        println(report.toString()); // NOSONAR
+
+        return finalWorkFactor;
     }
 
     public static int findResourcesForSCrypt(long maxMilliseconds, int workFactor, int parallelization)
     {
         warmUpSCrypt(workFactor, 1, parallelization);
+
+        StringBuilder report = new StringBuilder()
+                .append(System.lineSeparator())
+                .append("SCrypt with N=")
+                .append(workFactor)
+                .append(" and p=")
+                .append(parallelization)
+                .append(" under ")
+                .append(maxMilliseconds)
+                .append("ms")
+                .append(System.lineSeparator());
 
         long elapsed;
         int resources = 0;
@@ -153,9 +318,31 @@ public class SystemChecker
             long end = System.currentTimeMillis();
             elapsed = end - start;
 
+            report.append(" - resources: ")
+                    .append(resources)
+                    .append(" -> ")
+                    .append(elapsed)
+                    .append("ms")
+                    .append(System.lineSeparator());
+
         } while (elapsed <= maxMilliseconds);
 
-        return resources - 1;
+        int finalResources = resources - 1;
+
+        report.append("*** Final result: ")
+                .append(finalResources)
+                .append(" resources (r) under ")
+                .append(maxMilliseconds)
+                .append("ms ***")
+                .append(System.lineSeparator());
+
+        if (LOG.isInfoEnabled())
+        {
+            LOG.info(report.toString());
+        }
+        println(report.toString()); // NOSONAR
+
+        return finalResources;
     }
 
 
@@ -181,6 +368,18 @@ public class SystemChecker
         {
             SCryptFunction.getInstance(workFactor, resources, parallelization).hash(TO_BE_HASHED);
         }
+    }
+
+    private static void println(String message)
+    {
+        System.out.println(message); // NOSONAR
+    }
+
+
+    private static String ask(String message)
+    {
+        System.out.print(message); // NOSONAR
+        return SCANNER.nextLine();
     }
 
 

@@ -42,7 +42,7 @@ public class SystemCheckTest
         // GIVEN
 
         // WHEN
-        int result = SystemChecker.findRoundsForBCrypt(1);
+        int result = SystemChecker.findRoundsForBCrypt(100);
 
         // THEN
         Assert.assertTrue(result > 0);
@@ -52,10 +52,11 @@ public class SystemCheckTest
     public void testSCryptRounds()
     {
         // GIVEN
+        long maxMilliseconds = 100L;
 
         // WHEN
-        int result1 = SystemChecker.findWorkingFactoryForSCrypt(100, 16, 1);
-        int result2 = SystemChecker.findResourcesForSCrypt(100, 16384, 1);
+        int result1 = SystemChecker.findWorkingFactoryForSCrypt(maxMilliseconds, 16, 1);
+        int result2 = SystemChecker.findResourcesForSCrypt(maxMilliseconds, result1, 1);
 
         // THEN
         Assert.assertTrue(result1 > 0);

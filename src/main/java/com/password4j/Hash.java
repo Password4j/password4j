@@ -131,6 +131,18 @@ public class Hash
     }
 
     /**
+     * Retrieves the {@link HashingFunction} used
+     * to hash the password.
+     *
+     * @return the CHF
+     * @since 0.4.0
+     */
+    public HashingFunction getHashingFunction()
+    {
+        return hashingFunction;
+    }
+
+    /**
      * Retrieves the salt used by the hashing function.
      *
      * @return the salt.

@@ -400,6 +400,50 @@ public class BCryptFunctionTest
     }
 
     @Test(expected = BadParametersException.class)
+    public void testBadSalt1()
+    {
+        // GIVEN
+        String password = "password";
+        String badSalt1 = "2b$06$ehKGYiS4wt2HAr7KQXS5z.";
+
+        // WHEN
+        BCryptFunction.getInstance(10).hash(password, badSalt1);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadSalt2()
+    {
+        // GIVEN
+        String password = "password";
+        String badSalt2 = "$2b06$ehKGYiS4wt2HAr7KQXS5z.";
+
+        // WHEN
+        BCryptFunction.getInstance(10).hash(password, badSalt2);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadSalt3()
+    {
+        // GIVEN
+        String password = "password";
+        String badSalt3 = "$2d$06$ehKGYiS4wt2HAr7KQXS5z.";
+
+        // WHEN
+        BCryptFunction.getInstance(10).hash(password, badSalt3);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadSalt4()
+    {
+        // GIVEN
+        String password = "password";
+        String badSalt3 = "$2b$06%ehKGYiS4wt2HAr7KQXS5z.";
+
+        // WHEN
+        BCryptFunction.getInstance(10).hash(password, badSalt3);
+    }
+
+    @Test(expected = BadParametersException.class)
     public void genSaltFailsWithTooFewRounds()
     {
         BCryptFunction.generateSalt(3);

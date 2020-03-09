@@ -146,6 +146,20 @@ public class SCryptFunction extends AbstractHashingFunction
         return 128L * workFactor * resources * parallelization;
     }
 
+    public String getRequiredMemory()
+    {
+        long memoryInBytes = getRequiredBytes();
+        if(memoryInBytes > 1_000_000)
+        {
+            return Math.round(memoryInBytes / 10_000f) / 100.0 + "MB";
+        }
+        if(memoryInBytes > 1_000)
+        {
+            return Math.round(memoryInBytes / 1_000f) / 100.0 + "KB";
+        }
+        return memoryInBytes + "B";
+    }
+
     @Override
     public boolean equals(Object obj)
     {
@@ -235,7 +249,7 @@ public class SCryptFunction extends AbstractHashingFunction
         }
         else
         {
-            throw new IllegalArgumentException("N must be a power of 2 greater than 1");
+            throw new IllegalArgumentException("N must be a power of 2 greater than 1. Found " + workFactor);
         }
     }
 

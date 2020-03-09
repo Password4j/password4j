@@ -259,7 +259,7 @@ public class AlgorithmFinder
         int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", 32_768);
         int resources = PropertyReader.readInt("hash.scrypt.resources", 8);
         int parallelization = PropertyReader.readInt("hash.scrypt.parallelization", 1);
-        return SCryptFunction.getInstance(resources, workFactor, parallelization);
+        return SCryptFunction.getInstance(workFactor, resources, parallelization);
     }
 
     /**

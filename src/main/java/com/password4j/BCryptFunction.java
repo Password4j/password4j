@@ -34,7 +34,7 @@ public class BCryptFunction extends AbstractHashingFunction
 
     private static final int[] P_ORIG = { //
             0x243f6a88, 0x85a308d3, 0x13198a2e, 0x03707344, 0xa4093822, 0x299f31d0, 0x082efa98, 0xec4e6c89, 0x452821e6,
-            0x38d01377, 0xbe5466cf, 0x34e90c6c, 0xc0ac29b7, 0xc97c50dd, 0x3f84d5b5, 0xb5470917, 0x9216d5d9, 0x8979fb1b };
+            0x38d01377, 0xbe5466cf, 0x34e90c6c, 0xc0ac29b7, 0xc97c50dd, 0x3f84d5b5, 0xb5470917, 0x9216d5d9, 0x8979fb1b};
 
     private static final int[] S_ORIG = { //
             0xd1310ba6, 0x98dfb5ac, 0x2ffd72db, 0xd01adfb7, 0xb8e1afed, 0x6a267e96, 0xba7c9045, 0xf12c7f99, 0x24a19947,
@@ -150,21 +150,21 @@ public class BCryptFunction extends AbstractHashingFunction
             0x45e1d006, 0xc3f27b9a, 0xc9aa53fd, 0x62a80f00, 0xbb25bfe2, 0x35bdd2f6, 0x71126905, 0xb2040222, 0xb6cbcf7c,
             0xcd769c2b, 0x53113ec0, 0x1640e3d3, 0x38abbd60, 0x2547adf0, 0xba38209c, 0xf746ce76, 0x77afa1c5, 0x20756060,
             0x85cbfe4e, 0x8ae88dd8, 0x7aaaf9b0, 0x4cf9aa7e, 0x1948c25c, 0x02fb8a8c, 0x01c36ae4, 0xd6ebe1f9, 0x90d4f869,
-            0xa65cdea0, 0x3f09252d, 0xc208e69f, 0xb74e6132, 0xce77e25b, 0x578fdfe3, 0x3ac372e6 };
+            0xa65cdea0, 0x3f09252d, 0xc208e69f, 0xb74e6132, 0xce77e25b, 0x578fdfe3, 0x3ac372e6};
 
-    private static final int[] BF_CRYPT_CIPHERTEXT = { 0x4f727068, 0x65616e42, 0x65686f6c, 0x64657253, 0x63727944, 0x6f756274 };
+    private static final int[] BF_CRYPT_CIPHERTEXT = {0x4f727068, 0x65616e42, 0x65686f6c, 0x64657253, 0x63727944, 0x6f756274};
 
     private static final char[] BASE_64_CODE = { //
             '.', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
             'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-            's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+            's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
     private static final byte[] INDEX_64 = { //
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, -1,
             -1, -1, -1, -1, -1, -1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
             27, -1, -1, -1, -1, -1, -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-            50, 51, 52, 53, -1, -1, -1, -1, -1 };
+            50, 51, 52, 53, -1, -1, -1, -1, -1};
 
     private int logRounds;
 
@@ -214,17 +214,8 @@ public class BCryptFunction extends AbstractHashingFunction
 
     private Hash internalHash(String plain, String salt)
     {
-        try
-        {
-            String hash = hashPw(plain, salt);
-            return new Hash(this, hash, salt);
-        }
-        catch (IllegalArgumentException iae)
-        {
-            String message = "Invalid specification with salt=" + salt + " and #rounds=`" + logRounds + "`";
-            throw new BadParametersException(message, iae);
-        }
-
+        String hash = hashPw(plain, salt);
+        return new Hash(this, hash, salt);
     }
 
     @Override
@@ -384,7 +375,7 @@ public class BCryptFunction extends AbstractHashingFunction
     private static int[] streamToWords(byte[] data, int[] offp, int[] signp)
     {
         int i;
-        int[] words = { 0, 0 };
+        int[] words = {0, 0};
         int off = offp[0];
         int sign = signp[0];
 
@@ -404,21 +395,21 @@ public class BCryptFunction extends AbstractHashingFunction
 
     private static int streamToWord(byte[] data, int[] offp)
     {
-        int[] signp = { 0 };
+        int[] signp = {0};
         return streamToWords(data, offp, signp)[0];
     }
 
     private static int streamToWordBug(byte[] data, int[] offp)
     {
-        int[] signp = { 0 };
+        int[] signp = {0};
         return streamToWords(data, offp, signp)[1];
     }
 
     private void key(byte[] key, boolean signExtBug, int[] pArray, int[] sBox)
     {
         int i;
-        int[] koffp = { 0 };
-        int[] lr = { 0, 0 };
+        int[] koffp = {0};
+        int[] lr = {0, 0};
         int plen = pArray.length;
         int slen = sBox.length;
 
@@ -446,12 +437,12 @@ public class BCryptFunction extends AbstractHashingFunction
     private void eksKey(byte[] data, byte[] key, boolean signExtBug, int safety, int[] pArray, int[] sBox)
     {
         int i;
-        int[] koffp = { 0 };
-        int[] doffp = { 0 };
-        int[] lr = { 0, 0 };
+        int[] koffp = {0};
+        int[] doffp = {0};
+        int[] lr = {0, 0};
         int plen = pArray.length;
         int slen = sBox.length;
-        int[] signp = { 0 }; // non-benign sign-extension flag
+        int[] signp = {0}; // non-benign sign-extension flag
         int diff = 0;        // zero iff correct and buggy are same
 
         for (i = 0; i < plen; i++)
@@ -500,10 +491,10 @@ public class BCryptFunction extends AbstractHashingFunction
         byte[] ret;
 
         if (logRounds < 4 || logRounds > 31)
-            throw new IllegalArgumentException("Bad number of rounds");
+            throw new BadParametersException("Bad number of rounds");
         rounds = 1 << logRounds;
         if (salt.length != BCRYPT_SALT_LEN)
-            throw new IllegalArgumentException("Bad salt length");
+            throw new BadParametersException("Bad salt length");
 
         int[] pArray = P_ORIG.clone();
         int[] sBox = S_ORIG.clone();
@@ -550,35 +541,35 @@ public class BCryptFunction extends AbstractHashingFunction
 
         if (salt == null)
         {
-            throw new IllegalArgumentException("salt cannot be null");
+            throw new BadParametersException("salt cannot be null");
         }
 
         int saltLength = salt.length();
 
         if (saltLength < 28)
         {
-            throw new IllegalArgumentException("Invalid salt");
+            throw new BadParametersException("Invalid salt");
         }
 
         if (salt.charAt(0) != '$' || salt.charAt(1) != '2')
-            throw new IllegalArgumentException("Invalid salt version");
+            throw new BadParametersException("Invalid salt version");
         if (salt.charAt(2) == '$')
             off = 3;
         else
         {
             minor = salt.charAt(2);
             if ((minor != 'a' && minor != 'x' && minor != 'y' && minor != 'b') || salt.charAt(3) != '$')
-                throw new IllegalArgumentException("Invalid salt revision");
+                throw new BadParametersException("Invalid salt revision");
             off = 4;
         }
 
         // Extract number of rounds
         if (salt.charAt(off + 2) > '$')
-            throw new IllegalArgumentException("Missing salt rounds");
+            throw new BadParametersException("Missing salt rounds");
 
         if (off == 4 && saltLength < 29)
         {
-            throw new IllegalArgumentException("Invalid salt");
+            throw new BadParametersException("Invalid salt");
         }
         rounds = Integer.parseInt(salt.substring(off, off + 2));
 

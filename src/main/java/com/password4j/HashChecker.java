@@ -20,6 +20,8 @@ public class HashChecker<C extends HashChecker<?>>
 {
     private String hash;
 
+    private String salt;
+
     private String pepper;
 
     private String plain;
@@ -41,9 +43,15 @@ public class HashChecker<C extends HashChecker<?>>
         return (C) this;
     }
 
+    public C addSalt(String salt)
+    {
+        this.salt = salt;
+        return (C) this;
+    }
+
     public boolean with(HashingFunction hashingFunction)
     {
-        Hash internalHash = new Hash(hashingFunction, hash, null);
+        Hash internalHash = new Hash(hashingFunction, hash, salt);
         internalHash.setPepper(pepper);
 
         return internalHash.check(plain);

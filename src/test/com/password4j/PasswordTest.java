@@ -17,6 +17,7 @@
 package com.password4j;
 
 import com.password4j.custom.CustomHashBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -138,6 +139,23 @@ public class PasswordTest
 
     }
 
+    @Test
+    public void testRandomSalt()
+    {
+        // GIVEN
+        String password = "password";
+        String pepper = "pepper";
+        Hash hash = Password.hash(password).addPepper(pepper).addRandomSalt(12).withCompressedPBKDF2();
+
+        // WHEN
+        boolean check1 = Password.check(hash.getResult(), password).addPepper(pepper).withCompressedPBKDF2();
+
+
+        // THEN
+        Assert.assertTrue(check1);
+        Assert.assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
+    }
+
     @Test(expected = BadParametersException.class)
     public void testBad1()
     {
@@ -166,6 +184,12 @@ public class PasswordTest
     public void testBad5()
     {
         Password.check("hash", "password", null);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBad6()
+    {
+        Password.hash("password").addRandomSalt(-1);
     }
 
 

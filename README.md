@@ -16,6 +16,15 @@ an easy and configurable way.
 The library fully supports **BCrypt**, **SCrypt** and **PBKDF2** and can produce and handle cryptographic **salt** and **pepper**.
 
 ## Products successfully integrated with Password4j
-![SAP Hybris Commerce Cloud](https://i.imgur.com/9eg6DP3.png "SAP Hybris Commerce Cloud")
-![Apereo CAS](https://i.imgur.com/88iYWwe.png "Apereo CAS")
+&nbsp;&nbsp;&nbsp;&nbsp;[![SAP Hybris Commerce Cloud](https://i.imgur.com/9eg6DP3.png "SAP Hybris Commerce Cloud")](https://www.sap.com/products/crm/e-commerce-platforms.html) &nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;[![Apereo CAS](https://i.imgur.com/88iYWwe.png "Apereo CAS")](https://www.apereo.org/projects/cas)
+
+## Getting Started
+
+### Prerequisites
+You just need
+ * **Java 1.8 +** by any vendor
+ * **Maven 3.0 +**
+
+
 

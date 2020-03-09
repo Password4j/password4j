@@ -68,6 +68,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>de.mkammerer</groupId>
+            <artifactId>argon2-jvm-nolibs</artifactId>
+            <version>2.6</version>
+        </dependency>
+
     </dependencies>
 
     <build>

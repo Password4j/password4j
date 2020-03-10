@@ -11,13 +11,37 @@
 Password4j is a Java facade for hashing and checking passwords with different Crypto Hashing Functions (CHF) in
 an easy and configurable way.
 
-![example code](https://i.imgur.com/Q1evmoK.png)
+Algorithms can be configured **programmatically** or through a **property file** in your classpath <sup>(see Configuration section)</sup>.
+
+The configurations are mostly dependent on your environment. Password4j delivers a **tool that can create
+a set of optimal parameters** based on the system performance and the desired time threshold <sup>(see Performance section)</sup>.
+
+```java
+// Hashing with BCrypt
+Hash h1 = Password.hash("my password")
+                  .addPepper("pepper")
+                  .withBCrypt();                // BCrypt parameters are located
+                                                // in a property file
+
+h1.getResult();                                 // The hash,
+h1.getSalt();                                   // the salt,
+h1.getPepper();                                 // the pepper,
+h1.getHashingFunction();                        // and the algorithm with its parameters
+                                                // can be easily retrieved.
+```
+```java
+// Validating the password with SCrypt
+String hash = "$s0$e0801$c2FsdA==$dFcxr0SE8yOWiWnto..."
+String userSubmittedPassword = "..."
+
+Password.check(userSubmittedPassword, hash)   
+        .addPepper("pepper")
+        .withSCrypt();                           // SCrypt parameters are located
+                                                 // in a property file
+```
 
 The library fully supports **BCrypt**, **SCrypt** and **PBKDF2** and can produce and handle cryptographic **salt** and **pepper**.
 
-## Products successfully integrated with Password4j
-&nbsp;&nbsp;&nbsp;&nbsp;[![SAP Hybris Commerce Cloud](https://i.imgur.com/9eg6DP3.png "SAP Hybris Commerce Cloud")](https://www.sap.com/products/crm/e-commerce-platforms.html) &nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;[![Apereo CAS](https://i.imgur.com/88iYWwe.png "Apereo CAS")](https://www.apereo.org/projects/cas)
 
 ## Getting Started
 
@@ -25,6 +49,27 @@ The library fully supports **BCrypt**, **SCrypt** and **PBKDF2** and can produce
 You just need
  * **Java 1.8 +** by any vendor
  * **Maven 3.0 +**
+ 
+### Installation
+
+Put the following dependency in your `pom.xml` file.
+
+```xml
+<dependency>
+    <groupId>com.password4j</groupId>
+    <artifactId>password4j</artifactId>
+    <version>0.4.0</version>
+</dependency>
+```
+
+### Usage
+Password4j provides two main methods to hash and verify passwords.
+
+ 
+ ## Products successfully integrated with Password4j
+ &nbsp;&nbsp;&nbsp;&nbsp;[![SAP Hybris Commerce Cloud](https://i.imgur.com/9eg6DP3.png "SAP Hybris Commerce Cloud")](https://www.sap.com/products/crm/e-commerce-platforms.html) &nbsp;&nbsp;&nbsp;&nbsp;
+ &nbsp;&nbsp;&nbsp;&nbsp;[![Apereo CAS](https://i.imgur.com/88iYWwe.png "Apereo CAS")](https://www.apereo.org/projects/cas)
+
 
 
 

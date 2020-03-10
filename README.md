@@ -23,7 +23,7 @@ The library fully supports **BCrypt**, **SCrypt** and **PBKDF2** and can produce
 
 ## Getting Started
 
-### Prerequisites
+
 You just need
  * **Java 1.8 +** by any vendor
  * **Maven 3.0 +**
@@ -43,6 +43,26 @@ Put the following dependency in your `pom.xml` file.
 ### Usage
 Password4j provides two main methods to hash and verify passwords.
 
+#### Password.*hash*()
+This method helps the developer to build a chain of parameters that the CHF will use to produce the hash.
+
+Salt and pepper may be optionally added into the chain.
+
+Example with PBKDF2: 
+```java
+// PBKDF2 with salt 12 bytes long (randomly generated).
+Hash hash = Password.hash("password").addRandomSalt(12).withPBKDF2();
+
+// PBKDF2 with a chosen salt.
+Hash hash = Password.hash("password").addSalt("fixed salt").withPBKDF2();
+
+// PBKDF2 with chosen salt and pepper.
+Hash hash = Password.hash("password").addSalt("fixed salt").addPepper("pepper").withPBKDF2();
+
+// Custom PBKDF2 (PBKDF2 with HMAC-SHA512, 64000 iterations and 512bit length)
+Hash hash = Password.hash("password").with(new PBKDF2Function(Algorithm.SHA512, 64000, 512));
+```
+The same structure can be adopted for the other algorithms, not just for PBKDF2.
  
  ## Products successfully integrated with Password4j
  &nbsp;&nbsp;&nbsp;&nbsp;[![SAP Hybris Commerce Cloud](https://i.imgur.com/9eg6DP3.png "SAP Hybris Commerce Cloud")](https://www.sap.com/products/crm/e-commerce-platforms.html) &nbsp;&nbsp;&nbsp;&nbsp;

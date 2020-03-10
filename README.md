@@ -16,17 +16,7 @@ Algorithms can be configured **programmatically** or through a **property file**
 The configurations are mostly dependent on your environment. Password4j delivers a **tool that can create
 a set of optimal parameters** based on the system performance and the desired time threshold <sup>(see Performance section)</sup>.
 
-![Hashing with BCrypt](https://i.imgur.com/mIWI3oU.png)
-```java
-// Validating the password with SCrypt
-String hash = "$s0$e0801$c2FsdA==$dFcxr0SE8yOWiWnto..."
-String userSubmittedPassword = "..."
-
-Password.check(userSubmittedPassword, hash)   
-        .addPepper("pepper")
-        .withSCrypt();                           // SCrypt parameters are located
-                                                 // in a property file
-```
+![Hashing with BCrypt](https://i.imgur.com/zQMvGdG.png)
 
 The library fully supports **BCrypt**, **SCrypt** and **PBKDF2** and can produce and handle cryptographic **salt** and **pepper**.
 

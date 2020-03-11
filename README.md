@@ -126,7 +126,7 @@ Password4j makes available a portable way to configure the library.
 
 With the property file `psw4j.properties` put in your classpath, you can define the parameters of all the supported CHFs or just the CHF(s) you need.
 
-Here's a basic configuration (please do not use it in production, but instead start a benchmark session in your target environment<sup>see [Configuration section](#Configuration)</sup>)
+Here's a basic configuration (please do not use it in production, but instead start a benchmark session in your target environment<sup>see [Performance section](#Performance)</sup>)
 ```properties
 ### PBKDF2
 # with HMAC-SHA256

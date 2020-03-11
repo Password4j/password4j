@@ -347,9 +347,9 @@ public class BCryptFunctionTest
     @Test
     public void testBase64EncodeSimpleByteArrays()
     {
-        Assert.assertEquals(encodeBase64(new byte[]{0}, 1), "..");
-        Assert.assertEquals(encodeBase64(new byte[]{0, 0}, 2), "...");
-        Assert.assertEquals(encodeBase64(new byte[]{0, 0, 0}, 3), "....");
+        Assert.assertEquals("..", encodeBase64(new byte[]{0}, 1));
+        Assert.assertEquals("...", encodeBase64(new byte[]{0, 0}, 2));
+        Assert.assertEquals("....", encodeBase64(new byte[]{0, 0, 0}, 3));
     }
 
     @Test

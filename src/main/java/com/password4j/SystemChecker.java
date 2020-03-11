@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Scanner;
 
 public class SystemChecker
 {
@@ -33,8 +32,6 @@ public class SystemChecker
     private static final String SALT = new String(SaltGenerator.generate());
 
     private static final int WARMUP_ROUNDS = 20;
-
-    private static final Scanner SCANNER = new Scanner(System.in);
 
     private SystemChecker()
     {

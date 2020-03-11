@@ -539,20 +539,10 @@ public class BCryptFunction extends AbstractHashingFunction
         int off;
         StringBuilder rs = new StringBuilder();
 
-        if (salt == null)
-        {
-            throw new BadParametersException("salt cannot be null");
-        }
+        internalChecks(salt);
 
         int saltLength = salt.length();
 
-        if (saltLength < 28)
-        {
-            throw new BadParametersException("Invalid salt");
-        }
-
-        if (salt.charAt(0) != '$' || salt.charAt(1) != '2')
-            throw new BadParametersException("Invalid salt version");
         if (salt.charAt(2) == '$')
             off = 3;
         else
@@ -592,6 +582,22 @@ public class BCryptFunction extends AbstractHashingFunction
         encodeBase64(saltb, saltb.length, rs);
         encodeBase64(hashed, BF_CRYPT_CIPHERTEXT.length * 4 - 1, rs);
         return rs.toString();
+    }
+
+    private static void internalChecks(String salt)
+    {
+        if (salt == null)
+        {
+            throw new BadParametersException("salt cannot be null");
+        }
+        else if (salt.length() < 28)
+        {
+            throw new BadParametersException("Invalid salt");
+        }
+        else if (salt.charAt(0) != '$' || salt.charAt(1) != '2')
+        {
+            throw new BadParametersException("Invalid salt version");
+        }
     }
 
     private static String generateSalt(String prefix, int logRounds)

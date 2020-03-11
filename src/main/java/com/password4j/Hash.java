@@ -222,7 +222,6 @@ public class Hash
      *
      * @param obj the object to compare
      * @return true if equals
-     * @see HashingFunction#equals(Object)
      * @since 0.1.0
      */
     @Override

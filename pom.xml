@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.password4j</groupId>
-    <artifactId>password4j-core</artifactId>
-    <version>0.4.0</version>
+    <artifactId>password4j</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
 
@@ -16,6 +16,12 @@
         with different Crypto Hashing Functions (CHF).
     </description>
     <url>https://password4j.com/</url>
+
+    <scm>
+        <connection>scm:git:git@github.com/Password4j/${project.artifactId}.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/Password4j-api/${project.artifactId}.git</developerConnection>
+        <url>https://github.com/Password4j/password4j</url>
+    </scm>
 
     <licenses>
         <license>
@@ -61,12 +67,6 @@
             <version>1.8</version>
         </dependency>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.codehaus.mojo</groupId>
@@ -78,6 +78,15 @@
                     <artifactId>slf4j-jdk14</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -118,9 +127,26 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.1.1</version>
             </plugin>
+
         </plugins>
     </build>
 

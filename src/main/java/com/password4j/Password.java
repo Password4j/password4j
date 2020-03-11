@@ -66,6 +66,4 @@ public class Password
         }
         return checkerBiFunction.apply(plain, hash);
     }
-
-
 }

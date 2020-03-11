@@ -78,7 +78,7 @@ public class SystemChecker
         }
         println(listSB.toString());
         String chosenVariant = ask("Please choose one: ");
-        String suffix  = chosenVariant.replace("PBKDF2WithHmac", "");
+        String suffix = chosenVariant.replace("PBKDF2WithHmac", "");
         PBKDF2Function.Algorithm algorithm = PBKDF2Function.Algorithm.valueOf(suffix);
         println("The recommended length of the derived key is " + algorithm.bits() + " bits.");
         String millis = ask("Please enter a maximum execution time for password hashing (in milliseconds): ");
@@ -373,14 +373,17 @@ public class SystemChecker
 
     private static void println(String message)
     {
-        System.out.println(message); // NOSONAR
+        if (System.console() != null && System.console().writer() != null)
+        {
+            System.console().writer().println(message);
+        }
     }
 
 
     private static String ask(String message)
     {
-        System.out.print(message); // NOSONAR
-        return StringEscapeUtils.escapeJava(SCANNER.nextLine());
+        println(message);
+        return StringEscapeUtils.escapeJava(System.console().readLine());
     }
 
 

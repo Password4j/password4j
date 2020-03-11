@@ -22,15 +22,11 @@ The library fully supports **[BCrypt](https://en.wikipedia.org/wiki/Bcrypt)**, *
 and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/Salt_(cryptography))** and **[pepper](https://en.wikipedia.org/wiki/Pepper_(cryptography))**.
 
 
-## Getting Started
-
-
+## Installation
 You just need
  * **Java 1.8 +** by any vendor
  * **Maven 3.0 +**
  
-### Installation
-
 Put the following dependency in your `pom.xml` file.
 
 ```xml
@@ -41,10 +37,10 @@ Put the following dependency in your `pom.xml` file.
 </dependency>
 ```
 
-### Usage
+## Usage
 Password4j provides two main methods to hash and verify passwords.
 
-#### Password.*hash*()
+### Password.*hash*()
 This method helps the developer to build a chain of parameters that the CHF will use to produce the hash.
 
 Salt and pepper may be optionally added into the chain.
@@ -65,7 +61,7 @@ Hash hash = Password.hash("password").with(new PBKDF2Function(Algorithm.SHA512, 
 ```
 The same structure can be adopted for the other algorithms, not just for PBKDF2.
 
-##### Customize Password.*hash*()
+#### Customize Password.*hash*()
 If you need to add a new method in the chain of parameters or want to override one, here's the fastest way:
 ```java
 Password.hash("password", CustomBuilder::new).withSalt("fixed salt").withOtherStuff().withBCrypt();
@@ -86,7 +82,7 @@ public class CustomBuilder extends HashBuilder<CustomBuilder> {
 ```
 Create your custom `HashBuilder` and use it in `Password.hash()`.
 
-#### Password.*check*()
+### Password.*check*()
 The verification process builds a chain of parameters, as well.
 ```java
 String plaintext = "...";                                       // User provided password.
@@ -125,7 +121,7 @@ public class CustomChecker extends HashChecker<CustomChecker> {
 ```
 Create your custom `HashChecker` and use it in `Password.check()`.
 
-### Configuration
+## Configuration
 Password4j makes available a portable way to configure the library.
 
 With the property file `psw4j.properties` put in your classpath, you can define the parameters of all the supported CHFs or just the CHF(s) you need.
@@ -170,10 +166,39 @@ Password.check("password", "hash").addPepper().withSCrypt();
 global.random.strong=true
 ```
 but make sure that your JVM supports it and it points to a non-blocking source of entropy, otherwise you may experience huge performance drops<sup>see [SecureRandom](https://docs.oracle.com/javase/8/docs/api/java/security/SecureRandom.html#getInstanceStrong--)</sup>.
- ## Products successfully integrated with Password4j
+
+## Performance
+Password4j is delivered with a utility maven profile that helps the developers to choose the right parameters for a specific CHF.
+
+This tool must be used in the target system because performances may vary on different environments.
+```shell script
+mvn compile -Performance
+```
+
+
+## Products successfully integrated with Password4j
+Here a list where Password4j has been successfully integrated.
+ 
  &nbsp;&nbsp;&nbsp;&nbsp;[![SAP Hybris Commerce Cloud](https://i.imgur.com/9eg6DP3.png "SAP Hybris Commerce Cloud")](https://www.sap.com/products/crm/e-commerce-platforms.html) &nbsp;&nbsp;&nbsp;&nbsp;
  &nbsp;&nbsp;&nbsp;&nbsp;[![Apereo CAS](https://i.imgur.com/88iYWwe.png "Apereo CAS")](https://www.apereo.org/projects/cas)
 
+## Contributing
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Versioning
+We use [SemVer](http://semver.org/) for versioning. 
+
+For the versions available, see the [tags on this repository](https://github.com/Password4j/password4j/tags). 
+
+## Authors
+
+* **David Bertoldi** - *Initial work* - [firaja](https://github.com/firaja)
+
+See also the list of [contributors](https://github.com/Password4j/password4j/contributors) who participated in this project.
+
+## License
+
+This project is licensed under the Apache License 2.0 License - see the [LICENSE](LICENSE) file for details
 
 
 

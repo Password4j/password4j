@@ -16,6 +16,8 @@
  */
 package com.password4j;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class HashChecker<C extends HashChecker<?>>
 {
     private String hash;
@@ -57,10 +59,18 @@ public class HashChecker<C extends HashChecker<?>>
 
     public boolean with(HashingFunction hashingFunction)
     {
-        Hash internalHash = new Hash(hashingFunction, hash, salt);
-        internalHash.setPepper(pepper);
+        if (plain == null)
+        {
+            return false;
+        }
 
-        return internalHash.check(plain);
+        String peppered = plain;
+        if (StringUtils.isNotEmpty(this.pepper))
+        {
+            peppered = this.pepper + peppered;
+        }
+
+        return hashingFunction.check(peppered, hash, salt);
     }
 
     public boolean withPBKDF2()

@@ -17,7 +17,7 @@
 
     <scm>
         <connection>scm:git:git@github.com/Password4j/${project.artifactId}.git</connection>
-        <developerConnection>scm:git:git@github.com/Password4j/${project.artifactId}.git</developerConnection>
+        <developerConnection>scm:git:ssh://git@github.com/Password4j/${project.artifactId}.git</developerConnection>
         <url>https://github.com/Password4j/password4j</url>
       <tag>1.0.0</tag>
   </scm>

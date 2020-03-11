@@ -57,14 +57,15 @@ Hash hash = Password.hash("password").addSalt("fixed salt").withPBKDF2();
 Hash hash = Password.hash("password").addSalt("fixed salt").addPepper("pepper").withPBKDF2();
 
 // Custom PBKDF2 (PBKDF2 with HMAC-SHA512, 64000 iterations and 512bit length).
-Hash hash = Password.hash("password").with(new PBKDF2Function(Algorithm.SHA512, 64000, 512));
+Hash hash = Password.hash("password").with(PBKDF2Function.getInstance(PBKDF2Function.Algorithm.SHA512, 64000, 512));
+
 ```
 The same structure can be adopted for the other algorithms, not just for PBKDF2.
 
 #### Customize Password.*hash*()
 If you need to add a new method in the chain of parameters or want to override one, here's the fastest way:
 ```java
-Password.hash("password", CustomBuilder::new).withSalt("fixed salt").withOtherStuff().withBCrypt();
+Password.hash("password", CustomBuilder::new).addSalt("fixed salt").withOtherStuff().withBCrypt();
 ```
 ```java
 public class CustomBuilder extends HashBuilder<CustomBuilder> {

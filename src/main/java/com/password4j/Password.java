@@ -34,9 +34,9 @@ public class Password
         return hash(plain, HashBuilder::new);
     }
 
-    public static HashChecker check(String hash, String plain)
+    public static HashChecker check(String plain, String hash)
     {
-        return check(hash, plain, HashChecker::new);
+        return check(plain, hash, HashChecker::new);
     }
 
 
@@ -54,7 +54,7 @@ public class Password
     }
 
 
-    public static <C extends HashChecker<?>> C check(String hash, String plain, BiFunction<String, String, C> checkerBiFunction)
+    public static <C extends HashChecker<?>> C check(String plain, String hash, BiFunction<String, String, C> checkerBiFunction)
     {
         if (checkerBiFunction == null)
         {
@@ -64,7 +64,7 @@ public class Password
         {
             throw new BadParametersException("Hash or plain cannot be null");
         }
-        return checkerBiFunction.apply(hash, plain);
+        return checkerBiFunction.apply(plain, hash);
     }
 
 

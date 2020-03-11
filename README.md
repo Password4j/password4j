@@ -59,11 +59,99 @@ Hash hash = Password.hash("password").addSalt("fixed salt").withPBKDF2();
 // PBKDF2 with chosen salt and pepper.
 Hash hash = Password.hash("password").addSalt("fixed salt").addPepper("pepper").withPBKDF2();
 
-// Custom PBKDF2 (PBKDF2 with HMAC-SHA512, 64000 iterations and 512bit length)
+// Custom PBKDF2 (PBKDF2 with HMAC-SHA512, 64000 iterations and 512bit length).
 Hash hash = Password.hash("password").with(new PBKDF2Function(Algorithm.SHA512, 64000, 512));
 ```
 The same structure can be adopted for the other algorithms, not just for PBKDF2.
- 
+
+##### Customize Password.*hash*()
+If you need to add a new method in the chain of parameters or want to override one, here's the fastest way:
+```java
+Password.hash("password", CustomBuilder::new).withSalt("fixed salt").withOtherStuff().withBCrypt();
+```
+```java
+public class CustomBuilder extends HashBuilder<CustomBuilder> {
+    
+    public CustomBuilder withOtherStuff() {
+        // do here your stuff
+        return this;
+    }
+
+    @Override
+    public Hash withBCrypt() {
+        return with(new MyBCryptVariant());               // Recommended way.
+    }                                                     // It must implement HashingFunction
+}
+```
+Create your custom `HashBuilder` and use it in `Password.hash()`.
+
+#### Password.*check*()
+The verification process builds a chain of parameters, as well.
+```java
+String plaintext = "...";                                       // User provided password.
+String hash = "...";                                            // Hash retrieved from DB for that user.
+
+// Verify with PBKDF2.
+boolean verification = Password.check(plaintext, hash).withPBKDF2();
+
+// Verify with PBKDF2 and manually provided salt.
+boolean verification = Password.check(plaintext, hash).addSalt("salt from db").withPBKDF2();
+
+// Verify with PBKDF2 and manually provided salt and pepper.
+boolean verification = Password.check(plaintext, hash).addSalt("salt from db").addPepper("pepper").withPBKDF2();
+```
+ The same structure can be adopted for the other algorithms, not just for PBKDF2. Take in account that BCrypt and SCrypt store the salt
+ inside the hash, so that the `addSalt()` method is not needed.
+
+##### Customize Password.*check*()
+If you need to add a new method in the chain of parameters or want to override one, here's the fastest way:
+```java
+Password.check("password", "hash", CustomChecker::new).withOtherStuff().withBCrypt();
+```
+```java
+public class CustomChecker extends HashChecker<CustomChecker> {
+    
+    public CustomChecker withOtherStuff() {
+        // do here your stuff
+        return this;
+    }
+
+    @Override
+    public boolean withBCrypt() {
+        return with(new MyBCryptVariant());               // Recommended way.
+    }                                                     // It must implement HashingFunction
+}
+```
+Create your custom `HashChecker` and use it in `Password.check()`.
+
+### Configuration
+Password4j makes available a portable way to configure the library.
+
+With the property file `psw4j.properties` put in your classpath, you can define the parameters of all the supported CHFs or just the CHF(s) you need.
+
+Here's a basic configuration (please do not use it in production, but instead start a benchmark session in your target environment<sup>(see Performance section)</sup>)
+```properties
+### PBKDF2
+# with HMAC-SHA256
+hash.pbkdf2.algorithm=SHA256
+# 64000 iterations
+hash.pbkdf2.iterations=64000
+# derived key of 256bit 
+hash.pbkdf2.length=256
+
+### BCrypt
+# logarithmic cost (cost = 2^12)
+hash.bcrypt.rounds=12
+
+### SCrypt
+# N
+hash.scrypt.workfactor=16384
+# r
+hash.scrypt.resources=16
+# p
+hash.scrypt.parallelization=1
+```
+
  ## Products successfully integrated with Password4j
  &nbsp;&nbsp;&nbsp;&nbsp;[![SAP Hybris Commerce Cloud](https://i.imgur.com/9eg6DP3.png "SAP Hybris Commerce Cloud")](https://www.sap.com/products/crm/e-commerce-platforms.html) &nbsp;&nbsp;&nbsp;&nbsp;
  &nbsp;&nbsp;&nbsp;&nbsp;[![Apereo CAS](https://i.imgur.com/88iYWwe.png "Apereo CAS")](https://www.apereo.org/projects/cas)

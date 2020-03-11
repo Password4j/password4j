@@ -108,7 +108,8 @@ public class Hash
      * This constructor populates the object's attributes.
      *
      * @param hashingFunction the cryptographic algorithm used to produce the hash.
-     * @param result          the result of the computation of the hash. Notice that the format vary depending on the algorithm.
+     * @param result          the result of the computation of the hash.
+     *                        Notice that the format varies depending on the algorithm.
      * @param salt            the salt used for the computation.
      * @since 0.1.0
      */

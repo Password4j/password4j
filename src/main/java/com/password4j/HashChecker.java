@@ -31,7 +31,7 @@ public class HashChecker<C extends HashChecker<?>>
         //
     }
 
-    public HashChecker(String hash, String plain)
+    public HashChecker(String plain, String hash)
     {
         this.hash = hash;
         this.plain = plain;

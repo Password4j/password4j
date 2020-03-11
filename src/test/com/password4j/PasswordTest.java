@@ -61,7 +61,7 @@ public class PasswordTest
 
         // THEN
         Assert.assertTrue(strategy.check(pepper + password, hashed));
-        Assert.assertTrue(Password.check(hashed, password).addPepper(pepper).withCompressedPBKDF2());
+        Assert.assertTrue(Password.check(password, hashed).addPepper(pepper).withCompressedPBKDF2());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class PasswordTest
 
         // THEN
         Assert.assertTrue(strategy.check(pepper + password, hashed));
-        Assert.assertTrue(Password.check(hashed, password).addPepper(pepper).withBCrypt());
+        Assert.assertTrue(Password.check(password, hashed).addPepper(pepper).withBCrypt());
     }
 
     @Test
@@ -97,7 +97,7 @@ public class PasswordTest
 
         // THEN
         Assert.assertTrue(strategy.check(pepper + password, hashed));
-        Assert.assertTrue(Password.check(hashed, password).addPepper(pepper).withSCrypt());
+        Assert.assertTrue(Password.check(password, hashed).addPepper(pepper).withSCrypt());
     }
 
     @Test
@@ -128,9 +128,9 @@ public class PasswordTest
         Hash oldHash = Password.hash(password).addPepper(pepper).addSalt(salt).withCompressedPBKDF2();
 
         // WHEN
-        boolean oldCheck = Password.check(oldHash.getResult(), password).addPepper(pepper).withCompressedPBKDF2();
+        boolean oldCheck = Password.check(password, oldHash.getResult()).addPepper(pepper).withCompressedPBKDF2();
         Hash newHash = Password.hash(password).addSalt(pepper).withSCrypt();
-        boolean newCheck = Password.check(newHash.getResult(), password).withSCrypt();
+        boolean newCheck = Password.check(password, newHash.getResult()).withSCrypt();
 
 
         // THEN
@@ -148,7 +148,7 @@ public class PasswordTest
         Hash hash = Password.hash(password).addPepper(pepper).addRandomSalt(12).withCompressedPBKDF2();
 
         // WHEN
-        boolean check1 = Password.check(hash.getResult(), password).addPepper(pepper).withCompressedPBKDF2();
+        boolean check1 = Password.check(password, hash.getResult()).addPepper(pepper).withCompressedPBKDF2();
 
 
         // THEN
@@ -167,7 +167,7 @@ public class PasswordTest
         Hash hash = Password.hash(password).addPepper(pepper).addSalt(salt).withPBKDF2();
 
         // WHEN
-        boolean check1 = Password.check(hash.getResult(), password).addPepper(pepper).addSalt(salt).withPBKDF2();
+        boolean check1 = Password.check(password, hash.getResult()).addPepper(pepper).addSalt(salt).withPBKDF2();
 
 
         // THEN
@@ -219,13 +219,13 @@ public class PasswordTest
     @Test(expected = BadParametersException.class)
     public void testBad4()
     {
-        Password.check("hash", null);
+        Password.check(null, "hash");
     }
 
     @Test(expected = BadParametersException.class)
     public void testBad5()
     {
-        Password.check("hash", "password", null);
+        Password.check("password", "hash", null);
     }
 
     @Test(expected = BadParametersException.class)

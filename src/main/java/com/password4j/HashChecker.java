@@ -43,6 +43,12 @@ public class HashChecker<C extends HashChecker<?>>
         return (C) this;
     }
 
+    public C addPepper()
+    {
+        this.pepper = PepperGenerator.get();
+        return (C) this;
+    }
+
     public C addSalt(String salt)
     {
         this.salt = salt;

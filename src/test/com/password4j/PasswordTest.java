@@ -234,8 +234,20 @@ public class PasswordTest
         Password.hash("password").addRandomSalt(-1);
     }
 
+    @Test
+    public void testConfigurablePepper()
+    {
+        // GIVEN
+        String password = "password";
+        Hash hash = Password.hash(password).addPepper().withSCrypt();
 
+        // WHEN
+        boolean result = Password.check(password, hash.getResult()).addPepper().withSCrypt();
 
+        // THEN
+        Assert.assertEquals(PropertyReader.readString("global.pepper", null), hash.getPepper());
+        Assert.assertTrue(result);
+    }
 
 
 }

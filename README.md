@@ -23,18 +23,29 @@ and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/
 
 
 ## Installation
-You just need
- * **Java 1.8 +** by any vendor
- * **Maven 3.0 +**
- 
-Put the following dependency in your `pom.xml` file.
+Password4j runs on Java 8 and Java 12 of any vendor.
 
+The artifacts are deployed to [Maven Central](https://search.maven.org/).
+### Maven
+Add the dependency of the latest version to your `pom.xml`:
 ```xml
 <dependency>
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>0.4.0</version>
+    <version>1.0.2</version>
 </dependency>
+```
+
+### Gradle
+Add to your `build.gradle` module dependencies:
+```groovy
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.password4j:password4j:1.0.2'
+}
 ```
 
 ## Usage
@@ -169,11 +180,42 @@ global.random.strong=true
 but make sure that your JVM supports it and it points to a non-blocking source of entropy, otherwise you may experience huge performance drops<sup>see [SecureRandom](https://docs.oracle.com/javase/8/docs/api/java/security/SecureRandom.html#getInstanceStrong--)</sup>.
 
 ## Performance
+<sup>This tool must be used in the target system because performances may vary on different environments.</sup>
+
 Password4j is delivered with a utility maven profile that helps the developers to choose the right parameters for a specific CHF.
 
-This tool must be used in the target system because performances may vary on different environments.
-```shell script
-mvn compile -Performance
+The class `SystemChecker` can be used to find these optimal values.
+
+Here's an example on how to configure PBKDF2:
+```java
+PBKDF2Function.Algorithm algorithm = PBKDF2Function.Algorithm.SHA256;
+int length = algorithm.bits();
+long maxTimeInMilliseconds = 150;
+
+int iterations  = SystemChecker.findIterationsForPBKDF2(maxTimeInMilliseconds, algorithm, length);
+
+System.out.println("Iterations: " + iterations);
+```
+
+A similar approach can be used for BCrypt:
+```java
+long maxTimeInMilliseconds = 150;
+
+int rounds = SystemChecker.findRoundsForBCrypt(maxTimeInMilliseconds);
+
+System.out.println("Rounds: " + rounds);
+```
+
+And SCrypt:
+```java
+int r = 16;
+int p = 1;
+long maxTimeInMilliseconds = 150;
+
+int N = SystemChecker.findWorkingFactoryForSCrypt(maxTimeInMilliseconds, r, p);
+r = SystemChecker.findResourcesForSCrypt(maxTimeInMilliseconds, N, p);
+
+System.out.println("N: " + N + ", r: " + r);
 ```
 
 

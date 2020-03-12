@@ -90,12 +90,10 @@ public class SystemChecker
     public static int findWorkingFactoryForSCrypt(long maxMilliseconds, int resources, int parallelization)
     {
 
-        warmUpSCrypt(2, resources, parallelization);
-
-
+        int workFactor = 2;
+        warmUpSCrypt(workFactor, resources, parallelization);
 
         long elapsed;
-        int workFactor = 1;
         do
         {
             workFactor *= 2;

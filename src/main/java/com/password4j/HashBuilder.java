@@ -18,6 +18,7 @@ package com.password4j;
 
 import org.apache.commons.lang3.StringUtils;
 
+
 public class HashBuilder<H extends HashBuilder<?>>
 {
     private String plain;

@@ -205,7 +205,7 @@ public class PBKDF2FunctionTest
         Hash hash = PBKDF2Function.getInstance(PBKDF2Function.Algorithm.SHA256, 8_777, 256).hash(password);
 
         // THEN
-        Assert.assertTrue(hash.check(password));
+        Assert.assertTrue(Password.check(password, hash));
 
     }
 

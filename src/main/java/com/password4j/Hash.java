@@ -178,29 +178,6 @@ public class Hash
         this.pepper = pepper;
     }
 
-    /**
-     * Uses the {@link HashingFunction} used to calculate this {@link Hash}.
-     * Il the password is null, this returns false; otherwise {@link HashingFunction#check(String, String)} is invoked.
-     *
-     * @param plain the original password.
-     * @return true if the check passes, false otherwise.
-     * @since 0.1.0
-     */
-    public boolean check(String plain)
-    {
-        if (plain == null)
-        {
-            return false;
-        }
-
-        String peppered = plain;
-        if (StringUtils.isNotEmpty(this.pepper))
-        {
-            peppered = this.pepper + peppered;
-        }
-
-        return this.hashingFunction.check(peppered, this.getResult(), salt);
-    }
 
     /**
      * Produces a human readable description of the {@link Hash}.
@@ -211,8 +188,14 @@ public class Hash
     @Override
     public String toString()
     {
-        return hashingFunction.getClass()
-                .getSimpleName() + "[salt=" + getSalt() + ", pepper=" + getPepper() + ", hash=" + getResult() + "]";
+        StringBuilder sb = new StringBuilder();
+        if(this.hashingFunction != null)
+        {
+            sb.append(hashingFunction.getClass().getSimpleName());
+        }
+        sb.append("[salt=").append(getSalt())
+                .append(", pepper=").append(getPepper()).append(", hash=").append(getResult()).append("]");
+        return sb.toString();
     }
 
     /**

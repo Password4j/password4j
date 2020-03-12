@@ -39,9 +39,9 @@ public class PasswordTest
         Hash hash3 = Password.hash(password).addPepper(pepper).addSalt(salt).withSCrypt();
 
         // THEN
-        Assert.assertTrue(hash1.check(password));
-        Assert.assertTrue(hash2.check(password));
-        Assert.assertTrue(hash3.check(password));
+        Assert.assertTrue(Password.check(password, hash1));
+        Assert.assertTrue(Password.check(password, hash2));
+        Assert.assertTrue(Password.check(password, hash3));
     }
 
 
@@ -212,7 +212,7 @@ public class PasswordTest
     @Test(expected = BadParametersException.class)
     public void testBad3()
     {
-        Password.check(null, null);
+        Password.check(null, (String)null);
     }
 
     @Test(expected = BadParametersException.class)
@@ -231,6 +231,18 @@ public class PasswordTest
     public void testBad6()
     {
         Password.hash("password").addRandomSalt(-1);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBad7()
+    {
+        Password.check(null, (Hash)null);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBad8()
+    {
+        Password.check("passwprd", new Hash(null, null, null));
     }
 
     @Test

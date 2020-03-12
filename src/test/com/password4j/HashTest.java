@@ -38,7 +38,7 @@ public class HashTest
         Hash hash = Password.hash("myPassword").withCompressedPBKDF2();
 
         // WHEN
-        boolean result = hash.check(null);
+        boolean result = Password.check(null, hash);
 
         // THEN
         Assert.assertFalse(result);

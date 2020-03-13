@@ -27,10 +27,40 @@ public class CompressedPBKDF2Function extends PBKDF2Function
 
     private static Map<String, CompressedPBKDF2Function> instances = new ConcurrentHashMap<>();
 
+    private static final char DELIMITER = PropertyReader.readChar("hash.pbkdf2.delimiter", '$');
+
     protected CompressedPBKDF2Function()
     {
         super();
     }
+
+    public static CompressedPBKDF2Function getInstance(Algorithm algorithm, int iterations, int length)
+    {
+        String key = getUID(algorithm, iterations, length);
+        if (instances.containsKey(key))
+        {
+            return instances.get(key);
+        }
+        else
+        {
+            CompressedPBKDF2Function function = new CompressedPBKDF2Function(algorithm, iterations, length);
+            instances.put(key, function);
+            return function;
+        }
+    }
+
+    public static CompressedPBKDF2Function getInstance(String algorithm, int iterations, int length)
+    {
+        try
+        {
+            return getInstance(Algorithm.valueOf(algorithm), iterations, length);
+        }
+        catch (IllegalArgumentException iae)
+        {
+            throw new UnsupportedOperationException("Algorithm `" + algorithm + "` is not recognized.", iae);
+        }
+    }
+
 
 
     protected CompressedPBKDF2Function(Algorithm fromCode, int iterations, int length)
@@ -41,7 +71,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
 
     public static CompressedPBKDF2Function getInstanceFromHash(String hashed)
     {
-        String[] parts = hashed.split("\\$");
+        String[] parts = getParts(hashed);
         if (parts.length == 5)
         {
             int algorithm = Integer.parseInt(parts[1]);
@@ -84,7 +114,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
 
     private String getSaltFromHash(String hashed)
     {
-        String[] parts = hashed.split("\\$");
+        String[] parts = getParts(hashed);
         if (parts.length == 5)
         {
             return new String(Base64.getDecoder().decode(parts[3].getBytes()));
@@ -92,30 +122,10 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }
 
-    public static CompressedPBKDF2Function getInstance(Algorithm algorithm, int iterations, int length)
-    {
-        String key = getUID(algorithm, iterations, length);
-        if (instances.containsKey(key))
-        {
-            return instances.get(key);
-        }
-        else
-        {
-            CompressedPBKDF2Function function = new CompressedPBKDF2Function(algorithm, iterations, length);
-            instances.put(key, function);
-            return function;
-        }
-    }
 
-    public static CompressedPBKDF2Function getInstance(String algorithm, int iterations, int length)
+
+    protected static String[] getParts(String hashed)
     {
-        try
-        {
-            return getInstance(Algorithm.valueOf(algorithm), iterations, length);
-        }
-        catch (IllegalArgumentException iae)
-        {
-            throw new UnsupportedOperationException("Algorithm `" + algorithm + "` is not recognized.", iae);
-        }
+        return hashed.split(new StringBuilder(2).append('\\').append(DELIMITER).toString());
     }
 }

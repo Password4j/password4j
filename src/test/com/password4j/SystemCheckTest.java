@@ -55,7 +55,7 @@ public class SystemCheckTest
         long maxMilliseconds = 1;
 
         // WHEN
-        int result1 = SystemChecker.findWorkingFactoryForSCrypt(maxMilliseconds, 16, 1);
+        int result1 = SystemChecker.findWorkFactorForSCrypt(maxMilliseconds, 16, 1);
         int result2 = SystemChecker.findResourcesForSCrypt(maxMilliseconds, result1, 1);
 
         // THEN

@@ -60,6 +60,20 @@ public class SCryptFunctionTest
     }
 
     @Test
+    public void testWrongCheck()
+    {
+        // GIVEN
+        String password = "password";
+        String salt = "salt";
+
+        // WHEN
+        Hash hash = new SCryptFunction(16384, 8, 1).hash(password, salt);
+
+        // THEN
+        Assert.assertFalse(hash.getHashingFunction().check(password, "$s0$e0801$c2FsdA==$YXNkYXNkYXNkYXNk"));
+    }
+
+    @Test
     public void testEquality()
     {
         // GIVEN
@@ -102,6 +116,26 @@ public class SCryptFunctionTest
         Assert.assertTrue(StringUtils.contains(scrypt2.getRequiredMemory(), "MB"));
         Assert.assertEquals(128, scrypt3.getRequiredBytes());
         Assert.assertEquals("128B", scrypt3.getRequiredMemory());
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadParameters1()
+    {
+        // GIVEN
+        int r = 5;
+
+        // WHEN
+        SCryptFunction.getInstance((16777215/r) + 1, r, 1).hash("password");
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadParameters2()
+    {
+        // GIVEN
+        int p = 5;
+
+        // WHEN
+        SCryptFunction.getInstance(16, (16777215/p) + 1, p).hash("password");
     }
 
 }

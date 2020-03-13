@@ -90,6 +90,18 @@
         <testSourceDirectory>src/test</testSourceDirectory>
         <plugins>
             <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>animal-sniffer-maven-plugin</artifactId>
+            <version>1.16</version>
+            <configuration>
+                <signature>
+                    <groupId>net.sf.androidscents.signature</groupId>
+                    <artifactId>android-api-level-26</artifactId>
+                    <version>8.0.0_r2</version>
+                </signature>
+            </configuration>
+        </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>

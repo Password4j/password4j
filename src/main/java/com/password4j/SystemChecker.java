@@ -87,7 +87,7 @@ public class SystemChecker
         return iterations - 100;
     }
 
-    public static int findWorkingFactoryForSCrypt(long maxMilliseconds, int resources, int parallelization)
+    public static int findWorkFactorForSCrypt(long maxMilliseconds, int resources, int parallelization)
     {
 
         int workFactor = 2;

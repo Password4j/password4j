@@ -67,6 +67,21 @@ public class PropertyReaderTest
         Assert.assertEquals("default string", defaultValue);
     }
 
+    @Test
+    public void testChar()
+    {
+        // GIVEN
+        String key = "test.char";
+
+        // WHEN
+        int backslash = PropertyReader.readChar(key, '/');
+        int slash = PropertyReader.readChar(key + "abc", '/');
+
+        // THEN
+        Assert.assertEquals('\\', backslash);
+        Assert.assertEquals('/', slash);
+    }
+
     @Test(expected = BadParametersException.class)
     public void testNull()
     {

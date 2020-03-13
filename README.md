@@ -25,7 +25,7 @@ and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/
 
 
 ## Installation
-Password4j runs on Java 8 and Java 12 of any vendor.
+Password4j runs on **Java 8** and **Java 12** of any vendor. It is supported by **Android API 26+** as well.
 
 The artifacts are deployed to [Maven Central](https://search.maven.org/).
 ### Maven
@@ -184,7 +184,7 @@ but make sure that your JVM supports it and it points to a non-blocking source o
 ## Performance
 <sup>This tool must be used in the target system because performances may vary on different environments.</sup>
 
-Password4j is delivered with a utility maven profile that helps the developers to choose the right parameters for a specific CHF.
+Password4j is delivered with a tool that helps the developers to choose the right parameters for a specific CHF.
 
 The class `SystemChecker` can be used to find these optimal values.
 
@@ -214,7 +214,7 @@ int r = 16;
 int p = 1;
 long maxTimeInMilliseconds = 150;
 
-int N = SystemChecker.findWorkingFactoryForSCrypt(maxTimeInMilliseconds, r, p);
+int N = SystemChecker.findWorkFactorForSCrypt(maxTimeInMilliseconds, r, p);
 r = SystemChecker.findResourcesForSCrypt(maxTimeInMilliseconds, N, p);
 
 System.out.println("N: " + N + ", r: " + r);

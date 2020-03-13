@@ -21,6 +21,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.security.SecureRandom;
+import java.util.Properties;
+
 
 public class PasswordTest
 {
@@ -260,5 +265,20 @@ public class PasswordTest
         Assert.assertTrue(result);
     }
 
+    @Test
+    public void testSecureNeverNull() throws ClassNotFoundException
+    {
+        // GIVEN
+        PropertyReader.PROPERTIES.put("global.random.strong", "true");
+
+        // WHEN
+        SecureRandom sr = AlgorithmFinder.getSecureRandom();
+
+        // THEN
+        Assert.assertNotNull(sr);
+
+        PropertyReader.PROPERTIES.put("global.random.strong", "false");
+
+    }
 
 }

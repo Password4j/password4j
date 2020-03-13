@@ -23,7 +23,7 @@ import java.util.Properties;
 class PropertyReader
 {
 
-    private static final Properties PROPERTIES;
+    static final Properties PROPERTIES;
 
     static
     {
@@ -66,11 +66,6 @@ class PropertyReader
         return Boolean.parseBoolean(readString(key));
     }
 
-    private static String readString(String key)
-    {
-        return PROPERTIES.getProperty(key);
-    }
-
     static String readString(String key, String defaultValue)
     {
         if (key == null)
@@ -78,12 +73,27 @@ class PropertyReader
             throw new BadParametersException("Key cannot be null");
         }
 
-        String value = PROPERTIES.getProperty(key);
+        String value = readString(key);
         if (value == null)
         {
             return defaultValue;
         }
         return value;
+    }
+
+    static char readChar(String key, char defaultValue)
+    {
+        String str = readString(key);
+        if (str == null)
+        {
+            return defaultValue;
+        }
+        return str.charAt(0);
+    }
+
+    private static String readString(String key)
+    {
+        return PROPERTIES.getProperty(key);
     }
 
     private PropertyReader()

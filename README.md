@@ -1,7 +1,7 @@
 ![logo](https://i.imgur.com/BAAwsxr.png "Password4j logo")
 
 [![Build Status](https://travis-ci.org/Password4j/password4j.svg?branch=master)](https://travis-ci.org/Password4j/password4j)
-[![Maven Central](https://img.shields.io/maven-central/v/com.password4j/password4j)](https://search.maven.org/artifact/com.password4j/password4j/1.0.2/jar)
+[![Maven Central](https://img.shields.io/maven-central/v/com.password4j/password4j)](https://search.maven.org/artifact/com.password4j/password4j/1.1.0/jar)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Password4j_password4j&metric=alert_status)](https://sonarcloud.io/dashboard?id=Password4j_password4j)
@@ -34,7 +34,7 @@ Add the dependency of the latest version to your `pom.xml`:
 <dependency>
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.0.2</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -46,7 +46,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.password4j:password4j:1.0.2'
+    implementation 'com.password4j:password4j:1.1.0'
 }
 ```
 

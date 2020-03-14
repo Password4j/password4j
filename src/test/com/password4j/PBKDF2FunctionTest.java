@@ -31,7 +31,7 @@ public class PBKDF2FunctionTest
     public void testPBKDF2()
     {
         // GIVEN
-        HashingFunction strategy = CompressedPBKDF2Function.getInstance(PBKDF2Function.Algorithm.SHA256, 10_000, 256);
+        HashingFunction strategy = CompressedPBKDF2Function.getInstance(WithHmac.SHA256, 10_000, 256);
         String password = "password";
         String salt = "abc";
 
@@ -45,7 +45,7 @@ public class PBKDF2FunctionTest
     @Test
     public void testPBKDF2EachVariants()
     {
-        for (PBKDF2Function.Algorithm alg : PBKDF2Function.Algorithm.values())
+        for (WithHmac alg : WithHmac.values())
         {
             // GIVEN
             HashingFunction strategy = CompressedPBKDF2Function.getInstance(alg, 10_000, 256);
@@ -92,7 +92,7 @@ public class PBKDF2FunctionTest
     public void testPBKDF2WrongSalt()
     {
         // GIVEN
-        HashingFunction strategy = PBKDF2Function.getInstance(PBKDF2Function.Algorithm.SHA224, 10_000, 224);
+        HashingFunction strategy = PBKDF2Function.getInstance(WithHmac.SHA224, 10_000, 224);
         String password = "password";
         String salt = new String(new byte[0]);
 
@@ -179,10 +179,10 @@ public class PBKDF2FunctionTest
         // GIVEN
 
         // WHEN
-        PBKDF2Function.Algorithm algNull = PBKDF2Function.Algorithm.fromCode(-100);
-        for (PBKDF2Function.Algorithm enumAlg : PBKDF2Function.Algorithm.values())
+        WithHmac algNull = WithHmac.fromCode(-100);
+        for (WithHmac enumAlg : WithHmac.values())
         {
-            PBKDF2Function.Algorithm alg = PBKDF2Function.Algorithm.fromCode(enumAlg.code());
+            WithHmac alg = WithHmac.fromCode(enumAlg.code());
 
 
             // THEN
@@ -202,7 +202,7 @@ public class PBKDF2FunctionTest
         String password = "password";
 
         // WHEN
-        Hash hash = PBKDF2Function.getInstance(PBKDF2Function.Algorithm.SHA256, 8_777, 256).hash(password);
+        Hash hash = PBKDF2Function.getInstance(WithHmac.SHA256, 8_777, 256).hash(password);
 
         // THEN
         Assert.assertTrue(Password.check(password, hash));
@@ -217,7 +217,7 @@ public class PBKDF2FunctionTest
         String userSubmittedPassword = "password";
 
         // WHEN
-        HashingFunction strategy = new CompressedPBKDF2Function(PBKDF2Function.Algorithm.SHA256, 10_000, 256);
+        HashingFunction strategy = new CompressedPBKDF2Function(WithHmac.SHA256, 10_000, 256);
 
         // THEN
         Assert.assertTrue(strategy.check(userSubmittedPassword, hashed));
@@ -228,11 +228,11 @@ public class PBKDF2FunctionTest
     public void testPBKDF2equality()
     {
         // GIVEN
-        PBKDF2Function strategy1 = PBKDF2Function.getInstance(PBKDF2Function.Algorithm.SHA256, 10_000, 256);
-        PBKDF2Function strategy2 = PBKDF2Function.getInstance(PBKDF2Function.Algorithm.SHA256, 10_000, 256);
-        PBKDF2Function strategy3 = PBKDF2Function.getInstance(PBKDF2Function.Algorithm.SHA1, 10_000, 256);
-        PBKDF2Function strategy4 = PBKDF2Function.getInstance(PBKDF2Function.Algorithm.SHA256, 64_000, 256);
-        PBKDF2Function strategy5 = PBKDF2Function.getInstance(PBKDF2Function.Algorithm.SHA256, 64_000, 123);
+        PBKDF2Function strategy1 = PBKDF2Function.getInstance(WithHmac.SHA256, 10_000, 256);
+        PBKDF2Function strategy2 = PBKDF2Function.getInstance(WithHmac.SHA256, 10_000, 256);
+        PBKDF2Function strategy3 = PBKDF2Function.getInstance(WithHmac.SHA1, 10_000, 256);
+        PBKDF2Function strategy4 = PBKDF2Function.getInstance(WithHmac.SHA256, 64_000, 256);
+        PBKDF2Function strategy5 = PBKDF2Function.getInstance(WithHmac.SHA256, 64_000, 123);
 
 
         // WHEN

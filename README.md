@@ -70,7 +70,7 @@ Hash hash = Password.hash("password").addSalt("fixed salt").withPBKDF2();
 Hash hash = Password.hash("password").addSalt("fixed salt").addPepper("pepper").withPBKDF2();
 
 // Custom PBKDF2 (PBKDF2 with HMAC-SHA512, 64000 iterations and 512bit length).
-Hash hash = Password.hash("password").with(PBKDF2Function.getInstance(PBKDF2Function.Algorithm.SHA512, 64000, 512));
+Hash hash = Password.hash("password").with(PBKDF2Function.getInstance(WithHmac.SHA512, 64000, 512));
 
 ```
 The same structure can be adopted for the other algorithms, not just for PBKDF2.
@@ -190,7 +190,7 @@ The class `SystemChecker` can be used to find these optimal values.
 
 Here's an example on how to configure PBKDF2:
 ```java
-PBKDF2Function.Algorithm algorithm = PBKDF2Function.Algorithm.SHA256;
+WithHmac algorithm = WithHmac.SHA256;
 int length = algorithm.bits();
 long maxTimeInMilliseconds = 150;
 
@@ -220,12 +220,6 @@ r = SystemChecker.findResourcesForSCrypt(maxTimeInMilliseconds, N, p);
 System.out.println("N: " + N + ", r: " + r);
 ```
 
-
-## Products successfully integrated with Password4j
-Here a list where Password4j has been successfully integrated.
- 
- &nbsp;&nbsp;&nbsp;&nbsp;[![SAP Hybris Commerce Cloud](https://i.imgur.com/9eg6DP3.png "SAP Hybris Commerce Cloud")](https://www.sap.com/products/crm/e-commerce-platforms.html) &nbsp;&nbsp;&nbsp;&nbsp;
- &nbsp;&nbsp;&nbsp;&nbsp;[![Apereo CAS](https://i.imgur.com/88iYWwe.png "Apereo CAS")](https://www.apereo.org/projects/cas)
 
 ## Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.

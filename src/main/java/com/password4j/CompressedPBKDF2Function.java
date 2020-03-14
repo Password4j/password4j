@@ -34,7 +34,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         super();
     }
 
-    public static CompressedPBKDF2Function getInstance(Algorithm algorithm, int iterations, int length)
+    public static CompressedPBKDF2Function getInstance(WithHmac algorithm, int iterations, int length)
     {
         String key = getUID(algorithm, iterations, length);
         if (instances.containsKey(key))
@@ -53,7 +53,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
     {
         try
         {
-            return getInstance(Algorithm.valueOf(algorithm), iterations, length);
+            return getInstance(WithHmac.valueOf(algorithm), iterations, length);
         }
         catch (IllegalArgumentException iae)
         {
@@ -63,7 +63,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
 
 
 
-    protected CompressedPBKDF2Function(Algorithm fromCode, int iterations, int length)
+    protected CompressedPBKDF2Function(WithHmac fromCode, int iterations, int length)
     {
         super(fromCode, iterations, length);
     }
@@ -80,7 +80,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
             int iterations = (int) (configuration >> 32);
             int length = (int) configuration;
 
-            return CompressedPBKDF2Function.getInstance(Algorithm.fromCode(algorithm), iterations, length);
+            return CompressedPBKDF2Function.getInstance(WithHmac.fromCode(algorithm), iterations, length);
         }
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }

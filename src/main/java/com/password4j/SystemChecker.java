@@ -33,7 +33,7 @@ public class SystemChecker
     }
 
 
-    public static boolean isPBKDF2Supported(PBKDF2Function.Algorithm algorithm)
+    public static boolean isPBKDF2Supported(WithHmac algorithm)
     {
         if (algorithm == null)
         {
@@ -65,7 +65,7 @@ public class SystemChecker
     }
 
 
-    public static int findIterationsForPBKDF2(long maxMilliseconds, PBKDF2Function.Algorithm algorithm, int length)
+    public static int findIterationsForPBKDF2(long maxMilliseconds, WithHmac algorithm, int length)
     {
         warmUpPBKDF2(algorithm, length);
 
@@ -144,7 +144,7 @@ public class SystemChecker
         }
     }
 
-    private static void warmUpPBKDF2(PBKDF2Function.Algorithm algorithm, int length)
+    private static void warmUpPBKDF2(WithHmac algorithm, int length)
     {
         for (int i = 0; i < WARMUP_ROUNDS; i++)
         {

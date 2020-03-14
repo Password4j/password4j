@@ -186,9 +186,9 @@ public class AlgorithmFinder
 
     private static <T extends PBKDF2Function> T getPBKDF2Instance(Function<String, Function<Integer, Function<Integer, T>>> f)
     {
-        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Function.Algorithm.SHA512.name());
+        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", WithHmac.SHA512.name());
         int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", 64_000);
-        int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Function.Algorithm.SHA512.bits());
+        int length = PropertyReader.readInt("hash.pbkdf2.length", WithHmac.SHA512.bits());
         return f.apply(algorithm).apply(iterations).apply(length);
     }
 

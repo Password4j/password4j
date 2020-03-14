@@ -1,7 +1,7 @@
 ![logo](https://i.imgur.com/BAAwsxr.png "Password4j logo")
 
 [![Build Status](https://travis-ci.org/Password4j/password4j.svg?branch=master)](https://travis-ci.org/Password4j/password4j)
-[![Maven Central](https://img.shields.io/maven-central/v/com.password4j/password4j)](https://search.maven.org/artifact/com.password4j/password4j/1.0.2/jar)
+[![Maven Central](https://img.shields.io/maven-central/v/com.password4j/password4j)](https://search.maven.org/artifact/com.password4j/password4j/1.1.0/jar)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Password4j_password4j&metric=alert_status)](https://sonarcloud.io/dashboard?id=Password4j_password4j)
@@ -34,7 +34,7 @@ Add the dependency of the latest version to your `pom.xml`:
 <dependency>
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.0.2</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -46,7 +46,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.password4j:password4j:1.0.2'
+    implementation 'com.password4j:password4j:1.1.0'
 }
 ```
 
@@ -70,7 +70,7 @@ Hash hash = Password.hash("password").addSalt("fixed salt").withPBKDF2();
 Hash hash = Password.hash("password").addSalt("fixed salt").addPepper("pepper").withPBKDF2();
 
 // Custom PBKDF2 (PBKDF2 with HMAC-SHA512, 64000 iterations and 512bit length).
-Hash hash = Password.hash("password").with(PBKDF2Function.getInstance(PBKDF2Function.Algorithm.SHA512, 64000, 512));
+Hash hash = Password.hash("password").with(PBKDF2Function.getInstance(WithHmac.SHA512, 64000, 512));
 
 ```
 The same structure can be adopted for the other algorithms, not just for PBKDF2.
@@ -190,7 +190,7 @@ The class `SystemChecker` can be used to find these optimal values.
 
 Here's an example on how to configure PBKDF2:
 ```java
-PBKDF2Function.Algorithm algorithm = PBKDF2Function.Algorithm.SHA256;
+WithHmac algorithm = WithHmac.SHA256;
 int length = algorithm.bits();
 long maxTimeInMilliseconds = 150;
 
@@ -220,12 +220,6 @@ r = SystemChecker.findResourcesForSCrypt(maxTimeInMilliseconds, N, p);
 System.out.println("N: " + N + ", r: " + r);
 ```
 
-
-## Products successfully integrated with Password4j
-Here a list where Password4j has been successfully integrated.
- 
- &nbsp;&nbsp;&nbsp;&nbsp;[![SAP Hybris Commerce Cloud](https://i.imgur.com/9eg6DP3.png "SAP Hybris Commerce Cloud")](https://www.sap.com/products/crm/e-commerce-platforms.html) &nbsp;&nbsp;&nbsp;&nbsp;
- &nbsp;&nbsp;&nbsp;&nbsp;[![Apereo CAS](https://i.imgur.com/88iYWwe.png "Apereo CAS")](https://www.apereo.org/projects/cas)
 
 ## Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.

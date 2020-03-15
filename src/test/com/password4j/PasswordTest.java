@@ -21,32 +21,32 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.security.SecureRandom;
-import java.util.Properties;
 
 
 public class PasswordTest
 {
 
+    private static final String PASSWORD = "password";
+    private static final String SALT = "salt";
+    private static final String PEPPER = "pepper";
+
+    private static final SecureString SECURE_PASSWORD = new SecureString(PASSWORD.toCharArray());
+
     @Test
     public void testCoherence()
     {
         // GIVEN
-        String password = "password";
-        String salt = "salt";
-        String pepper = "pepper";
 
         // WHEN
-        Hash hash1 = Password.hash(password).addPepper(pepper).addSalt(salt).withPBKDF2();
-        Hash hash2 = Password.hash(password).addPepper(pepper).withBCrypt();
-        Hash hash3 = Password.hash(password).addPepper(pepper).addSalt(salt).withSCrypt();
+        Hash hash1 = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withPBKDF2();
+        Hash hash2 = Password.hash(PASSWORD).addPepper(PEPPER).withBCrypt();
+        Hash hash3 = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withSCrypt();
 
         // THEN
-        Assert.assertTrue(Password.check(password, hash1));
-        Assert.assertTrue(Password.check(password, hash2));
-        Assert.assertTrue(Password.check(password, hash3));
+        Assert.assertTrue(Password.check(PASSWORD, hash1));
+        Assert.assertTrue(Password.check(PASSWORD, hash2));
+        Assert.assertTrue(Password.check(PASSWORD, hash3));
     }
 
 
@@ -54,67 +54,55 @@ public class PasswordTest
     public void testRawCheck1()
     {
         // GIVEN
-        String password = "password";
-        String salt = "salt";
-        String pepper = "pepper";
-        Hash hash = Password.hash(password).addPepper(pepper).addSalt(salt).withCompressedPBKDF2();
+        Hash hash = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withCompressedPBKDF2();
         String hashed = hash.getResult();
 
         // WHEN
         PBKDF2Function strategy = CompressedPBKDF2Function.getInstanceFromHash(hashed);
 
         // THEN
-        Assert.assertTrue(strategy.check(pepper + password, hashed));
-        Assert.assertTrue(Password.check(password, hashed).addPepper(pepper).withCompressedPBKDF2());
+        Assert.assertTrue(strategy.check(PEPPER + PASSWORD, hashed));
+        Assert.assertTrue(Password.check(PASSWORD, hashed).addPepper(PEPPER).withCompressedPBKDF2());
     }
 
     @Test
     public void testRawCheck2()
     {
         // GIVEN
-        String password = "password";
-        String salt = "salt";
-        String pepper = "pepper";
-        Hash hash = Password.hash(password).addPepper(pepper).withBCrypt();
+        Hash hash = Password.hash(PASSWORD).addPepper(PEPPER).withBCrypt();
         String hashed = hash.getResult();
 
         // WHEN
         BCryptFunction strategy = new BCryptFunction(5);
 
         // THEN
-        Assert.assertTrue(strategy.check(pepper + password, hashed));
-        Assert.assertTrue(Password.check(password, hashed).addPepper(pepper).withBCrypt());
+        Assert.assertTrue(strategy.check(PEPPER + PASSWORD, hashed));
+        Assert.assertTrue(Password.check(PASSWORD, hashed).addPepper(PEPPER).withBCrypt());
     }
 
     @Test
     public void testRawCheck3()
     {
         // GIVEN
-        String password = "password";
-        String salt = "salt";
-        String pepper = "pepper";
-        Hash hash = Password.hash(password).addPepper(pepper).addSalt(salt).withSCrypt();
+        Hash hash = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withSCrypt();
         String hashed = hash.getResult();
 
         // WHEN
         SCryptFunction strategy = SCryptFunction.getInstanceFromHash(hashed);
 
         // THEN
-        Assert.assertTrue(strategy.check(pepper + password, hashed));
-        Assert.assertTrue(Password.check(password, hashed).addPepper(pepper).withSCrypt());
+        Assert.assertTrue(strategy.check(PEPPER + PASSWORD, hashed));
+        Assert.assertTrue(Password.check(PASSWORD, hashed).addPepper(PEPPER).withSCrypt());
     }
 
     @Test
     public void testCustomBuilder()
     {
         // GIVEN
-        String password = "password";
-        String salt = "salt";
-        String pepper = "pepper";
 
         // WHEN
-        Hash hash1 = Password.hash(password, CustomHashBuilder::new).addPepper(pepper).addSalt(salt).withTest();
-        Hash hash2 = Password.hash(password, CustomHashBuilder::new).addPepper(pepper).addSalt(salt).withBCrypt();
+        Hash hash1 = Password.hash(PASSWORD, CustomHashBuilder::new).addPepper(PEPPER).addSalt(SALT).withTest();
+        Hash hash2 = Password.hash(PASSWORD, CustomHashBuilder::new).addPepper(PEPPER).addSalt(SALT).withBCrypt();
 
         // THEN
         Assert.assertEquals(CustomHashBuilder.SAME_RESULT, hash1.getResult());
@@ -126,15 +114,12 @@ public class PasswordTest
     public void testMigration()
     {
         // GIVEN
-        String password = "password";
-        String salt = "salt";
-        String pepper = "pepper";
-        Hash oldHash = Password.hash(password).addPepper(pepper).addSalt(salt).withCompressedPBKDF2();
+        Hash oldHash = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withCompressedPBKDF2();
 
         // WHEN
-        boolean oldCheck = Password.check(password, oldHash.getResult()).addPepper(pepper).withCompressedPBKDF2();
-        Hash newHash = Password.hash(password).addSalt(pepper).withSCrypt();
-        boolean newCheck = Password.check(password, newHash.getResult()).withSCrypt();
+        boolean oldCheck = Password.check(PASSWORD, oldHash.getResult()).addPepper(PEPPER).withCompressedPBKDF2();
+        Hash newHash = Password.hash(PASSWORD).addSalt(PEPPER).withSCrypt();
+        boolean newCheck = Password.check(PASSWORD, newHash.getResult()).withSCrypt();
 
 
         // THEN
@@ -147,12 +132,10 @@ public class PasswordTest
     public void testRandomSalt()
     {
         // GIVEN
-        String password = "password";
-        String pepper = "pepper";
-        Hash hash = Password.hash(password).addPepper(pepper).addRandomSalt(12).withCompressedPBKDF2();
+        Hash hash = Password.hash(PASSWORD).addPepper(PEPPER).addRandomSalt(12).withCompressedPBKDF2();
 
         // WHEN
-        boolean check1 = Password.check(password, hash.getResult()).addPepper(pepper).withCompressedPBKDF2();
+        boolean check1 = Password.check(PASSWORD, hash.getResult()).addPepper(PEPPER).withCompressedPBKDF2();
 
 
         // THEN
@@ -165,13 +148,10 @@ public class PasswordTest
     public void testCustomSalt()
     {
         // GIVEN
-        String password = "password";
-        String salt = "salt";
-        String pepper = "pepper";
-        Hash hash = Password.hash(password).addPepper(pepper).addSalt(salt).withPBKDF2();
+        Hash hash = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withPBKDF2();
 
         // WHEN
-        boolean check1 = Password.check(password, hash.getResult()).addPepper(pepper).addSalt(salt).withPBKDF2();
+        boolean check1 = Password.check(PASSWORD, hash.getResult()).addPepper(PEPPER).addSalt(SALT).withPBKDF2();
 
 
         // THEN
@@ -184,15 +164,13 @@ public class PasswordTest
     public void testHashingFunction()
     {
         // GIVEN
-        String password = "password";
-        String pepper = "pepper";
 
 
         // WHEN
-        Hash hash1 = Password.hash(password).withPBKDF2();
-        Hash hash2 = Password.hash(password).withBCrypt();
-        Hash hash3 = Password.hash(password).withSCrypt();
-        Hash hash4 = Password.hash(password).withCompressedPBKDF2();
+        Hash hash1 = Password.hash(PASSWORD).withPBKDF2();
+        Hash hash2 = Password.hash(PASSWORD).withBCrypt();
+        Hash hash3 = Password.hash(PASSWORD).withSCrypt();
+        Hash hash4 = Password.hash(PASSWORD).withCompressedPBKDF2();
 
 
         // THEN
@@ -211,7 +189,7 @@ public class PasswordTest
     @Test(expected = BadParametersException.class)
     public void testBad2()
     {
-        Password.hash("password", null);
+        Password.hash(PASSWORD, null);
     }
 
     @Test(expected = BadParametersException.class)
@@ -223,19 +201,19 @@ public class PasswordTest
     @Test(expected = BadParametersException.class)
     public void testBad4()
     {
-        Password.check(null, "hash");
+        Password.check(null, PASSWORD);
     }
 
     @Test(expected = BadParametersException.class)
     public void testBad5()
     {
-        Password.check("password", "hash", null);
+        Password.check(PASSWORD, PASSWORD, null);
     }
 
     @Test(expected = BadParametersException.class)
     public void testBad6()
     {
-        Password.hash("password").addRandomSalt(-1);
+        Password.hash(PASSWORD).addRandomSalt(-1);
     }
 
     @Test(expected = BadParametersException.class)
@@ -247,18 +225,17 @@ public class PasswordTest
     @Test(expected = BadParametersException.class)
     public void testBad8()
     {
-        Password.check("passwprd", new Hash(null, null, null));
+        Password.check(PASSWORD, new Hash(null, null, null));
     }
 
     @Test
     public void testConfigurablePepper()
     {
         // GIVEN
-        String password = "password";
-        Hash hash = Password.hash(password).addPepper().withSCrypt();
+        Hash hash = Password.hash(PASSWORD).addPepper().withSCrypt();
 
         // WHEN
-        boolean result = Password.check(password, hash.getResult()).addPepper().withSCrypt();
+        boolean result = Password.check(PASSWORD, hash.getResult()).addPepper().withSCrypt();
 
         // THEN
         Assert.assertEquals(PropertyReader.readString("global.pepper", null), hash.getPepper());
@@ -279,6 +256,196 @@ public class PasswordTest
 
         PropertyReader.PROPERTIES.put("global.random.strong", "false");
 
+    }
+
+    @Test
+    public void testCoherenceSecureString()
+    {
+        // GIVEN
+
+        // WHEN
+        Hash hash1 = Password.hash(SECURE_PASSWORD).addPepper(PEPPER).addSalt(SALT).withPBKDF2();
+        Hash hash2 = Password.hash(SECURE_PASSWORD).addPepper(PEPPER).withBCrypt();
+        Hash hash3 = Password.hash(SECURE_PASSWORD).addPepper(PEPPER).addSalt(SALT).withSCrypt();
+
+        // THEN
+        Assert.assertTrue(Password.check(SECURE_PASSWORD, hash1));
+        Assert.assertTrue(Password.check(SECURE_PASSWORD, hash2));
+        Assert.assertTrue(Password.check(SECURE_PASSWORD, hash3));
+    }
+
+
+    @Test
+    public void testRawCheck1SecureString()
+    {
+        // GIVEN
+        Hash hash = Password.hash(SECURE_PASSWORD).addPepper(PEPPER).addSalt(SALT).withCompressedPBKDF2();
+        String hashed = hash.getResult();
+
+        // WHEN
+        PBKDF2Function strategy = CompressedPBKDF2Function.getInstanceFromHash(hashed);
+
+        // THEN
+        Assert.assertTrue(strategy.check(Utilities.append(PEPPER, SECURE_PASSWORD), hashed));
+        Assert.assertTrue(Password.check(SECURE_PASSWORD, hashed).addPepper(PEPPER).withCompressedPBKDF2());
+    }
+
+    @Test
+    public void testRawCheck2SecureString()
+    {
+        // GIVEN
+        Hash hash = Password.hash(SECURE_PASSWORD).addPepper(PEPPER).withBCrypt();
+        String hashed = hash.getResult();
+
+        // WHEN
+        BCryptFunction strategy = new BCryptFunction(5);
+
+        // THEN
+        Assert.assertTrue(strategy.check(Utilities.append(PEPPER, SECURE_PASSWORD), hashed));
+        Assert.assertTrue(Password.check(SECURE_PASSWORD, hashed).addPepper(PEPPER).withBCrypt());
+    }
+
+    @Test
+    public void testRawCheck3SecureString()
+    {
+        // GIVEN
+        Hash hash = Password.hash(SECURE_PASSWORD).addPepper(PEPPER).addSalt(SALT).withSCrypt();
+        String hashed = hash.getResult();
+
+        // WHEN
+        SCryptFunction strategy = SCryptFunction.getInstanceFromHash(hashed);
+
+        // THEN
+        Assert.assertTrue(strategy.check(Utilities.append(PEPPER, SECURE_PASSWORD), hashed));
+        Assert.assertTrue(Password.check(SECURE_PASSWORD, hashed).addPepper(PEPPER).withSCrypt());
+    }
+
+    @Test
+    public void testCustomBuilderSecureString()
+    {
+        // GIVEN
+
+        // WHEN
+        Hash hash1 = Password.hash(SECURE_PASSWORD, CustomHashBuilder::new).addPepper(PEPPER).addSalt(SALT).withTest();
+        Hash hash2 = Password.hash(SECURE_PASSWORD, CustomHashBuilder::new).addPepper(PEPPER).addSalt(SALT).withBCrypt();
+
+        // THEN
+        Assert.assertEquals(CustomHashBuilder.SAME_RESULT, hash1.getResult());
+        Assert.assertEquals(CustomHashBuilder.SAME_RESULT, hash2.getResult());
+
+    }
+
+    @Test
+    public void testMigrationSecureString()
+    {
+        // GIVEN
+        Hash oldHash = Password.hash(SECURE_PASSWORD).addPepper(PEPPER).addSalt(SALT).withCompressedPBKDF2();
+
+        // WHEN
+        boolean oldCheck = Password.check(SECURE_PASSWORD, oldHash.getResult()).addPepper(PEPPER).withCompressedPBKDF2();
+        Hash newHash = Password.hash(SECURE_PASSWORD).addSalt(PEPPER).withSCrypt();
+        boolean newCheck = Password.check(SECURE_PASSWORD, newHash.getResult()).withSCrypt();
+
+
+        // THEN
+        Assert.assertTrue(oldCheck);
+        Assert.assertTrue(newCheck);
+
+    }
+
+    @Test
+    public void testRandomSaltSecureString()
+    {
+        // GIVEN
+        Hash hash = Password.hash(SECURE_PASSWORD).addPepper(PEPPER).addRandomSalt(12).withCompressedPBKDF2();
+
+        // WHEN
+        boolean check1 = Password.check(SECURE_PASSWORD, hash.getResult()).addPepper(PEPPER).withCompressedPBKDF2();
+
+
+        // THEN
+        Assert.assertTrue(check1);
+        Assert.assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
+    }
+
+
+    @Test
+    public void testCustomSaltSecureString()
+    {
+        // GIVEN
+        Hash hash = Password.hash(SECURE_PASSWORD).addPepper(PEPPER).addSalt(SALT).withPBKDF2();
+
+        // WHEN
+        boolean check1 = Password.check(SECURE_PASSWORD, hash.getResult()).addPepper(PEPPER).addSalt(SALT).withPBKDF2();
+
+
+        // THEN
+        Assert.assertTrue(check1);
+        Assert.assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
+    }
+
+
+    @Test
+    public void testHashingFunctionSecureString()
+    {
+        // GIVEN
+
+
+        // WHEN
+        Hash hash1 = Password.hash(SECURE_PASSWORD).withPBKDF2();
+        Hash hash2 = Password.hash(SECURE_PASSWORD).withBCrypt();
+        Hash hash3 = Password.hash(SECURE_PASSWORD).withSCrypt();
+        Hash hash4 = Password.hash(SECURE_PASSWORD).withCompressedPBKDF2();
+
+
+        // THEN
+        Assert.assertTrue(hash1.getHashingFunction() instanceof PBKDF2Function);
+        Assert.assertTrue(hash2.getHashingFunction() instanceof BCryptFunction);
+        Assert.assertTrue(hash3.getHashingFunction() instanceof SCryptFunction);
+        Assert.assertTrue(hash4.getHashingFunction() instanceof CompressedPBKDF2Function);
+    }
+
+
+
+    @Test(expected = BadParametersException.class)
+    public void testBad2SecureString()
+    {
+        Password.hash(SECURE_PASSWORD, null);
+    }
+
+
+
+    @Test(expected = BadParametersException.class)
+    public void testBad5SecureString()
+    {
+        Password.check(SECURE_PASSWORD, PASSWORD, null);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBad6SecureString()
+    {
+        Password.hash(SECURE_PASSWORD).addRandomSalt(-1);
+    }
+
+
+    @Test(expected = BadParametersException.class)
+    public void testBad8SecureString()
+    {
+        Password.check(SECURE_PASSWORD, new Hash(null, null, null));
+    }
+
+    @Test
+    public void testConfigurablePepperSecureString()
+    {
+        // GIVEN
+        Hash hash = Password.hash(SECURE_PASSWORD).addPepper().withSCrypt();
+
+        // WHEN
+        boolean result = Password.check(SECURE_PASSWORD, hash.getResult()).addPepper().withSCrypt();
+
+        // THEN
+        Assert.assertEquals(PropertyReader.readString("global.pepper", null), hash.getPepper());
+        Assert.assertTrue(result);
     }
 
 }

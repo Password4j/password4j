@@ -80,7 +80,7 @@ public class HashBuilder<H extends HashBuilder<?>>
         CharSequence peppered = plainTextPassword;
         if (StringUtils.isNotEmpty(this.pepper))
         {
-            peppered = this.pepper + peppered;
+            peppered = Utilities.append(this.pepper, peppered);
         }
 
         Hash hash;

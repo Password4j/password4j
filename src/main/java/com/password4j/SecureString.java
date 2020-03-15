@@ -39,11 +39,33 @@ public class SecureString implements CharSequence
      *
      * @param chars sequence of characters
      * @since 1.2.0
+     * @throws NullPointerException if null is passed
      */
     public SecureString(char[] chars)
     {
         this.chars = new char[chars.length];
         System.arraycopy(chars, 0, this.chars, 0, chars.length);
+    }
+
+    /**
+     * Creates a {@link SecureString} from an array of {@code char}s.
+     * Important: if the second argument is true, the original array is zeroed after the object creation! Each {@code char} is replaced
+     * with {@link Character#MIN_VALUE}
+     * <p>
+     * The sequence is never put in the String pool.
+     *
+     * @param chars sequence of characters
+     * @param eraseSource if true, the original array is zeroed
+     * @since 1.2.0
+     * @throws NullPointerException if null is passed
+     */
+    public SecureString(char[] chars, boolean eraseSource)
+    {
+        this(chars);
+        if(eraseSource)
+        {
+            clear(chars);
+        }
     }
 
     /**
@@ -54,11 +76,13 @@ public class SecureString implements CharSequence
      * @param start index of the beginning of the subsequence
      * @param end index of the end of the subsequence
      * @since 1.2.0
+     * @throws NullPointerException if null is passed as array of {@code char}s
      */
     public SecureString(char[] chars, int start, int end)
     {
         this.chars = new char[end - start];
         System.arraycopy(chars, start, this.chars, 0, this.chars.length);
+        clear(chars);
     }
 
     /**
@@ -102,7 +126,15 @@ public class SecureString implements CharSequence
      * @since 1.2.0
      */
     public void clear(){
-        Arrays.fill(chars, '0');
+        synchronized (chars)
+        {
+            clear(chars);
+        }
+    }
+
+    private static void clear(char[] chars)
+    {
+        Arrays.fill(chars, Character.MIN_VALUE);
     }
 
     @Override
@@ -110,5 +142,23 @@ public class SecureString implements CharSequence
     {
         clear();
         super.finalize();
+    }
+
+    /**
+     *
+     * @return a masked version of this object.
+     * @since 1.2.0
+     */
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder(chars.length + 2);
+        sb.append("SecureString[");
+        for(int i = 0; i < chars.length; i++)
+        {
+            sb.append('*');
+        }
+        sb.append(']');
+        return sb.toString();
     }
 }

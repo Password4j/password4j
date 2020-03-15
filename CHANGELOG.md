@@ -3,7 +3,7 @@
 ## [Unreleased]
 ## Added
  * This CHANGELOG.md file
- * API interchangeable between `SecureString` and `String`.
+ * Plain text passwords can be provided either with `SecureString` or `String`.
 
 ## [1.1.0](https://github.com/Password4j/password4j/releases/tag/1.1.0) - (2020-03-14)
 ### Added

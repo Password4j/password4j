@@ -1,23 +1,14 @@
 package org.example.project;
 
+import com.password4j.*;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.password4j.BCryptFunction;
-import com.password4j.CompressedPBKDF2Function;
-import com.password4j.HashBuilder;
-import com.password4j.HashChecker;
-import com.password4j.HashingFunction;
-import com.password4j.PBKDF2Function;
-import com.password4j.Password;
-import com.password4j.SCryptFunction;
-import com.password4j.WithHmac;
 
 
 public class PublicPasswordTest
 {
 
-    private static final TestSuite[] PBKDF2_TEST = new TestSuite[] {
+    private static final TestSuite[] PBKDF2_TEST = new TestSuite[]{
             new TestSuite("r+bFUweFtsxrHGRTOEcxvV7kMu5Un9QvtmlXea2KHFv1neacSPd078QAfVKY+QM8AkHVq2kwXntk7O642DTP7A==", "password",
                     "salt", null, PBKDF2Function.getInstance(WithHmac.SHA512, 1000, 512)),
 
@@ -25,7 +16,14 @@ public class PublicPasswordTest
                     "salt", "pepper", PBKDF2Function.getInstance(WithHmac.SHA512, 1000, 512)),
 
             new TestSuite("EgvuM3qhGradmNwl2b1Z5uPnasY=", "123", "456", "",
-                    PBKDF2Function.getInstance(WithHmac.SHA1, 49999, 160)) };
+                    PBKDF2Function.getInstance(WithHmac.SHA1, 49999, 160)),
+
+            new TestSuite("$2a$06$If6bvum7DFjUnE9p2uDeDu0YHzrHM6tf.iqN8.yx.jNN1ILEf7h0i", "bc", "$2a$06$If6bvum7DFjUnE9p2uDeDu", "a",
+                    BCryptFunction.getInstance(10)),
+
+            new TestSuite("$s0$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==", "word", "salt",
+                    "pass", SCryptFunction.getInstance(16384, 8, 1))
+    };
 
     @Test
     public void test()
@@ -36,6 +34,12 @@ public class PublicPasswordTest
             Assert.assertEquals(test.hashingFunction.toString(), test.hash,
                     Password.hash(test.password).addSalt(test.salt).addPepper(test.pepper).with(test.hashingFunction)
                             .getResult());
+
+            SecureString securePassword = new SecureString(test.password.toCharArray());
+            Assert.assertEquals(test.hashingFunction.toString(), test.hash,
+                    Password.hash(securePassword).addSalt(test.salt).addPepper(test.pepper).with(test.hashingFunction)
+                            .getResult());
+
         }
 
     }
@@ -93,6 +97,9 @@ public class PublicPasswordTest
             BCryptFunction.getInstance(1);
             SCryptFunction.getInstance(2, 1, 1);
             SCryptFunction.getInstanceFromHash(password);
+
+            SecureString s = new SecureString(new char[]{'a'});
+            s.clear();
         }
         catch (Exception e)
         {

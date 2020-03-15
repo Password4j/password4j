@@ -67,7 +67,7 @@ public class HashChecker<C extends HashChecker<?>>
         CharSequence peppered = plain;
         if (StringUtils.isNotEmpty(this.pepper))
         {
-            peppered = this.pepper + peppered;
+            peppered = Utilities.append(this.pepper, peppered);
         }
 
         return hashingFunction.check(peppered, hash, salt);

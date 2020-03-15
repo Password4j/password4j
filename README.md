@@ -145,7 +145,7 @@ It is always recommended to use `char[]` instead of `String` <sup>(where possibl
 most web containers will pass the password into the `HttpServletRequest` object in plaintext as `String`)</sup>.
 
 For this reason Password4j provides a `SecureString` class that alleviates this problem. The provided
-`char[]` is wrapped around `SecureString` and it is never converted into a `String` during the it's lifecycle.
+`char[]` is wrapped around `SecureString` and it is never converted into a `String` during it's lifecycle.
 
 You can erase the underlying `char[]` with `clear()` method.
 ```java

@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.2.0](https://github.com/Password4j/password4j/releases/tag/1.2.0) - (2020-03-15)
 ## Added
  * This CHANGELOG.md file
  * Plain text passwords can be provided either with `SecureString` or `String`.

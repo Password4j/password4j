@@ -1,7 +1,7 @@
 ![logo](https://i.imgur.com/BAAwsxr.png "Password4j logo")
 
 [![Build Status](https://travis-ci.org/Password4j/password4j.svg?branch=master)](https://travis-ci.org/Password4j/password4j)
-[![Maven Central](https://img.shields.io/maven-central/v/com.password4j/password4j)](https://search.maven.org/artifact/com.password4j/password4j/1.1.0/jar)
+[![Maven Central](https://img.shields.io/maven-central/v/com.password4j/password4j)](https://search.maven.org/artifact/com.password4j/password4j/1.2.0/jar)
 [![javadoc](https://javadoc.io/badge2/com.password4j/password4j/javadoc.svg)](https://javadoc.io/doc/com.password4j/password4j)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 

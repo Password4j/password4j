@@ -4,8 +4,9 @@
 
 We release patches for security vulnerabilities. Which versions are eligible receiving such patches depend on the [<span>CVSS 3</span>](https://www.first.org/cvss/calculator/3.0) Rating:
 | Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
+|---------|--------------------|
+| 0.x     | :x:                |
+| 1.x     | :heavy_check_mark: |
 
 ## Reporting a Vulnerability
 

@@ -26,14 +26,14 @@ public class HashChecker<C extends HashChecker<?>>
 
     private String pepper;
 
-    private String plain;
+    private CharSequence plain;
 
     private HashChecker()
     {
         //
     }
 
-    public HashChecker(String plain, String hash)
+    public HashChecker(CharSequence plain, String hash)
     {
         this.hash = hash;
         this.plain = plain;
@@ -64,7 +64,7 @@ public class HashChecker<C extends HashChecker<?>>
             return false;
         }
 
-        String peppered = plain;
+        CharSequence peppered = plain;
         if (StringUtils.isNotEmpty(this.pepper))
         {
             peppered = this.pepper + peppered;

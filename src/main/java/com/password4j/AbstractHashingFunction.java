@@ -21,8 +21,8 @@ public abstract class AbstractHashingFunction implements HashingFunction
 {
 
     @Override
-    public boolean check(String plain, String hashed, String salt)
+    public boolean check(CharSequence plainTextPassword, String hashed, String salt)
     {
-        return check(plain, hashed);
+        return check(plainTextPassword, hashed);
     }
 }

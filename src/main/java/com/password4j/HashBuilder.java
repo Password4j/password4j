@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class HashBuilder<H extends HashBuilder<?>>
 {
-    private String plain;
+    private CharSequence plainTextPassword;
 
     private String salt;
 
@@ -32,9 +32,9 @@ public class HashBuilder<H extends HashBuilder<?>>
         //
     }
 
-    public HashBuilder(String plain)
+    public HashBuilder(CharSequence plainTextPassword)
     {
-        this.plain = plain;
+        this.plainTextPassword = plainTextPassword;
     }
 
     public H addSalt(String salt)
@@ -77,7 +77,7 @@ public class HashBuilder<H extends HashBuilder<?>>
 
     public Hash with(HashingFunction hashingFunction)
     {
-        String peppered = plain;
+        CharSequence peppered = plainTextPassword;
         if (StringUtils.isNotEmpty(this.pepper))
         {
             peppered = this.pepper + peppered;

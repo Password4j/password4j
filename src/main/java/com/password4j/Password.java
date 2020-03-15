@@ -54,7 +54,7 @@ public class Password
      * @throws BadParametersException if any of the arguments are null.
      * @since 0.1.1
      */
-    public static HashBuilder hash(String plainTextPassword)
+    public static HashBuilder hash(CharSequence plainTextPassword)
     {
         return hash(plainTextPassword, HashBuilder::new);
     }
@@ -73,7 +73,7 @@ public class Password
      * @throws BadParametersException if any of the arguments are null.
      * @since 0.1.1
      */
-    public static HashChecker check(String plainTextPassword, String hash)
+    public static HashChecker check(CharSequence plainTextPassword, String hash)
     {
         return check(plainTextPassword, hash, HashChecker::new);
     }
@@ -84,7 +84,7 @@ public class Password
      *
      * This method uses the {@link HashingFunction} used to calculate the given {@link Hash}.
      * Il the password is null, this returns false;
-     * otherwise {@link HashingFunction#check(String, String)} is invoked.
+     * otherwise {@link HashingFunction#check(CharSequence, String)} is invoked.
      *
      * @param plainTextPassword the original password.
      * @param hashObject an {@link Hash} object.
@@ -92,7 +92,7 @@ public class Password
      * @throws BadParametersException if the Hash is null or if there's no hashing function defined in it.
      * @since 1.0.3
      */
-    public static boolean check(String plainTextPassword, Hash hashObject)
+    public static boolean check(CharSequence plainTextPassword, Hash hashObject)
     {
         if(hashObject == null || hashObject.getHashingFunction() == null)
         {
@@ -104,10 +104,10 @@ public class Password
             return false;
         }
 
-        String peppered = plainTextPassword;
+        CharSequence peppered = plainTextPassword;
         if (StringUtils.isNotEmpty(hashObject.getPepper()))
         {
-            peppered = hashObject.getPepper() + peppered;
+            peppered = Utilities.append(hashObject.getPepper(), peppered);
         }
 
         return hashObject.getHashingFunction().check(peppered, hashObject.getResult(), hashObject.getSalt());
@@ -136,7 +136,7 @@ public class Password
      * @throws BadParametersException if any of the arguments are null.
      * @since 0.1.1
      */
-    public static <B extends HashBuilder<?>> B hash(String plainTextPassword, Function<String, B> builderFunction)
+    public static <B extends HashBuilder<?>> B hash(CharSequence plainTextPassword, Function<CharSequence, B> builderFunction)
     {
         if (builderFunction == null)
         {
@@ -174,7 +174,7 @@ public class Password
      * @return a builder instance of {@link HashChecker}
      * @since 0.2.1
      */
-    public static <C extends HashChecker<?>> C check(String plainTextPassword, String hash, BiFunction<String, String, C> checkerBiFunction)
+    public static <C extends HashChecker<?>> C check(CharSequence plainTextPassword, String hash, BiFunction<CharSequence, String, C> checkerBiFunction)
     {
         if (checkerBiFunction == null)
         {

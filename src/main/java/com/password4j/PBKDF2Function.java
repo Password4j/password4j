@@ -83,18 +83,18 @@ public class PBKDF2Function extends AbstractHashingFunction
     }
 
     @Override
-    public Hash hash(String plain)
+    public Hash hash(CharSequence plainTextPassword)
     {
         byte[] salt = SaltGenerator.generate();
-        return hash(plain, new String(salt));
+        return hash(plainTextPassword, new String(salt));
     }
 
     @Override
-    public Hash hash(String plain, String salt)
+    public Hash hash(CharSequence plainTextPassword, String salt)
     {
         try
         {
-            SecretKey key = internalHash(plain, salt, this.algorithm, this.iterations, this.length);
+            SecretKey key = internalHash(plainTextPassword, salt, this.algorithm, this.iterations, this.length);
             return new Hash(this, getHash(key, salt), salt);
         }
         catch (NoSuchAlgorithmException nsae)
@@ -109,10 +109,10 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
     }
 
-    protected static SecretKey internalHash(String plain, String salt, WithHmac algorithm, int iterations, int length)
+    protected static SecretKey internalHash(CharSequence plainTextPassword, String salt, WithHmac algorithm, int iterations, int length)
             throws NoSuchAlgorithmException, InvalidKeySpecException
     {
-        return internalHash(plain.toCharArray(), salt.getBytes(), algorithm, iterations, length);
+        return internalHash(Utilities.fromCharSequenceToChars(plainTextPassword), salt.getBytes(), algorithm, iterations, length);
     }
 
     protected static SecretKey internalHash(char[] plain, byte[] salt, WithHmac algorithm, int iterations, int length)
@@ -129,17 +129,17 @@ public class PBKDF2Function extends AbstractHashingFunction
     }
 
     @Override
-    public boolean check(String plain, String hashed, String salt)
+    public boolean check(CharSequence plainTextPassword, String hashed, String salt)
     {
-        Hash internalHash = hash(plain, salt);
+        Hash internalHash = hash(plainTextPassword, salt);
         return slowEquals(internalHash.getResult().getBytes(), hashed.getBytes());
     }
 
     @Override
-    public boolean check(String password, String hashed)
+    public boolean check(CharSequence plainTexPassword, String hashed)
     {
         throw new UnsupportedOperationException(
-                "This implementation requires an explicit salt. Use check(String, String, String) method instead.");
+                "This implementation requires an explicit salt. Use check(CharSequence, String, String) method instead.");
 
     }
 

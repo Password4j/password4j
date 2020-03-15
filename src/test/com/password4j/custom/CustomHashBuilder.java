@@ -25,7 +25,7 @@ public class CustomHashBuilder extends HashBuilder<CustomHashBuilder>
 
     public static final String SAME_RESULT = "i always produce this hash";
 
-    public CustomHashBuilder(String plain)
+    public CustomHashBuilder(CharSequence plain)
     {
         super(plain);
     }

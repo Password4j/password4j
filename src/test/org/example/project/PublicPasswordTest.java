@@ -103,7 +103,7 @@ public class PublicPasswordTest
     private class CHB extends HashBuilder<CHB>
     {
 
-        public CHB(String plain)
+        public CHB(CharSequence plain)
         {
             super(plain);
         }
@@ -117,7 +117,7 @@ public class PublicPasswordTest
     private class CHC extends HashChecker<CHC>
     {
 
-        public CHC(String plain, String hash)
+        public CHC(CharSequence plain, String hash)
         {
             super(plain, hash);
         }

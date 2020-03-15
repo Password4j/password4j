@@ -194,27 +194,27 @@ public class BCryptFunction extends AbstractHashingFunction
     }
 
     @Override
-    public Hash hash(String plain)
+    public Hash hash(CharSequence plainTextPassword)
     {
         String salt = generateSalt(logRounds);
-        return hash(plain, salt);
+        return hash(plainTextPassword, salt);
     }
 
     @Override
-    public Hash hash(String plain, String salt)
+    public Hash hash(CharSequence plainTextPassword, String salt)
     {
-        return internalHash(plain, salt);
+        return internalHash(plainTextPassword, salt);
     }
 
     @Override
-    public boolean check(String password, String hashed)
+    public boolean check(CharSequence plainTexPassword, String hashed)
     {
-        return checkPw(password, hashed);
+        return checkPw(plainTexPassword, hashed);
     }
 
-    private Hash internalHash(String plain, String salt)
+    private Hash internalHash(CharSequence plainTextPassword, String salt)
     {
-        String hash = hashPw(plain, salt);
+        String hash = hashPw(plainTextPassword, salt);
         return new Hash(this, hash, salt);
     }
 
@@ -522,9 +522,9 @@ public class BCryptFunction extends AbstractHashingFunction
         return ret;
     }
 
-    private String hashPw(String password, String salt)
+    private String hashPw(CharSequence password, String salt)
     {
-        byte[] passwordb = password.getBytes(StandardCharsets.UTF_8);
+        byte[] passwordb = Utilities.fromCharSequenceToBytes(password);
 
         return hashPw(passwordb, salt);
     }
@@ -632,7 +632,7 @@ public class BCryptFunction extends AbstractHashingFunction
         return generateSalt("$2a", logRounds);
     }
 
-    private boolean checkPw(String plaintext, String hashed)
+    private boolean checkPw(CharSequence plaintext, String hashed)
     {
         return equalsNoEarlyReturn(hashed, hashPw(plaintext, hashed));
     }

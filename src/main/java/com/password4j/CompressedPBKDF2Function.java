@@ -96,19 +96,19 @@ public class CompressedPBKDF2Function extends PBKDF2Function
     }
 
     @Override
-    public boolean check(String password, String hashed)
+    public boolean check(CharSequence plainTexPassword, String hashed)
     {
         String salt = getSaltFromHash(hashed);
-        Hash internalHas = hash(password, salt);
+        Hash internalHas = hash(plainTexPassword, salt);
 
         return slowEquals(internalHas.getResult().getBytes(), hashed.getBytes());
     }
 
     @Override
-    public boolean check(String plain, String hashed, String salt)
+    public boolean check(CharSequence plainTextPassword, String hashed, String salt)
     {
         String realSalt = getSaltFromHash(hashed);
-        Hash internalHas = hash(plain, realSalt);
+        Hash internalHas = hash(plainTextPassword, realSalt);
         return slowEquals(internalHas.getResult().getBytes(), hashed.getBytes());
     }
 

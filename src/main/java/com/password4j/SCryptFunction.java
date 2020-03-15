@@ -78,19 +78,19 @@ public class SCryptFunction extends AbstractHashingFunction
     }
 
     @Override
-    public Hash hash(String plain)
+    public Hash hash(CharSequence plainTextPassword)
     {
         byte[] salt = SaltGenerator.generate();
-        return hash(plain, new String(salt));
+        return hash(plainTextPassword, new String(salt));
     }
 
     @Override
-    public Hash hash(String plain, String salt)
+    public Hash hash(CharSequence plainTextPassword, String salt)
     {
         try
         {
             byte[] saltAsBytes = salt.getBytes(StandardCharsets.UTF_8);
-            byte[] derived = scrypt(plain.getBytes(StandardCharsets.UTF_8), saltAsBytes, 64);
+            byte[] derived = scrypt(Utilities.fromCharSequenceToBytes(plainTextPassword), saltAsBytes, 64);
             String params = Long.toString(log2(workFactor) << 16 | resources << 8 | parallelization, 16);
             String sb = "$s0$" + params + '$' + Base64.getEncoder().encodeToString(saltAsBytes) + '$' + Base64.getEncoder()
                     .encodeToString(derived);
@@ -104,7 +104,7 @@ public class SCryptFunction extends AbstractHashingFunction
     }
 
     @Override
-    public boolean check(String plain, String hashed)
+    public boolean check(CharSequence plainTexPassword, String hashed)
     {
         try
         {
@@ -113,7 +113,7 @@ public class SCryptFunction extends AbstractHashingFunction
             {
                 byte[] salt = Base64.getDecoder().decode(parts[3]);
                 byte[] derived0 = Base64.getDecoder().decode(parts[4]);
-                byte[] derived1 = scrypt(plain.getBytes(StandardCharsets.UTF_8), salt, 64);
+                byte[] derived1 = scrypt(Utilities.fromCharSequenceToBytes(plainTexPassword), salt, 64);
                 if (derived0.length != derived1.length)
                 {
                     return false;

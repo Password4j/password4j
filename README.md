@@ -136,16 +136,18 @@ public class CustomChecker extends HashChecker<CustomChecker> {
 Create your custom `HashChecker` and use it in `Password.check()`.
 
 ### Security of Strings
-`String`s are immutable object and stored in the String Pool, a location in the heap memory.
-Since they are almost never garbage collected, an attacker that has access to the memory could read the password
-just before you use it as input for Password4j.
+`String`s are immutable objects and they are stored in the String Pool, a location in the heap memory.
+Since you do not have control on the Garbage Collector, an attacker that has access to the memory could read the password
+just before you use it as input for Password4j. Even after this, the `String` may be still persisted in memory
+until the garbage collection occurs.
 
-It is recommended to use `char[]` instead.
+It is always recommended to use `char[]` instead of `String` <sup>(where possible - If we're talking of a web application, 
+most web containers will pass the password into the `HttpServletRequest` object in plaintext as `String`)</sup>.
 
 For this reason Password4j provides a `SecureString` class that alleviates this problem. The provided
-`char[]` is wrapped around `SecureString` and it is never converted into a `String` during the process.
+`char[]` is wrapped around `SecureString` and it is never converted into a `String` during the it's lifecycle.
 
-You can erase erases the underlying `char[]` with `clear()` method.
+You can erase the underlying `char[]` with `clear()` method.
 ```java
 SecureString secure = new SecureString(new char[]{...});
 

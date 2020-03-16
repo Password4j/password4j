@@ -90,7 +90,7 @@ public class SecureString implements CharSequence
      * @since 1.2.0
      */
     @Override
-    public int length()
+    public synchronized int  length()
     {
         return chars.length;
     }
@@ -101,7 +101,7 @@ public class SecureString implements CharSequence
      * @since 1.2.0
      */
     @Override
-    public char charAt(int index)
+    public synchronized char charAt(int index)
     {
         return chars[index];
     }
@@ -115,7 +115,7 @@ public class SecureString implements CharSequence
      * @since 1.2.0
      */
     @Override
-    public CharSequence subSequence(int start, int end)
+    public synchronized CharSequence subSequence(int start, int end)
     {
         return new SecureString(this.chars, start, end);
     }
@@ -133,7 +133,7 @@ public class SecureString implements CharSequence
         }
     }
 
-    private static void clear(char[] chars)
+    private static synchronized void clear(char[] chars)
     {
         Arrays.fill(chars, Character.MIN_VALUE);
     }
@@ -153,5 +153,44 @@ public class SecureString implements CharSequence
         }
         sb.append(']');
         return sb.toString();
+    }
+
+    /**
+     * Constant time equality to avoid potential timing attacks.
+     *
+     * @param other object
+     * @since 1.2.1
+     */
+    @Override
+    public synchronized boolean equals(Object other)
+    {
+        if (this == other)
+        {
+            return true;
+        }
+        if (!(other instanceof CharSequence))
+        {
+            return false;
+        }
+        CharSequence that = (CharSequence) other;
+
+        if (chars.length != that.length())
+        {
+            return false;
+        }
+
+        int equals = 0;
+        for (int i = 0; i < chars.length; i++)
+        {
+            equals |= chars[i] ^ that.charAt(i);
+        }
+
+        return equals == 0;
+    }
+
+    @Override
+    public synchronized int hashCode()
+    {
+        return Arrays.hashCode(chars);
     }
 }

@@ -20,6 +20,7 @@ package com.password4j;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.CharBuffer;
 import java.util.Arrays;
 
 public class StringTest
@@ -129,6 +130,22 @@ public class StringTest
         char z = Character.MIN_VALUE;
         Assert.assertEquals(Arrays.toString(new char[]{z, z, z, z}), Arrays.toString(password1));
         Assert.assertEquals(Arrays.toString(new char[]{'a', 'b', 'c', 'd'}), Arrays.toString(password2));
+    }
+
+    @Test
+    public void testEquality()
+    {
+        char[] password = new char[]{'a', 'b', 'c', 'd'};
+        String str = new String(password);
+        SecureString ss = new SecureString(password);
+
+        Assert.assertTrue(ss.equals(str));
+        Assert.assertFalse(ss.equals(null));
+        Assert.assertTrue(ss.equals(CharBuffer.wrap(password)));
+        Assert.assertFalse(ss.equals("abc"));
+        Assert.assertFalse(ss.equals("cbad"));
+        Assert.assertTrue(ss.equals(ss));
+        Assert.assertEquals(Arrays.hashCode(password), ss.hashCode());
     }
 
     @Test

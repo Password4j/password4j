@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PBKDF2Function extends AbstractHashingFunction
 {
-    private WithHmac algorithm;
+    private Hmac algorithm;
 
     private int iterations;
 
@@ -49,13 +49,13 @@ public class PBKDF2Function extends AbstractHashingFunction
         this.length = length;
     }
 
-    protected PBKDF2Function(WithHmac algorithm, int iterations, int length)
+    protected PBKDF2Function(Hmac algorithm, int iterations, int length)
     {
         this(iterations, length);
         this.algorithm = algorithm;
     }
 
-    public static PBKDF2Function getInstance(WithHmac algorithm, int iterations, int length)
+    public static PBKDF2Function getInstance(Hmac algorithm, int iterations, int length)
     {
         String key = getUID(algorithm, iterations, length);
         if (instances.containsKey(key))
@@ -74,7 +74,7 @@ public class PBKDF2Function extends AbstractHashingFunction
     {
         try
         {
-            return getInstance(WithHmac.valueOf(algorithm), iterations, length);
+            return getInstance(Hmac.valueOf(algorithm), iterations, length);
         }
         catch (IllegalArgumentException iae)
         {
@@ -109,13 +109,13 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
     }
 
-    protected static SecretKey internalHash(CharSequence plainTextPassword, String salt, WithHmac algorithm, int iterations, int length)
+    protected static SecretKey internalHash(CharSequence plainTextPassword, String salt, Hmac algorithm, int iterations, int length)
             throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         return internalHash(Utilities.fromCharSequenceToChars(plainTextPassword), salt.getBytes(), algorithm, iterations, length);
     }
 
-    protected static SecretKey internalHash(char[] plain, byte[] salt, WithHmac algorithm, int iterations, int length)
+    protected static SecretKey internalHash(char[] plain, byte[] salt, Hmac algorithm, int iterations, int length)
             throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(ALGORITHM_PREFIX + algorithm.name());
@@ -160,7 +160,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         return diff == 0;
     }
 
-    public WithHmac getAlgorithm()
+    public Hmac getAlgorithm()
     {
         return algorithm;
     }
@@ -202,7 +202,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         return toString().hashCode();
     }
 
-    protected static String getUID(WithHmac algorithm, int iterations, int length)
+    protected static String getUID(Hmac algorithm, int iterations, int length)
     {
         return String.valueOf(algorithm.code()) + '|' + iterations + '|' + length;
     }

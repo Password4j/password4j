@@ -189,7 +189,7 @@ public class Hash
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        if(this.hashingFunction != null)
+        if (this.hashingFunction != null)
         {
             sb.append(hashingFunction.getClass().getSimpleName());
         }

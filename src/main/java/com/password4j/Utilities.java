@@ -32,7 +32,7 @@ class Utilities
 
     static byte[] fromCharSequenceToBytes(CharSequence charSequence)
     {
-        if(charSequence == null || charSequence.length() == 0)
+        if (charSequence == null || charSequence.length() == 0)
         {
             return new byte[0];
         }
@@ -47,12 +47,12 @@ class Utilities
 
     static char[] fromCharSequenceToChars(CharSequence charSequence)
     {
-        if(charSequence == null || charSequence.length() == 0)
+        if (charSequence == null || charSequence.length() == 0)
         {
             return new char[0];
         }
         char[] result = new char[charSequence.length()];
-        for(int i = 0; i < charSequence.length(); i++)
+        for (int i = 0; i < charSequence.length(); i++)
         {
             result[i] = charSequence.charAt(i);
         }
@@ -61,12 +61,12 @@ class Utilities
 
     static CharSequence append(CharSequence cs1, CharSequence cs2)
     {
-        if(cs1 == null || cs1.length() == 0)
+        if (cs1 == null || cs1.length() == 0)
         {
             return cs2;
         }
 
-        if(cs2 == null || cs2.length() == 0)
+        if (cs2 == null || cs2.length() == 0)
         {
             return cs1;
         }

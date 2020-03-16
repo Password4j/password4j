@@ -29,7 +29,7 @@ public class SystemCheckTest
         // GIVEN
 
         // WHEN
-        int result = SystemChecker.findIterationsForPBKDF2(1, WithHmac.SHA256, 256);
+        int result = SystemChecker.findIterationsForPBKDF2(1, Hmac.SHA256, 256);
 
         // THEN
         Assert.assertTrue(result > 0);
@@ -78,7 +78,7 @@ public class SystemCheckTest
         //GIVEN
 
         // WHEN
-       SystemChecker.isPBKDF2Supported(WithHmac.SHA256);
+       SystemChecker.isPBKDF2Supported(Hmac.SHA256);
     }
 
 

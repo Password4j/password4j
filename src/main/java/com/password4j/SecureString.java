@@ -20,8 +20,8 @@ package com.password4j;
 import java.util.Arrays;
 
 /**
- * More secure implementation of a {@link String}, preventing heap memory attacks.
- *
+ * More secure implementation of {@link CharSequence} than {@link String}, preventing heap memory attacks.
+ * <p>
  * Like {@link String}, this {@link CharSequence} implementation has an underlying array of {@code char}s.
  * The sequence however is not stored in the String pool and the array of {@code char}s lives
  * temporary in the heap memory.
@@ -38,8 +38,8 @@ public class SecureString implements CharSequence
      * The sequence is never put in the String pool.
      *
      * @param chars sequence of characters
-     * @since 1.2.0
      * @throws NullPointerException if null is passed
+     * @since 1.2.0
      */
     public SecureString(char[] chars)
     {
@@ -54,15 +54,15 @@ public class SecureString implements CharSequence
      * <p>
      * The sequence is never put in the String pool.
      *
-     * @param chars sequence of characters
+     * @param chars       sequence of characters
      * @param eraseSource if true, the original array is zeroed
-     * @since 1.2.0
      * @throws NullPointerException if null is passed
+     * @since 1.2.0
      */
     public SecureString(char[] chars, boolean eraseSource)
     {
         this(chars);
-        if(eraseSource)
+        if (eraseSource)
         {
             clear(chars);
         }
@@ -74,9 +74,9 @@ public class SecureString implements CharSequence
      *
      * @param chars sequence of characters
      * @param start index of the beginning of the subsequence
-     * @param end index of the end of the subsequence
-     * @since 1.2.0
+     * @param end   index of the end of the subsequence
      * @throws NullPointerException if null is passed as array of {@code char}s
+     * @since 1.2.0
      */
     public SecureString(char[] chars, int start, int end)
     {
@@ -110,9 +110,9 @@ public class SecureString implements CharSequence
      * Creates a {@link SecureString} from a subsequence of this object.
      *
      * @param start index of the beginning of the subsequence
-     * @param end index of the end of the subsequence
-     * @since 1.2.0
+     * @param end   index of the end of the subsequence
      * @see SecureString#SecureString(char[], int, int)
+     * @since 1.2.0
      */
     @Override
     public CharSequence subSequence(int start, int end)
@@ -125,7 +125,8 @@ public class SecureString implements CharSequence
      *
      * @since 1.2.0
      */
-    public void clear(){
+    public void clear()
+    {
         synchronized (chars)
         {
             clear(chars);
@@ -137,15 +138,7 @@ public class SecureString implements CharSequence
         Arrays.fill(chars, Character.MIN_VALUE);
     }
 
-    @Override
-    protected void finalize() throws Throwable
-    {
-        clear();
-        super.finalize();
-    }
-
     /**
-     *
      * @return a masked version of this object.
      * @since 1.2.0
      */
@@ -154,7 +147,7 @@ public class SecureString implements CharSequence
     {
         StringBuilder sb = new StringBuilder(chars.length + 2);
         sb.append("SecureString[");
-        for(int i = 0; i < chars.length; i++)
+        for (int i = 0; i < chars.length; i++)
         {
             sb.append('*');
         }

@@ -17,6 +17,12 @@
 
 package com.password4j;
 
+/**
+ * Class in the hierarchy to avoid code duplication.
+ *
+ * @author David Bertoldi
+ * @since 0.1.0
+ */
 public abstract class AbstractHashingFunction implements HashingFunction
 {
 

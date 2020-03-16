@@ -71,7 +71,7 @@ Hash hash = Password.hash("password").addSalt("fixed salt").withPBKDF2();
 Hash hash = Password.hash("password").addSalt("fixed salt").addPepper("pepper").withPBKDF2();
 
 // Custom PBKDF2 (PBKDF2 with HMAC-SHA512, 64000 iterations and 512bit length).
-Hash hash = Password.hash("password").with(PBKDF2Function.getInstance(WithHmac.SHA512, 64000, 512));
+Hash hash = Password.hash("password").with(PBKDF2Function.getInstance(Hmac.SHA512, 64000, 512));
 
 ```
 The same structure can be adopted for the other algorithms, not just for PBKDF2.
@@ -146,7 +146,6 @@ It is always recommended to use `char[]` instead of `String` <sup>(where possibl
 most web containers will pass the password into the `HttpServletRequest` object in plaintext as `String`)</sup>.
 
 For this reason Password4j provides a `SecureString` class that alleviates this problem. The provided
-`char[]` is wrapped around `SecureString` and it is never converted into a `String` during it's lifecycle.
 
 You can erase the underlying `char[]` with `clear()` method.
 ```java
@@ -222,7 +221,7 @@ The class `SystemChecker` can be used to find these optimal values.
 
 Here's an example on how to configure PBKDF2:
 ```java
-WithHmac algorithm = WithHmac.SHA256;
+Hmac algorithm = Hmac.SHA256;
 int length = algorithm.bits();
 long maxTimeInMilliseconds = 150;
 

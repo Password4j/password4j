@@ -47,7 +47,7 @@ public interface HashingFunction
      *
      * @param plainTextPassword the password to be hashed
      * @return a {@link Hash}
-     * @see HashingFunction#hash(String, String)
+     * @see HashingFunction#hash(CharSequence, String)
      * @since 0.1.0
      */
     Hash hash(CharSequence plainTextPassword);
@@ -63,7 +63,7 @@ public interface HashingFunction
      * responsibility of the caller.
      *
      * @param plainTextPassword the password to be hashed
-     * @param salt  the salt used in the hashing process
+     * @param salt              the salt used in the hashing process
      * @return a {@link Hash}
      * @throws BadParametersException if the salt does not pass the validation of the CHF
      * @since 0.1.0
@@ -84,8 +84,8 @@ public interface HashingFunction
      * recognise a valid salt) a {@link BadParametersException}
      * is thrown.
      *
-     * @param plainTexPassword  the plaintext password
-     * @param hashed the hash
+     * @param plainTexPassword the plaintext password
+     * @param hashed           the hash
      * @return true if the hash is generated from the plaintext; false otherwise
      * @throws UnsupportedOperationException if the CHF need a salt and it is not part of the hash
      * @throws BadParametersException        if the hash is not well-formed
@@ -104,9 +104,9 @@ public interface HashingFunction
      * recognise a valid salt) a {@link BadParametersException}
      * is thrown.
      *
-     * @param plainTextPassword  the plaintext password
-     * @param hashed the hash
-     * @param salt   the salt used to produce the hash
+     * @param plainTextPassword the plaintext password
+     * @param hashed            the hash
+     * @param salt              the salt used to produce the hash
      * @return true if the hash is generated from the plaintext; false otherwise
      * @throws BadParametersException if the hash is not well-formed
      * @since 0.2.1

@@ -19,7 +19,7 @@ package com.password4j;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Builder class that helps to build a chain of parameters to be used
+ * Builder class that helps to create a chain of parameters to be used
  * in the verification process.
  *
  * @param <C> extends HashChecker.
@@ -36,20 +36,21 @@ public class HashChecker<C extends HashChecker<?>>
 
     private CharSequence plainTextPassword;
 
+    @SuppressWarnings("unused")
     private HashChecker()
     {
         //
     }
 
     /**
-     * @param plainTextPassowrd the plain text password
+     * @param plainTextPassword the plain text password
      * @param hash              the hash to verify
      * @since 1.0.0
      */
-    public HashChecker(CharSequence plainTextPassowrd, String hash)
+    public HashChecker(CharSequence plainTextPassword, String hash)
     {
         this.hash = hash;
-        this.plainTextPassword = plainTextPassowrd;
+        this.plainTextPassword = plainTextPassword;
     }
 
     /**

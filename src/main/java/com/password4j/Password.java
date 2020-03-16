@@ -68,7 +68,7 @@ public class Password
      * method to verify the hash.
      *
      * @param plainTextPassword the plain text password
-     * @param hash an hash string
+     * @param hash              an hash string
      * @return a builder instance of {@link HashChecker}
      * @throws BadParametersException if any of the arguments are null.
      * @since 0.1.1
@@ -81,20 +81,20 @@ public class Password
     /**
      * Starts to verify if an hash object has been generated with
      * the given plain text password.
-     *
+     * <p>
      * This method uses the {@link HashingFunction} used to calculate the given {@link Hash}.
      * Il the password is null, this returns false;
      * otherwise {@link HashingFunction#check(CharSequence, String)} is invoked.
      *
      * @param plainTextPassword the original password.
-     * @param hashObject an {@link Hash} object.
+     * @param hashObject        an {@link Hash} object.
      * @return true if the check passes, false otherwise.
      * @throws BadParametersException if the Hash is null or if there's no hashing function defined in it.
      * @since 1.0.3
      */
     public static boolean check(CharSequence plainTextPassword, Hash hashObject)
     {
-        if(hashObject == null || hashObject.getHashingFunction() == null)
+        if (hashObject == null || hashObject.getHashingFunction() == null)
         {
             throw new BadParametersException("Invalid Hash object. " +
                     (hashObject != null ? hashObject.toString() : null));
@@ -126,12 +126,13 @@ public class Password
      * <p>
      * For example:<br/>
      * <code>
-     *     Passowrd.hash("password", CustomHashBuilder::new);
+     * Passowrd.hash("password", CustomHashBuilder::new);
      * </code>
+     *
      * @param plainTextPassword the plain text password
-     * @param builderFunction any lambda function or method reference
-     *                        that returns an instance of the extended
-     *                        {@link HashBuilder}.
+     * @param builderFunction   any lambda function or method reference
+     *                          that returns an instance of the extended
+     *                          {@link HashBuilder}.
      * @return a builder instance of {@link HashBuilder}
      * @throws BadParametersException if any of the arguments are null.
      * @since 0.1.1
@@ -163,15 +164,16 @@ public class Password
      * <p>
      * For example:<br/>
      * <code>
-     *     Passowrd.check("password", "hash", CustomHashChecker::new);
+     * Passowrd.check("password", "hash", CustomHashChecker::new);
      * </code>
+     *
      * @param plainTextPassword the plain text password
-     * @param hash an hash string
+     * @param hash              an hash string
      * @param checkerBiFunction any lambda function or method reference
      *                          that returns an instance of the extended
      *                          {@link HashChecker}.
-     * @throws BadParametersException if any of the arguments are null.
      * @return a builder instance of {@link HashChecker}
+     * @throws BadParametersException if any of the arguments are null.
      * @since 0.2.1
      */
     public static <C extends HashChecker<?>> C check(CharSequence plainTextPassword, String hash, BiFunction<CharSequence, String, C> checkerBiFunction)

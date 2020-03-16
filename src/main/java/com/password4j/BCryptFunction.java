@@ -289,7 +289,7 @@ public class BCryptFunction extends AbstractHashingFunction
             if (off >= length)
             {
                 sb.append(BASE_64_CODE[c1 & 0x3f]);
-                break;
+                return;
             }
             c2 = toBeEncoded[off++] & 0xff;
             c1 |= (c2 >> 4) & 0x0f;
@@ -298,7 +298,7 @@ public class BCryptFunction extends AbstractHashingFunction
             if (off >= length)
             {
                 sb.append(BASE_64_CODE[c1 & 0x3f]);
-                break;
+                return;
             }
             c2 = toBeEncoded[off++] & 0xff;
             c1 |= (c2 >> 6) & 0x03;
@@ -339,7 +339,6 @@ public class BCryptFunction extends AbstractHashingFunction
         int off = 0;
         int strLength = str.length();
         int oLength = 0;
-        byte[] ret;
         byte c1;
         byte c2;
         byte c3;
@@ -355,26 +354,26 @@ public class BCryptFunction extends AbstractHashingFunction
             c2 = char64(str.charAt(off++));
             if (c1 == -1 || c2 == -1)
             {
-                break;
+                return fromStringBuilderToBytes(rs, oLength);
             }
             o = (byte) (c1 << 2);
             o |= (c2 & 0x30) >> 4;
             rs.append((char) o);
             if (++oLength >= maxOLength || off >= strLength)
             {
-                break;
+                return fromStringBuilderToBytes(rs, oLength);
             }
             c3 = char64(str.charAt(off++));
             if (c3 == -1)
             {
-                break;
+                return fromStringBuilderToBytes(rs, oLength);
             }
             o = (byte) ((c2 & 0x0f) << 4);
             o |= (c3 & 0x3c) >> 2;
             rs.append((char) o);
             if (++oLength >= maxOLength || off >= strLength)
             {
-                break;
+                return fromStringBuilderToBytes(rs, oLength);
             }
             c4 = char64(str.charAt(off++));
             o = (byte) ((c3 & 0x03) << 6);
@@ -383,11 +382,20 @@ public class BCryptFunction extends AbstractHashingFunction
             ++oLength;
         }
 
-        ret = new byte[oLength];
-        for (off = 0; off < oLength; off++)
-            ret[off] = (byte) rs.charAt(off);
+        return fromStringBuilderToBytes(rs, oLength);
+
+    }
+
+    private static byte[] fromStringBuilderToBytes(StringBuilder sb, int oLength)
+    {
+        byte[] ret = new byte[oLength];
+        for (int i = 0; i < oLength; i++)
+        {
+            ret[i] = (byte) sb.charAt(i);
+        }
         return ret;
     }
+
 
     /**
      * Blowfish encipher a single 64-bit block encoded as

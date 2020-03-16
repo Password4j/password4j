@@ -22,7 +22,13 @@ import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-
+/**
+ * Class containing the implementation of BCrypt function and its parameters.
+ *
+ * @author David Bertoldi
+ * @see <a href="https://en.wikipedia.org/wiki/Bcrypt">BCrypt</a>
+ * @since 0.1.0
+ */
 public class BCryptFunction extends AbstractHashingFunction
 {
 
@@ -173,12 +179,23 @@ public class BCryptFunction extends AbstractHashingFunction
         //
     }
 
-    public BCryptFunction(int logRounds)
+    protected BCryptFunction(int logRounds)
     {
         this();
         this.logRounds = logRounds;
     }
 
+    /**
+     * Creates a singleton instance, depending on the provided
+     * logarithmic cost.
+     * <p>
+     * The cost is expressed with the following formula:
+     * {@code cost = 2^logRounds}
+     *
+     * @param logRounds logarithmic cost
+     * @return a singleton instance
+     * @since 0.3.0
+     */
     public static BCryptFunction getInstance(int logRounds)
     {
         if (instances.containsKey(logRounds))
@@ -242,56 +259,86 @@ public class BCryptFunction extends AbstractHashingFunction
         return toString().hashCode();
     }
 
-    static void encodeBase64(byte[] d, int length, StringBuilder rs)
+    /**
+     * Encode a byte array using BCrypt's slightly-modified base64
+     * encoding scheme. Note that this is <strong>not</strong> compatible with
+     * the standard MIME-base64 encoding.
+     *
+     * @param toBeEncoded the byte array to encode
+     * @param length      the number of bytes to encode
+     * @param sb          StringBuilder representing the base64-encoded string
+     * @throws IllegalArgumentException if the length is invalid
+     * @since 0.1.0
+     */
+    protected static void encodeBase64(byte[] toBeEncoded, int length, StringBuilder sb)
     {
         int off = 0;
         int c1;
         int c2;
 
-        if (length <= 0 || length > d.length)
+        if (length <= 0 || length > toBeEncoded.length)
         {
             throw new BadParametersException("Invalid length");
         }
 
         while (off < length)
         {
-            c1 = d[off++] & 0xff;
-            rs.append(BASE_64_CODE[(c1 >> 2) & 0x3f]);
+            c1 = toBeEncoded[off++] & 0xff;
+            sb.append(BASE_64_CODE[(c1 >> 2) & 0x3f]);
             c1 = (c1 & 0x03) << 4;
             if (off >= length)
             {
-                rs.append(BASE_64_CODE[c1 & 0x3f]);
+                sb.append(BASE_64_CODE[c1 & 0x3f]);
                 break;
             }
-            c2 = d[off++] & 0xff;
+            c2 = toBeEncoded[off++] & 0xff;
             c1 |= (c2 >> 4) & 0x0f;
-            rs.append(BASE_64_CODE[c1 & 0x3f]);
+            sb.append(BASE_64_CODE[c1 & 0x3f]);
             c1 = (c2 & 0x0f) << 2;
             if (off >= length)
             {
-                rs.append(BASE_64_CODE[c1 & 0x3f]);
+                sb.append(BASE_64_CODE[c1 & 0x3f]);
                 break;
             }
-            c2 = d[off++] & 0xff;
+            c2 = toBeEncoded[off++] & 0xff;
             c1 |= (c2 >> 6) & 0x03;
-            rs.append(BASE_64_CODE[c1 & 0x3f]);
-            rs.append(BASE_64_CODE[c2 & 0x3f]);
+            sb.append(BASE_64_CODE[c1 & 0x3f]);
+            sb.append(BASE_64_CODE[c2 & 0x3f]);
         }
     }
 
-    private static byte char64(char x)
+    /**
+     * Look up the 3 bits base64-encoded by the specified character,
+     * range-checking against conversion table
+     *
+     * @param c the base64-encoded value
+     * @return the decoded value of x
+     * @since 0.1.0
+     */
+    protected static byte char64(char c)
     {
-        if ((int) x >= INDEX_64.length)
+        if ((int) c >= INDEX_64.length)
             return -1;
-        return INDEX_64[(int) x];
+        return INDEX_64[(int) c];
     }
 
-    static byte[] decodeBase64(String s, int maxOLength)
+    /**
+     * Decode a string encoded using BCrypt's base64 scheme to a
+     * byte array. Note that this is *not* compatible with
+     * the standard MIME-base64 encoding.
+     *
+     * @param str        the string to decode
+     * @param maxOLength the maximum number of bytes to decode
+     * @return an array containing the decoded bytes
+     * @throws IllegalArgumentException if maxOLength is invalid
+     * @since 0.1.0
+     */
+    protected static byte[] decodeBase64(String str, int maxOLength)
     {
         StringBuilder rs = new StringBuilder();
         int off = 0;
-        int slen = s.length();
-        int olen = 0;
+        int strLength = str.length();
+        int oLength = 0;
         byte[] ret;
         byte c1;
         byte c2;
@@ -302,10 +349,10 @@ public class BCryptFunction extends AbstractHashingFunction
         if (maxOLength <= 0)
             throw new BadParametersException("Invalid maxOLength");
 
-        while (off < slen - 1 && olen < maxOLength)
+        while (off < strLength - 1 && oLength < maxOLength)
         {
-            c1 = char64(s.charAt(off++));
-            c2 = char64(s.charAt(off++));
+            c1 = char64(str.charAt(off++));
+            c2 = char64(str.charAt(off++));
             if (c1 == -1 || c2 == -1)
             {
                 break;
@@ -313,11 +360,11 @@ public class BCryptFunction extends AbstractHashingFunction
             o = (byte) (c1 << 2);
             o |= (c2 & 0x30) >> 4;
             rs.append((char) o);
-            if (++olen >= maxOLength || off >= slen)
+            if (++oLength >= maxOLength || off >= strLength)
             {
                 break;
             }
-            c3 = char64(s.charAt(off++));
+            c3 = char64(str.charAt(off++));
             if (c3 == -1)
             {
                 break;
@@ -325,24 +372,32 @@ public class BCryptFunction extends AbstractHashingFunction
             o = (byte) ((c2 & 0x0f) << 4);
             o |= (c3 & 0x3c) >> 2;
             rs.append((char) o);
-            if (++olen >= maxOLength || off >= slen)
+            if (++oLength >= maxOLength || off >= strLength)
             {
                 break;
             }
-            c4 = char64(s.charAt(off++));
+            c4 = char64(str.charAt(off++));
             o = (byte) ((c3 & 0x03) << 6);
             o |= c4;
             rs.append((char) o);
-            ++olen;
+            ++oLength;
         }
 
-        ret = new byte[olen];
-        for (off = 0; off < olen; off++)
+        ret = new byte[oLength];
+        for (off = 0; off < oLength; off++)
             ret[off] = (byte) rs.charAt(off);
         return ret;
     }
 
-    private void encipher(int[] lr, int off, int[] pArray, int[] sBox)
+    /**
+     * Blowfish encipher a single 64-bit block encoded as
+     * two 32-bit halves
+     *
+     * @param lr  an array containing the two 32-bit half blocks
+     * @param off the position in the array of the blocks
+     * @since 0.1.0
+     */
+    protected void encipher(int[] lr, int off, int[] pArray, int[] sBox)
     {
         int i;
         int n;
@@ -363,20 +418,20 @@ public class BCryptFunction extends AbstractHashingFunction
         lr[off + 1] = l;
     }
 
-    private int feistelSubstitution(int p, int[] sBox)
-    {
-        int x = sBox[(p >> 24) & 0xff];
-        x += sBox[0x100 | ((p >> 16) & 0xff)];
-        x ^= sBox[0x200 | ((p >> 8) & 0xff)];
-        x += sBox[0x300 | (p & 0xff)];
-        return x;
-    }
-
-    private static int[] streamToWords(byte[] data, int[] offp, int[] signp)
+    /**
+     * Cyclically extracts a word of key material
+     *
+     * @param data       the string to extract the data from
+     * @param offPointer a "pointer" (as a one-entry array) to the
+     *                   current offset into data
+     * @return the next word of material from data
+     * @since 0.1.0
+     */
+    protected static int[] streamToWords(byte[] data, int[] offPointer, int[] signp)
     {
         int i;
         int[] words = {0, 0};
-        int off = offp[0];
+        int off = offPointer[0];
         int sign = signp[0];
 
         for (i = 0; i < 4; i++)
@@ -388,45 +443,61 @@ public class BCryptFunction extends AbstractHashingFunction
             off = (off + 1) % data.length;
         }
 
-        offp[0] = off;
+        offPointer[0] = off;
         signp[0] = sign;
         return words;
     }
 
-    private static int streamToWord(byte[] data, int[] offp)
+    private int feistelSubstitution(int p, int[] sBox)
+    {
+        int x = sBox[(p >> 24) & 0xff];
+        x += sBox[0x100 | ((p >> 16) & 0xff)];
+        x ^= sBox[0x200 | ((p >> 8) & 0xff)];
+        x += sBox[0x300 | (p & 0xff)];
+        return x;
+    }
+
+
+    protected static int streamToWord(byte[] data, int[] offp)
     {
         int[] signp = {0};
         return streamToWords(data, offp, signp)[0];
     }
 
-    private static int streamToWordBug(byte[] data, int[] offp)
+    protected static int streamToWordBug(byte[] data, int[] offp)
     {
         int[] signp = {0};
         return streamToWords(data, offp, signp)[1];
     }
 
-    private void key(byte[] key, boolean signExtBug, int[] pArray, int[] sBox)
+    /**
+     * Key the Blowfish cipher
+     *
+     * @param key an array containing the key
+     * @since 0.1.0
+     */
+    protected void key(byte[] key, boolean signExtBug, int[] pArray, int[] sBox)
     {
         int i;
         int[] koffp = {0};
         int[] lr = {0, 0};
-        int plen = pArray.length;
-        int slen = sBox.length;
+        int pLength = pArray.length;
+        int sLenght = sBox.length;
 
-        for (i = 0; i < plen; i++)
+        for (i = 0; i < pLength; i++)
             if (!signExtBug)
                 pArray[i] = pArray[i] ^ streamToWord(key, koffp);
             else
                 pArray[i] = pArray[i] ^ streamToWordBug(key, koffp);
 
-        for (i = 0; i < plen; i += 2)
+        for (i = 0; i < pLength; i += 2)
         {
             encipher(lr, 0, pArray, sBox);
             pArray[i] = lr[0];
             pArray[i + 1] = lr[1];
         }
 
-        for (i = 0; i < slen; i += 2)
+        for (i = 0; i < sLenght; i += 2)
         {
             encipher(lr, 0, pArray, sBox);
             sBox[i] = lr[0];
@@ -434,25 +505,34 @@ public class BCryptFunction extends AbstractHashingFunction
         }
     }
 
-    private void eksKey(byte[] data, byte[] key, boolean signExtBug, int safety, int[] pArray, int[] sBox)
+    /**
+     * Perform the "enhanced key schedule" step described by
+     * Provos and Mazieres in "A Future-Adaptable Password Scheme"
+     *
+     * @param data salt information
+     * @param key  password information
+     * @see <a href="http://www.openbsd.org/papers/bcrypt-paper.ps">A Future-Adaptable Password Scheme</a>
+     * @since 0.1.0
+     */
+    protected void enhancedKeySchedule(byte[] data, byte[] key, boolean signExtBug, int safety, int[] pArray, int[] sBox)
     {
         int i;
         int[] koffp = {0};
         int[] doffp = {0};
         int[] lr = {0, 0};
-        int plen = pArray.length;
-        int slen = sBox.length;
-        int[] signp = {0}; // non-benign sign-extension flag
-        int diff = 0;        // zero iff correct and buggy are same
+        int pLength = pArray.length;
+        int sLength = sBox.length;
+        int[] signP = {0};
+        int diff = 0;
 
-        for (i = 0; i < plen; i++)
+        for (i = 0; i < pLength; i++)
         {
-            int[] words = streamToWords(key, koffp, signp);
+            int[] words = streamToWords(key, koffp, signP);
             diff |= words[0] ^ words[1];
             pArray[i] = pArray[i] ^ words[signExtBug ? 1 : 0];
         }
 
-        int sign = signp[0];
+        int sign = signP[0];
 
         diff |= diff >> 16;
         diff &= 0xffff;
@@ -462,7 +542,7 @@ public class BCryptFunction extends AbstractHashingFunction
 
         pArray[0] ^= sign;
 
-        for (i = 0; i < plen; i += 2)
+        for (i = 0; i < pLength; i += 2)
         {
             lr[0] ^= streamToWord(data, doffp);
             lr[1] ^= streamToWord(data, doffp);
@@ -471,7 +551,7 @@ public class BCryptFunction extends AbstractHashingFunction
             pArray[i + 1] = lr[1];
         }
 
-        for (i = 0; i < slen; i += 2)
+        for (i = 0; i < sLength; i += 2)
         {
             lr[0] ^= streamToWord(data, doffp);
             lr[1] ^= streamToWord(data, doffp);
@@ -481,7 +561,18 @@ public class BCryptFunction extends AbstractHashingFunction
         }
     }
 
-    private byte[] cryptRaw(byte[] password, byte[] salt, int logRounds, boolean sign, int safety)
+    /**
+     * Perform the central password hashing step in the
+     * BCrypt scheme
+     *
+     * @param password  the password to hash
+     * @param salt      the binary salt to hash with the password
+     * @param logRounds the binary logarithm of the number
+     *                  of rounds of hashing to apply
+     * @return an array containing the binary hashed password
+     * @since 0.1.0
+     */
+    protected byte[] cryptRaw(byte[] password, byte[] salt, int logRounds, boolean sign, int safety)
     {
         int rounds;
         int i;
@@ -498,7 +589,7 @@ public class BCryptFunction extends AbstractHashingFunction
 
         int[] pArray = P_ORIG.clone();
         int[] sBox = S_ORIG.clone();
-        eksKey(salt, password, sign, safety, pArray, sBox);
+        enhancedKeySchedule(salt, password, sign, safety, pArray, sBox);
         for (i = 0; i < rounds; i++)
         {
             key(password, sign, pArray, sBox);
@@ -522,14 +613,23 @@ public class BCryptFunction extends AbstractHashingFunction
         return ret;
     }
 
-    private String hashPw(CharSequence password, String salt)
+    /**
+     * Hash a password using the OpenBSD bcrypt scheme
+     *
+     * @param password the password to hash
+     * @param salt     the salt to hash with (perhaps generated
+     *                 using {@link BCryptFunction#generateSalt(int)})
+     * @return the hashed password
+     * @since 0.1.0
+     */
+    protected String hashPw(CharSequence password, String salt)
     {
         byte[] passwordb = Utilities.fromCharSequenceToBytes(password);
 
         return hashPw(passwordb, salt);
     }
 
-    private String hashPw(byte[] passwordb, String salt)
+    protected String hashPw(byte[] passwordb, String salt)
     {
         String realSalt;
         byte[] saltb;
@@ -600,7 +700,8 @@ public class BCryptFunction extends AbstractHashingFunction
         }
     }
 
-    private static String generateSalt(String prefix, int logRounds)
+
+    protected static String generateSalt(String prefix, int logRounds)
     {
         StringBuilder rs = new StringBuilder();
         byte[] rnd = new byte[BCRYPT_SALT_LEN];
@@ -627,12 +728,30 @@ public class BCryptFunction extends AbstractHashingFunction
         return rs.toString();
     }
 
-    static String generateSalt(int logRounds)
+    /**
+     * Generate a salt to be used with the {@link BCryptFunction#hash(CharSequence, String)} method
+     *
+     * @param logRounds the log2 of the number of rounds of
+     *                  hashing to apply - the work factor therefore increases as
+     *                  2^log_rounds.
+     * @return an encoded salt value
+     * @since 0.1.0
+     */
+    protected static String generateSalt(int logRounds)
     {
         return generateSalt("$2a", logRounds);
     }
 
-    private boolean checkPw(CharSequence plaintext, String hashed)
+    /**
+     * Check that a plaintext password matches a previously hashed
+     * one
+     *
+     * @param plaintext the plaintext password to verify
+     * @param hashed    the previously-hashed password
+     * @return true if the passwords match, false otherwise
+     * @since 0.1.0
+     */
+    protected boolean checkPw(CharSequence plaintext, String hashed)
     {
         return equalsNoEarlyReturn(hashed, hashPw(plaintext, hashed));
     }

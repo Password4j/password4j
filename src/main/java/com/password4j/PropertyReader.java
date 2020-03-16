@@ -16,6 +16,9 @@
  */
 package com.password4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -23,11 +26,18 @@ import java.util.Properties;
 class PropertyReader
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger(PropertyReader.class);
+
+    private static final String FILE_NAME = "psw4j.properties";
+
+    private static final String MESSAGE = "{}. Default value is used ({}). Please set property {} in your " + FILE_NAME + " file.";
+
+
     static final Properties PROPERTIES;
 
     static
     {
-        InputStream in = PropertyReader.class.getResourceAsStream("/psw4j.properties");
+        InputStream in = PropertyReader.class.getResourceAsStream("/" + FILE_NAME);
         Properties props = new Properties();
 
 
@@ -46,15 +56,17 @@ class PropertyReader
         PROPERTIES = props;
     }
 
-    static int readInt(String key, int defaultValue)
+    static int readInt(String key, int defaultValue, String message)
     {
         String str = readString(key);
         if (str == null)
         {
+            LOG.warn(MESSAGE, message, defaultValue, key);
             return defaultValue;
         }
         return Integer.parseInt(readString(key));
     }
+
 
     static boolean readBoolean(String key, boolean defaultValue)
     {
@@ -66,16 +78,12 @@ class PropertyReader
         return Boolean.parseBoolean(readString(key));
     }
 
-    static String readString(String key, String defaultValue)
+    static String readString(String key, String defaultValue, String message)
     {
-        if (key == null)
-        {
-            throw new BadParametersException("Key cannot be null");
-        }
-
         String value = readString(key);
         if (value == null)
         {
+            LOG.warn(MESSAGE, message, defaultValue, key);
             return defaultValue;
         }
         return value;
@@ -93,6 +101,10 @@ class PropertyReader
 
     private static String readString(String key)
     {
+        if (key == null)
+        {
+            throw new BadParametersException("Key cannot be null");
+        }
         return PROPERTIES.getProperty(key);
     }
 

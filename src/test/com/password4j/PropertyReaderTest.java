@@ -29,8 +29,8 @@ public class PropertyReaderTest
         String key = "test.int";
 
         // WHEN
-        int ten = PropertyReader.readInt(key, -4);
-        int minusNine = PropertyReader.readInt(key + "abc", -9);
+        int ten = PropertyReader.readInt(key, -4, null);
+        int minusNine = PropertyReader.readInt(key + "abc", -9, null);
 
         // THEN
         Assert.assertEquals(10, ten);
@@ -59,8 +59,8 @@ public class PropertyReaderTest
         String key = "test.string";
 
         // WHEN
-        String testString = PropertyReader.readString(key, "default string");
-        String defaultValue = PropertyReader.readString(key + "abc", "default string");
+        String testString = PropertyReader.readString(key, "default string", null);
+        String defaultValue = PropertyReader.readString(key + "abc", "default string", null);
 
         // THEN
         Assert.assertEquals("This is a string", testString);
@@ -89,6 +89,6 @@ public class PropertyReaderTest
         String key = "test.string";
 
         // WHEN
-        String testString = PropertyReader.readString(null, "null");
+        String testString = PropertyReader.readString(null, "null", null);
     }
 }

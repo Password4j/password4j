@@ -92,7 +92,7 @@ public class PepperGenerator
      */
     public static String get()
     {
-        return PropertyReader.readString("global.pepper", null);
+        return PropertyReader.readString("global.pepper", null, "Global pepper is not defined");
     }
 
 }

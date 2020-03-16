@@ -238,7 +238,7 @@ public class PasswordTest
         boolean result = Password.check(PASSWORD, hash.getResult()).addPepper().withSCrypt();
 
         // THEN
-        Assert.assertEquals(PropertyReader.readString("global.pepper", null), hash.getPepper());
+        Assert.assertEquals(PropertyReader.readString("global.pepper", null, null), hash.getPepper());
         Assert.assertTrue(result);
     }
 
@@ -444,7 +444,7 @@ public class PasswordTest
         boolean result = Password.check(SECURE_PASSWORD, hash.getResult()).addPepper().withSCrypt();
 
         // THEN
-        Assert.assertEquals(PropertyReader.readString("global.pepper", null), hash.getPepper());
+        Assert.assertEquals(PropertyReader.readString("global.pepper", null, null), hash.getPepper());
         Assert.assertTrue(result);
     }
 

@@ -26,6 +26,18 @@ package com.password4j;
 public abstract class AbstractHashingFunction implements HashingFunction
 {
 
+    /**
+     * Just calls {@link #check(CharSequence, String)} without salt
+     * parameter.
+     * <p>
+     * Do not override this if the algorithm doesn't need a manually
+     * provided salt.
+     *
+     * @param plainTextPassword the plaintext password
+     * @param hashed            the hash
+     * @param salt              the salt used to produce the hash
+     * @return true if the hash is generated from the plaintext; false otherwise
+     */
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed, String salt)
     {

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+## Added
+ * Constant time equality in `SecureString`
+## Changed
+ * Enum `WithHmac` renamed to `Hmac`
+
 ## [1.2.0](https://github.com/Password4j/password4j/releases/tag/1.2.0) - (2020-03-15)
 ## Added
  * This CHANGELOG.md file

@@ -22,6 +22,40 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Class containing the implementation of PBKDF2 function and its parameters.
+ * <p>
+ * The main difference between {@link PBKDF2Function} is the hash produced: the configurations of the CHF,
+ * the salt and the hash are encoded inside it.
+ * <p>
+ * The produced hash is in the form
+ * <p>
+ * <code>
+ * $algorithm$parameters$salt$hash
+ * </code>
+ * <p>
+ * Assuming {@code $} as delimiter.
+ * <p>
+ * <ul>
+ *     <li>
+ *         The algorithm is encoded with its numeric uid {@link Hmac#code()}
+ *     </li>
+ *     <li>
+ *         Parameters are encoded in one integer where the length occupies the first 32bit and
+ *          the number of iterations the remaining 32 bits.
+ *     </li>
+ *     <li>
+ *         Salt is encoded in Base64
+ *     </li>
+ *     <li>
+ *         Hash is encoded in Base64 as in {@link PBKDF2Function}
+ *     </li>
+ * </ul>
+ *
+ * @author David Bertoldi
+ * @see <a href="https://en.wikipedia.org/wiki/PBKDF2">PBKDF2</a>
+ * @since 0.1.0
+ */
 public class CompressedPBKDF2Function extends PBKDF2Function
 {
 

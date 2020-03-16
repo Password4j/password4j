@@ -16,9 +16,12 @@
  */
 package com.password4j;
 
+import com.sun.crypto.provider.HmacSHA1;
 import org.junit.Assert;
 import org.junit.Test;
+import sun.security.provider.SHA;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -247,6 +250,27 @@ public class PBKDF2FunctionTest
         // THEN
         Assert.assertEquals(4, map.size());
         Assert.assertEquals(strategy1, strategy2);
+    }
+
+    @Test
+    public void testCompressed()
+    {
+        Hmac algorithm = Hmac.SHA512;
+
+
+        for (int i = 1; i <= 100; i++)
+        {
+            String password = PepperGenerator.generate(12);
+            String salt = PepperGenerator.generate(i);
+            Hash hash = CompressedPBKDF2Function.getInstance(algorithm, 100*i, algorithm.bits()).hash(password, salt);
+
+            Hash notCompressedHash = PBKDF2Function.getInstance(algorithm, 100*i, algorithm.bits()).hash(password, salt);
+
+            String params = Long.toString((((long) 100*i) << 32) | (algorithm.bits() & 0xffffffffL));
+            String expected = "$" + algorithm.code() + "$" + params + "$" + Base64.getEncoder().encodeToString(salt.getBytes()) + "$" + notCompressedHash.getResult();
+
+            Assert.assertEquals(expected, hash.getResult());
+        }
     }
 
 }

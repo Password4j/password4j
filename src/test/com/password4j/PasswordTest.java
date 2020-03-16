@@ -448,4 +448,28 @@ public class PasswordTest
         Assert.assertTrue(result);
     }
 
+    @Test
+    public void testHashChecker()
+    {
+        // GIVEN
+        HashChecker hc = new HashChecker(null, "hash");
+
+        // WHEN
+        boolean result = hc.with(AlgorithmFinder.getPBKDF2Instance());
+
+        // THEN
+        Assert.assertFalse(result);
+    }
+
+    @Test
+    public void testHmac()
+    {
+
+        for(Hmac hmac : Hmac.values())
+        {
+            Assert.assertEquals("PBKDF2WithHmac" + hmac.name(), hmac.toString());
+        }
+
+    }
+
 }

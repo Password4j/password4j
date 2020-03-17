@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [1.2.1](https://github.com/Password4j/password4j/releases/tag/1.2.1) - (2020-03-17)
 ### Added
  * Constant time equality in `SecureString`
 ### Changed

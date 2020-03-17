@@ -16,10 +16,8 @@
  */
 package com.password4j;
 
-import com.sun.crypto.provider.HmacSHA1;
 import org.junit.Assert;
 import org.junit.Test;
-import sun.security.provider.SHA;
 
 import java.util.Base64;
 import java.util.HashMap;

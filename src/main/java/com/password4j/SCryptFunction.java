@@ -65,6 +65,7 @@ public class SCryptFunction extends AbstractHashingFunction
      *
      * @param hashed an already hashed password
      * @return a singleton instance based on the given hash
+     * @since 1.0.0
      */
     public static SCryptFunction getInstanceFromHash(String hashed)
     {

@@ -68,6 +68,16 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         super();
     }
 
+    /**
+     * Creates a singleton instance, depending on the provided
+     * algorithm, number of iterations and key length.
+     *
+     * @param algorithm  hmac algorithm
+     * @param iterations number of iterations
+     * @param length     length of the derived key
+     * @return a singleton instance
+     * @since 0.1.0
+     */
     public static CompressedPBKDF2Function getInstance(Hmac algorithm, int iterations, int length)
     {
         String key = getUID(algorithm, iterations, length);
@@ -83,6 +93,16 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         }
     }
 
+    /**
+     * Creates a singleton instance, depending on the provided
+     * algorithm, number of iterations and key length.
+     *
+     * @param algorithm  string veriong of hmac algorithm
+     * @param iterations number of iterations
+     * @param length     length of the derived key
+     * @return a singleton instance
+     * @since 0.1.0
+     */
     public static CompressedPBKDF2Function getInstance(String algorithm, int iterations, int length)
     {
         try
@@ -101,7 +121,14 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         super(fromCode, iterations, length);
     }
 
-
+    /**
+     * Reads the configuration contained in the given hash and
+     * builds a singleton instance based on these configurations.
+     *
+     * @param hashed an already hashed password
+     * @return a singleton instance based on the given hash
+     * @since 1.0.0
+     */
     public static CompressedPBKDF2Function getInstanceFromHash(String hashed)
     {
         String[] parts = getParts(hashed);

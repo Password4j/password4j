@@ -65,9 +65,9 @@ public class PBKDF2Function extends AbstractHashingFunction
      * Creates a singleton instance, depending on the provided
      * algorithm, number of iterations and key length.
      *
-     * @param algorithm hmac algorithm
+     * @param algorithm  hmac algorithm
      * @param iterations number of iterations
-     * @param length length of the derived key
+     * @param length     length of the derived key
      * @return a singleton instance
      * @since 0.1.0
      */
@@ -90,9 +90,9 @@ public class PBKDF2Function extends AbstractHashingFunction
      * Creates a singleton instance, depending on the provided
      * algorithm, number of iterations and key length.
      *
-     * @param algorithm string veriong of hmac algorithm
+     * @param algorithm  string veriong of hmac algorithm
      * @param iterations number of iterations
-     * @param length length of the derived key
+     * @param length     length of the derived key
      * @return a singleton instance
      * @since 0.1.0
      */

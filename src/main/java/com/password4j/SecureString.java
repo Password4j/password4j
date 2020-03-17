@@ -90,7 +90,7 @@ public class SecureString implements CharSequence
      * @since 1.2.0
      */
     @Override
-    public synchronized int  length()
+    public synchronized int length()
     {
         return chars.length;
     }

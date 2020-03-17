@@ -29,7 +29,7 @@ and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/
 Password4j runs on **Java 8** and **Java 12** of any vendor. It is supported by **Android API 26+** as well.
 
 The artifacts are deployed to [Maven Central](https://search.maven.org/).
-### Maven
+### ![Maven](https://i.imgur.com/2TZzobp.png?1) Maven 
 Add the dependency of the latest version to your `pom.xml`:
 ```xml
 <dependency>
@@ -39,7 +39,7 @@ Add the dependency of the latest version to your `pom.xml`:
 </dependency>
 ```
 
-### Gradle
+### ![Gradle](https://i.imgur.com/qtc6bXq.png?1) Gradle
 Add to your `build.gradle` module dependencies:
 ```groovy
 repositories {
@@ -51,7 +51,7 @@ dependencies {
 }
 ```
 
-### Scala SBT
+### ![Scala SBT](https://i.imgur.com/Nqv3mVd.png?1) Scala SBT 
 Add to the managed dependencies of your `build.sbt` the latest version:
 ```shell script
 libraryDependencies += "com.password4j" % "password4j" % "1.2.1"

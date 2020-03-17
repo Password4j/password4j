@@ -121,7 +121,7 @@ boolean verification = Password.check(plaintext, hash).addSalt("salt from db").a
  The same structure can be adopted for the other algorithms, not just for PBKDF2. Take in account that BCrypt and SCrypt store the salt
  inside the hash, so that the `addSalt()` method is not needed.
 
-#### Customize Password.*check*()
+### Customize Password.*check*()
 If you need to add a new method in the chain of parameters or want to override one, here's the fastest way:
 ```java
 Password.check("password", "hash", CustomChecker::new).withOtherStuff().withBCrypt();

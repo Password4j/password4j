@@ -36,6 +36,8 @@ public class HashChecker<C extends HashChecker<?>>
 
     private CharSequence plainTextPassword;
 
+    private boolean autoUpdate = false;
+
     @SuppressWarnings("unused")
     private HashChecker()
     {
@@ -94,6 +96,13 @@ public class HashChecker<C extends HashChecker<?>>
         return (C) this;
     }
 
+    public HashUpdate autoUpdate(HashingFunction hashingFunction)
+    {
+
+        autoUpdate = true;
+        return (C) this;
+    }
+
     /**
      * Check if the previously given hash was produced from the given plain text password
      * with a specific implementation of {@link HashingFunction}.
@@ -117,7 +126,14 @@ public class HashChecker<C extends HashChecker<?>>
             peppered = Utilities.append(this.pepper, peppered);
         }
 
-        return hashingFunction.check(peppered, hash, salt);
+        boolean result = hashingFunction.check(peppered, hash, salt);
+
+        if(autoUpdate || PropertyReader.readBoolean("global.autoupdate", false))
+        {
+
+        }
+
+        return result;
     }
 
     /**

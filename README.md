@@ -25,11 +25,11 @@ The library fully supports **[BCrypt](https://en.wikipedia.org/wiki/Bcrypt)**, *
 and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/Salt_(cryptography))** and **[pepper](https://en.wikipedia.org/wiki/Pepper_(cryptography))**.
 
 
-## Installation
+# Installation
 Password4j runs on **Java 8** and **Java 12** of any vendor. It is supported by **Android API 26+** as well.
 
 The artifacts are deployed to [Maven Central](https://search.maven.org/).
-### ![Maven](https://i.imgur.com/2TZzobp.png?1) Maven 
+## ![Maven](https://i.imgur.com/2TZzobp.png?1) Maven 
 Add the dependency of the latest version to your `pom.xml`:
 ```xml
 <dependency>
@@ -39,7 +39,7 @@ Add the dependency of the latest version to your `pom.xml`:
 </dependency>
 ```
 
-### ![Gradle](https://i.imgur.com/qtc6bXq.png?1) Gradle
+## ![Gradle](https://i.imgur.com/qtc6bXq.png?1) Gradle
 Add to your `build.gradle` module dependencies:
 ```groovy
 repositories {
@@ -51,16 +51,16 @@ dependencies {
 }
 ```
 
-### ![Scala SBT](https://i.imgur.com/Nqv3mVd.png?1) Scala SBT 
+## ![Scala SBT](https://i.imgur.com/Nqv3mVd.png?1) Scala SBT 
 Add to the managed dependencies of your `build.sbt` the latest version:
 ```shell script
 libraryDependencies += "com.password4j" % "password4j" % "1.2.1"
 ```
 
-## Usage
+# Usage
 Password4j provides two main methods to hash and verify passwords.
 
-### Password.*hash*()
+## Password.*hash*()
 This method helps the developer to build a chain of parameters that the CHF will use to produce the hash.
 
 Salt and pepper may be optionally added into the chain.
@@ -82,7 +82,7 @@ Hash hash = Password.hash("password").with(PBKDF2Function.getInstance(Hmac.SHA51
 ```
 The same structure can be adopted for the other algorithms, not just for PBKDF2.
 
-#### Customize Password.*hash*()
+### Customize Password.*hash*()
 If you need to add a new method in the chain of parameters or want to override one, here's the fastest way:
 ```java
 Password.hash("password", CustomBuilder::new).addSalt("fixed salt").withOtherStuff().withBCrypt();
@@ -103,7 +103,7 @@ public class CustomBuilder extends HashBuilder<CustomBuilder> {
 ```
 Create your custom `HashBuilder` and use it in `Password.hash()`.
 
-### Password.*check*()
+## Password.*check*()
 The verification process builds a chain of parameters, as well.
 ```java
 String plaintext = "...";                                       // User provided password.
@@ -121,7 +121,7 @@ boolean verification = Password.check(plaintext, hash).addSalt("salt from db").a
  The same structure can be adopted for the other algorithms, not just for PBKDF2. Take in account that BCrypt and SCrypt store the salt
  inside the hash, so that the `addSalt()` method is not needed.
 
-##### Customize Password.*check*()
+#### Customize Password.*check*()
 If you need to add a new method in the chain of parameters or want to override one, here's the fastest way:
 ```java
 Password.check("password", "hash", CustomChecker::new).withOtherStuff().withBCrypt();
@@ -142,7 +142,7 @@ public class CustomChecker extends HashChecker<CustomChecker> {
 ```
 Create your custom `HashChecker` and use it in `Password.check()`.
 
-### Security of Strings
+## Security of Strings
 `String`s are immutable objects and they are stored in the String Pool, a location in the heap memory.
 Since you do not have control on the Garbage Collector, an attacker that has access to the memory could read the password
 just before you use it as input for Password4j. Even after this, the `String` may be still persisted in memory
@@ -172,7 +172,7 @@ SecureString secure = new SecureString(password, true);
 // At this point password = {\0, \0, \0, ...}
 ```
 
-## Configuration
+# Configuration
 Password4j makes available a portable way to configure the library.
 
 With the property file `psw4j.properties` put in your classpath, you can define the parameters of all the supported CHFs or just the CHF(s) you need.
@@ -218,7 +218,7 @@ global.random.strong=true
 ```
 but make sure that your JVM supports it and it points to a non-blocking source of entropy, otherwise you may experience huge performance drops<sup>see [SecureRandom](https://docs.oracle.com/javase/8/docs/api/java/security/SecureRandom.html#getInstanceStrong--)</sup>.
 
-## Performance
+# Performance
 <sup>This tool must be used in the target system because performances may vary on different environments.</sup>
 
 Password4j is delivered with a tool that helps the developers to choose the right parameters for a specific CHF.
@@ -258,25 +258,25 @@ System.out.println("N: " + N + ", r: " + r);
 ```
 
 
-## Contributing
+# Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## Versioning
+# Versioning
 We use [SemVer](http://semver.org/) for versioning. 
 
 For the versions available, see the [tags on this repository](https://github.com/Password4j/password4j/tags). 
 
-## Authors
+# Authors
 
 * **David Bertoldi** - *Initial work* - [firaja](https://github.com/firaja)
 
 See also the list of [contributors](https://github.com/Password4j/password4j/contributors) who participated in this project.
 
-## License
+# License
 
 This project is licensed under the Apache License 2.0 License - see the [LICENSE](LICENSE) file for details
 
 
-## Changelog
+# Changelog
 
 See the [CHANGELOG.md](CHANGELOG.md) file for a more detailed description of each release.

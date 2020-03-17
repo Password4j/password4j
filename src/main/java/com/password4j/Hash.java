@@ -108,7 +108,8 @@ public class Hash
      * This constructor populates the object's attributes.
      *
      * @param hashingFunction the cryptographic algorithm used to produce the hash.
-     * @param result          the result of the computation of the hash. Notice that the format vary depending on the algorithm.
+     * @param result          the result of the computation of the hash.
+     *                        Notice that the format varies depending on the algorithm.
      * @param salt            the salt used for the computation.
      * @since 0.1.0
      */
@@ -177,29 +178,6 @@ public class Hash
         this.pepper = pepper;
     }
 
-    /**
-     * Uses the {@link HashingFunction} used to calculate this {@link Hash}.
-     * Il the password is null, this returns false; otherwise {@link HashingFunction#check(String, String)} is invoked.
-     *
-     * @param plain the original password.
-     * @return true if the check passes, false otherwise.
-     * @since 0.1.0
-     */
-    public boolean check(String plain)
-    {
-        if (plain == null)
-        {
-            return false;
-        }
-
-        String peppered = plain;
-        if (StringUtils.isNotEmpty(this.pepper))
-        {
-            peppered = this.pepper + peppered;
-        }
-
-        return this.hashingFunction.check(peppered, this.getResult(), salt);
-    }
 
     /**
      * Produces a human readable description of the {@link Hash}.
@@ -210,8 +188,14 @@ public class Hash
     @Override
     public String toString()
     {
-        return hashingFunction.getClass()
-                .getSimpleName() + "[salt=" + getSalt() + ", pepper=" + getPepper() + ", hash=" + getResult() + "]";
+        StringBuilder sb = new StringBuilder();
+        if (this.hashingFunction != null)
+        {
+            sb.append(hashingFunction.getClass().getSimpleName());
+        }
+        sb.append("[salt=").append(getSalt())
+                .append(", pepper=").append(getPepper()).append(", hash=").append(getResult()).append("]");
+        return sb.toString();
     }
 
     /**
@@ -221,7 +205,6 @@ public class Hash
      *
      * @param obj the object to compare
      * @return true if equals
-     * @see HashingFunction#equals(Object)
      * @since 0.1.0
      */
     @Override

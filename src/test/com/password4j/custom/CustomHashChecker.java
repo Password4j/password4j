@@ -21,7 +21,7 @@ import com.password4j.HashChecker;
 
 public class CustomHashChecker extends HashChecker<CustomHashChecker>
 {
-    CustomHashChecker(String hash, String plain)
+    CustomHashChecker(CharSequence hash, String plain)
     {
         super(hash, plain);
     }

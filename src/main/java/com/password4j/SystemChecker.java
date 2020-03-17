@@ -17,116 +17,36 @@
 
 package com.password4j;
 
-import org.apache.commons.text.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
-import java.util.Scanner;
 
+/**
+ * This class benchmarks the target environment.
+ *
+ * @author David Bertoldi
+ * @since 1.0.0
+ */
 public class SystemChecker
 {
-    private static final Logger LOG = LoggerFactory.getLogger(SystemChecker.class);
-
     private static final String TO_BE_HASHED = "abcDEF123@~# xyz+-*/=456spqr";
 
     private static final String SALT = new String(SaltGenerator.generate());
 
     private static final int WARMUP_ROUNDS = 20;
 
-    private static final Scanner SCANNER = new Scanner(System.in);
-
     private SystemChecker()
     {
         //
     }
 
-    public static void main(String... args)
-    {
-        println("Please choose the CHF you want to optimize for your system.");
-        println(" - PBKDF2");
-        println(" - BCrypt");
-        println(" - SCrypt");
-        String choice = ask("Choice: ");
-
-        switch (choice)
-        {
-            case "PBKDF2":
-                managePBKDF2();
-                break;
-            case "BCrypt":
-                manageBCrypt();
-                break;
-            case "SCrypt":
-                manageSCrypt();
-                break;
-            default:
-                println(choice + " is not a supported CHF.");
-                System.exit(1);
-        }
-        System.exit(0);
-    }
-
-    private static void managePBKDF2()
-    {
-        println("These are the supported PBKDF2 algorithms by your environment");
-        List<String> variants = AlgorithmFinder.getAllPBKDF2Variants();
-        StringBuilder listSB = new StringBuilder(variants.size());
-        for (String variant : variants)
-        {
-            listSB.append(" - ").append(variant).append(System.lineSeparator());
-        }
-        println(listSB.toString());
-        String chosenVariant = ask("Please choose one: ");
-        String suffix  = chosenVariant.replace("PBKDF2WithHmac", "");
-        PBKDF2Function.Algorithm algorithm = PBKDF2Function.Algorithm.valueOf(suffix);
-        println("The recommended length of the derived key is " + algorithm.bits() + " bits.");
-        String millis = ask("Please enter a maximum execution time for password hashing (in milliseconds): ");
-        long maxMillis = Long.parseLong(millis);
-        int iterations = findIterationsForPBKDF2(maxMillis, algorithm, algorithm.bits());
-
-        println("Use the following configurations in your psw4j.properties file" + System.lineSeparator());
-
-        println("   hash.pbkdf2.algorithm=" + suffix);
-        println("   hash.pbkdf2.iterations=" + iterations);
-        println("   hash.pbkdf2.length=" + algorithm.bits());
-
-    }
-
-    private static void manageBCrypt()
-    {
-        String millis = ask("Please enter a maximum execution time for password hashing (in milliseconds): ");
-        long maxMillis = Long.parseLong(millis);
-        int logRounds = findRoundsForBCrypt(maxMillis);
-
-        println("Use the following configurations in your psw4j.properties file" + System.lineSeparator());
-
-        println("   hash.bcrypt.rounds=" + logRounds);
-    }
-
-    private static void manageSCrypt()
-    {
-        String parallelization = ask("Please choose the parallelization (p) parameter: ");
-        int p = Integer.parseInt(parallelization);
-
-        String millis = ask("Please enter a maximum execution time for password hashing (in milliseconds): ");
-        long maxMillis = Long.parseLong(millis);
-
-        int n = findWorkingFactoryForSCrypt(maxMillis, 14, p);
-        int r = findResourcesForSCrypt(maxMillis, n, p);
-
-        println("Estimated memory required for this configuration: " + new SCryptFunction(n, r, p).getRequiredMemory());
-
-
-        println("Use the following configurations in your psw4j.properties file" + System.lineSeparator());
-
-        println("   hash.scrypt.workfactor=" + n);
-        println("   hash.scrypt.resources=" + r);
-        println("   hash.scrypt.parallelization=" + p);
-    }
-
-
-    public static boolean isPBKDF2Supported(PBKDF2Function.Algorithm algorithm)
+    /**
+     * Verifies if the algorithm is supported by the current environment.
+     * PBKDF2 variants are available if the JVM has a corresponding
+     * {@link java.security.Provider.Service}
+     *
+     * @param algorithm the algorithm to check
+     * @return true if the algorithm is supported; false otherwise
+     */
+    public static boolean isPBKDF2Supported(Hmac algorithm)
     {
         if (algorithm == null)
         {
@@ -136,17 +56,20 @@ public class SystemChecker
         return variants.stream().anyMatch(v -> algorithm.name().equals(v));
     }
 
+    /**
+     * Finds the optimal logarithmic cost of BCrypt.
+     * <p>
+     * To prevent timing attacks, a maximum interval of time (in milliseconds)
+     * is required to perform a single hash.
+     *
+     * @param maxMilliseconds max time to perform the hashing
+     * @return the logarithmic cost
+     * @see BCryptFunction
+     * @since 1.0.0
+     */
     public static int findRoundsForBCrypt(long maxMilliseconds)
     {
         warmUpBCrypt();
-
-        StringBuilder report = new StringBuilder()
-                .append(System.lineSeparator())
-                .append("BCrypt")
-                .append(" under ")
-                .append(maxMilliseconds)
-                .append("ms")
-                .append(System.lineSeparator());
 
         long elapsed;
         int rounds = 3;
@@ -160,49 +83,28 @@ public class SystemChecker
             long end = System.currentTimeMillis();
             elapsed = end - start;
 
-            report.append(" * logRounds: ")
-                    .append(rounds)
-                    .append(" -> ")
-                    .append(elapsed)
-                    .append("ms")
-                    .append(System.lineSeparator());
-
         } while (elapsed <= maxMilliseconds);
 
-        int finalRounds = rounds - 1;
-
-        report.append("*** Final result: ")
-                .append(finalRounds)
-                .append(" logRounds under ")
-                .append(maxMilliseconds)
-                .append("ms ***")
-                .append(System.lineSeparator());
-
-        if (LOG.isInfoEnabled())
-        {
-            LOG.info(report.toString());
-        }
-        println(report.toString()); // NOSONAR
-
-        return finalRounds;
+        return rounds - 1;
     }
 
 
-    public static int findIterationsForPBKDF2(long maxMilliseconds, PBKDF2Function.Algorithm algorithm, int length)
+    /**
+     * Finds the optimal number of iterations for PBKDF2.
+     * <p>
+     * To prevent timing attacks, a maximum interval of time (in milliseconds)
+     * is required to perform a single hash.
+     *
+     * @param maxMilliseconds max time to perform the hashing
+     * @param algorithm       the chosen variant
+     * @param length          it is recommended to use {@link Hmac#bits()}
+     * @return number of iterations
+     * @see PBKDF2Function
+     * @since 1.0.0
+     */
+    public static int findIterationsForPBKDF2(long maxMilliseconds, Hmac algorithm, int length)
     {
         warmUpPBKDF2(algorithm, length);
-
-        String title = System.lineSeparator() +
-                "Finding the number of iterations for PBKDF2 with algorithm=PBKDF2WithHmac" +
-                algorithm.name() +
-                " and length=" +
-                length +
-                " under " +
-                maxMilliseconds +
-                "ms" +
-                System.lineSeparator();
-        println(title);
-
 
         long elapsed;
         int iterations = 1;
@@ -218,43 +120,29 @@ public class SystemChecker
 
         } while (elapsed <= maxMilliseconds);
 
-        int finalIterations = iterations - 100;
 
-        StringBuilder result = new StringBuilder()
-                .append("*** Final result: ")
-                .append(finalIterations)
-                .append(" iterations under ")
-                .append(maxMilliseconds)
-                .append("ms ***")
-                .append(System.lineSeparator());
-
-        if (LOG.isInfoEnabled())
-        {
-            LOG.info(result.toString());
-        }
-        println(result.toString());
-
-        return finalIterations;
+        return iterations - 100;
     }
 
-    public static int findWorkingFactoryForSCrypt(long maxMilliseconds, int resources, int parallelization)
+    /**
+     * Finds the optimal work factor (N) for SCrypt.
+     * <p>
+     * To prevent timing attacks, a maximum interval of time (in milliseconds)
+     * is required to perform a single hash.
+     *
+     * @param maxMilliseconds max time to perform the hashing
+     * @param resources       r parameter
+     * @param parallelization p parameter
+     * @return the optimal work factor (N)
+     * @since 1.0.0
+     */
+    public static int findWorkFactorForSCrypt(long maxMilliseconds, int resources, int parallelization)
     {
 
-        warmUpSCrypt(2, resources, parallelization);
-
-        StringBuilder report = new StringBuilder()
-                .append(System.lineSeparator())
-                .append("SCrypt with r=")
-                .append(resources)
-                .append(" and p=")
-                .append(parallelization)
-                .append(" under ")
-                .append(maxMilliseconds)
-                .append("ms")
-                .append(System.lineSeparator());
+        int workFactor = 2;
+        warmUpSCrypt(workFactor, resources, parallelization);
 
         long elapsed;
-        int workFactor = 1;
         do
         {
             workFactor *= 2;
@@ -265,47 +153,28 @@ public class SystemChecker
             long end = System.currentTimeMillis();
             elapsed = end - start;
 
-            report.append(" - workFactor: ")
-                    .append(workFactor)
-                    .append(" -> ")
-                    .append(elapsed)
-                    .append("ms")
-                    .append(System.lineSeparator());
 
         } while (elapsed <= maxMilliseconds);
 
 
-        int finalWorkFactor = workFactor / 2;
-
-        report.append("*** Final result: ")
-                .append(finalWorkFactor)
-                .append(" workFactor (N) under ")
-                .append(maxMilliseconds)
-                .append("ms ***");
-
-        if (LOG.isInfoEnabled())
-        {
-            LOG.info(report.toString());
-        }
-        println(report.toString()); // NOSONAR
-
-        return finalWorkFactor;
+        return workFactor / 2;
     }
 
+    /**
+     * Finds the optimal resources (r) for SCrypt.
+     * <p>
+     * To prevent timing attacks, a maximum interval of time (in milliseconds)
+     * is required to perform a single hash.
+     *
+     * @param maxMilliseconds max time to perform the hashing
+     * @param workFactor      N parameter
+     * @param parallelization p parameter
+     * @return the optimal resources (r)
+     * @since 1.0.0
+     */
     public static int findResourcesForSCrypt(long maxMilliseconds, int workFactor, int parallelization)
     {
         warmUpSCrypt(workFactor, 1, parallelization);
-
-        StringBuilder report = new StringBuilder()
-                .append(System.lineSeparator())
-                .append("SCrypt with N=")
-                .append(workFactor)
-                .append(" and p=")
-                .append(parallelization)
-                .append(" under ")
-                .append(maxMilliseconds)
-                .append("ms")
-                .append(System.lineSeparator());
 
         long elapsed;
         int resources = 0;
@@ -319,31 +188,11 @@ public class SystemChecker
             long end = System.currentTimeMillis();
             elapsed = end - start;
 
-            report.append(" - resources: ")
-                    .append(resources)
-                    .append(" -> ")
-                    .append(elapsed)
-                    .append("ms")
-                    .append(System.lineSeparator());
 
         } while (elapsed <= maxMilliseconds);
 
-        int finalResources = resources - 1;
 
-        report.append("*** Final result: ")
-                .append(finalResources)
-                .append(" resources (r) under ")
-                .append(maxMilliseconds)
-                .append("ms ***")
-                .append(System.lineSeparator());
-
-        if (LOG.isInfoEnabled())
-        {
-            LOG.info(report.toString());
-        }
-        println(report.toString()); // NOSONAR
-
-        return finalResources;
+        return resources - 1;
     }
 
 
@@ -355,7 +204,7 @@ public class SystemChecker
         }
     }
 
-    private static void warmUpPBKDF2(PBKDF2Function.Algorithm algorithm, int length)
+    private static void warmUpPBKDF2(Hmac algorithm, int length)
     {
         for (int i = 0; i < WARMUP_ROUNDS; i++)
         {
@@ -369,18 +218,6 @@ public class SystemChecker
         {
             SCryptFunction.getInstance(workFactor, resources, parallelization).hash(TO_BE_HASHED);
         }
-    }
-
-    private static void println(String message)
-    {
-        System.out.println(message); // NOSONAR
-    }
-
-
-    private static String ask(String message)
-    {
-        System.out.print(message); // NOSONAR
-        return StringEscapeUtils.escapeJava(SCANNER.nextLine());
     }
 
 

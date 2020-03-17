@@ -23,7 +23,13 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-
+/**
+ * Class containing the implementation of SCrypt function and its parameters.
+ *
+ * @author David Bertoldi
+ * @see <a href="https://en.wikipedia.org/wiki/Scrypt">SCrypt</a>
+ * @since 0.1.0
+ */
 public class SCryptFunction extends AbstractHashingFunction
 {
 
@@ -35,11 +41,17 @@ public class SCryptFunction extends AbstractHashingFunction
 
     private static ConcurrentMap<String, SCryptFunction> instances = new ConcurrentHashMap<>();
 
+    @SuppressWarnings("unused")
     private SCryptFunction()
     {
         //
     }
 
+    /**
+     * @param workFactor      (N)
+     * @param resources       (r)
+     * @param parallelization (p)
+     */
     protected SCryptFunction(int workFactor, int resources, int parallelization)
     {
         this.resources = resources;
@@ -47,6 +59,14 @@ public class SCryptFunction extends AbstractHashingFunction
         this.parallelization = parallelization;
     }
 
+    /**
+     * Reads the configuration contained in the given hash and
+     * builds a singleton instance based on these configurations.
+     *
+     * @param hashed an already hashed password
+     * @return a singleton instance based on the given hash
+     * @since 1.0.0
+     */
     public static SCryptFunction getInstanceFromHash(String hashed)
     {
         String[] parts = hashed.split("\\$");
@@ -62,6 +82,16 @@ public class SCryptFunction extends AbstractHashingFunction
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }
 
+    /**
+     * Creates a singleton instance, depending on the provided
+     * N, r and p parameters.
+     *
+     * @param workFactor      work factor (N)
+     * @param resources       resources (r)
+     * @param parallelization parallelization (p)
+     * @return a singleton instance
+     * @since 0.3.0
+     */
     public static SCryptFunction getInstance(int workFactor, int resources, int parallelization)
     {
         String key = getUID(resources, workFactor, parallelization);
@@ -78,19 +108,19 @@ public class SCryptFunction extends AbstractHashingFunction
     }
 
     @Override
-    public Hash hash(String plain)
+    public Hash hash(CharSequence plainTextPassword)
     {
         byte[] salt = SaltGenerator.generate();
-        return hash(plain, new String(salt));
+        return hash(plainTextPassword, new String(salt));
     }
 
     @Override
-    public Hash hash(String plain, String salt)
+    public Hash hash(CharSequence plainTextPassword, String salt)
     {
         try
         {
             byte[] saltAsBytes = salt.getBytes(StandardCharsets.UTF_8);
-            byte[] derived = scrypt(plain.getBytes(StandardCharsets.UTF_8), saltAsBytes, 64);
+            byte[] derived = scrypt(Utilities.fromCharSequenceToBytes(plainTextPassword), saltAsBytes, 64);
             String params = Long.toString(log2(workFactor) << 16 | resources << 8 | parallelization, 16);
             String sb = "$s0$" + params + '$' + Base64.getEncoder().encodeToString(saltAsBytes) + '$' + Base64.getEncoder()
                     .encodeToString(derived);
@@ -104,7 +134,7 @@ public class SCryptFunction extends AbstractHashingFunction
     }
 
     @Override
-    public boolean check(String plain, String hashed)
+    public boolean check(CharSequence plainTexPassword, String hashed)
     {
         try
         {
@@ -113,7 +143,7 @@ public class SCryptFunction extends AbstractHashingFunction
             {
                 byte[] salt = Base64.getDecoder().decode(parts[3]);
                 byte[] derived0 = Base64.getDecoder().decode(parts[4]);
-                byte[] derived1 = scrypt(plain.getBytes(StandardCharsets.UTF_8), salt, 64);
+                byte[] derived1 = scrypt(Utilities.fromCharSequenceToBytes(plainTexPassword), salt, 64);
                 if (derived0.length != derived1.length)
                 {
                     return false;
@@ -141,19 +171,34 @@ public class SCryptFunction extends AbstractHashingFunction
         }
     }
 
+    /**
+     * Estimates the required memory to calculate an hash with
+     * the current configuration.
+     *
+     * @return the required memory
+     * @since 0.1.0
+     */
     public long getRequiredBytes()
     {
         return 128L * workFactor * resources * parallelization;
     }
 
+    /**
+     * A more readable version of {@link #getRequiredMemory()},
+     * changing the unit (B, KB, MB) so that the number has at most
+     * 2 decimal places.
+     *
+     * @return the required memory
+     * @since 0.3.0
+     */
     public String getRequiredMemory()
     {
         long memoryInBytes = getRequiredBytes();
-        if(memoryInBytes > 1_000_000)
+        if (memoryInBytes > 1_000_000)
         {
             return Math.round(memoryInBytes / 10_000f) / 100.0 + "MB";
         }
-        if(memoryInBytes > 1_000)
+        if (memoryInBytes > 1_000)
         {
             return Math.round(memoryInBytes / 1_000f) / 100.0 + "KB";
         }
@@ -191,30 +236,38 @@ public class SCryptFunction extends AbstractHashingFunction
         return String.valueOf(resources + '|' + workFactor + '|' + parallelization);
     }
 
-    private static int log2(int n)
+    /**
+     * Calculates the logarithm base 2 of a number that is already
+     * power of two
+     *
+     * @param number power of 2 positive number.
+     * @return the logarithm base 2
+     * @since 0.1.0
+     */
+    private static int log2(int number)
     {
         int log = 0;
-        if ((n & -65536) != 0)
+        if ((number & -65536) != 0)
         {
-            n >>>= 16;
+            number >>>= 16;
             log = 16;
         }
-        if (n >= 256)
+        if (number >= 256)
         {
-            n >>>= 8;
+            number >>>= 8;
             log += 8;
         }
-        if (n >= 16)
+        if (number >= 16)
         {
-            n >>>= 4;
+            number >>>= 4;
             log += 4;
         }
-        if (n >= 4)
+        if (number >= 4)
         {
-            n >>>= 2;
+            number >>>= 2;
             log += 2;
         }
-        return log + (n >>> 1);
+        return log + (number >>> 1);
     }
 
     public byte[] scrypt(byte[] passwd, byte[] salt, int dkLen) throws GeneralSecurityException
@@ -234,7 +287,7 @@ public class SCryptFunction extends AbstractHashingFunction
                 byte[] xyArray = new byte[256 * resources];
                 byte[] vArray = new byte[128 * resources * workFactor];
                 byte[] intensiveSalt = PBKDF2Function
-                        .internalHash(new String(passwd).toCharArray(), salt, PBKDF2Function.Algorithm.SHA256, 1,
+                        .internalHash(new String(passwd).toCharArray(), salt, Hmac.SHA256, 1,
                                 8 * parallelization * 128 * resources).getEncoded();
 
                 for (int i = 0; i < parallelization; ++i)
@@ -243,7 +296,7 @@ public class SCryptFunction extends AbstractHashingFunction
                 }
 
                 return PBKDF2Function
-                        .internalHash(new String(passwd).toCharArray(), intensiveSalt, PBKDF2Function.Algorithm.SHA256, 1,
+                        .internalHash(new String(passwd).toCharArray(), intensiveSalt, Hmac.SHA256, 1,
                                 8 * dkLen).getEncoded();
             }
         }

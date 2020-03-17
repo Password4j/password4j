@@ -186,9 +186,9 @@ public class AlgorithmFinder
 
     private static <T extends PBKDF2Function> T getPBKDF2Instance(Function<String, Function<Integer, Function<Integer, T>>> f)
     {
-        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", PBKDF2Function.Algorithm.SHA512.name());
-        int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", 64_000);
-        int length = PropertyReader.readInt("hash.pbkdf2.length", PBKDF2Function.Algorithm.SHA512.bits());
+        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", Hmac.SHA512.name(), "PBKDF2 algorithm is not defined");
+        int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", 64_000, "PBKDF2 #iterations are not defined");
+        int length = PropertyReader.readInt("hash.pbkdf2.length", Hmac.SHA512.bits(), "PBKDF2 key length is not defined");
         return f.apply(algorithm).apply(iterations).apply(length);
     }
 
@@ -217,7 +217,7 @@ public class AlgorithmFinder
      */
     public static BCryptFunction getBCryptInstance()
     {
-        int rounds = PropertyReader.readInt("hash.bcrypt.rounds", 10);
+        int rounds = PropertyReader.readInt("hash.bcrypt.rounds", 10, "BCrypt rounds are not defined");
         return BCryptFunction.getInstance(rounds);
     }
 
@@ -256,9 +256,9 @@ public class AlgorithmFinder
      */
     public static SCryptFunction getSCryptInstance()
     {
-        int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", 32_768);
-        int resources = PropertyReader.readInt("hash.scrypt.resources", 8);
-        int parallelization = PropertyReader.readInt("hash.scrypt.parallelization", 1);
+        int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", 32_768, "SCrypt work factor (N) is not defined");
+        int resources = PropertyReader.readInt("hash.scrypt.resources", 8, "SCrypt resources (r) is not defined");
+        int parallelization = PropertyReader.readInt("hash.scrypt.parallelization", 1, "SCrypt parallelization (p) is not defined");
         return SCryptFunction.getInstance(workFactor, resources, parallelization);
     }
 

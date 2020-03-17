@@ -50,7 +50,7 @@ public class BCryptFunctionTest
         Hash hash = new BCryptFunction(10).hash(password);
 
         // THEN
-        Assert.assertTrue(hash.check(password));
+        Assert.assertTrue(Password.check(password, hash));
 
     }
 
@@ -64,7 +64,7 @@ public class BCryptFunctionTest
         Hash hash = new BCryptFunction(12).hash(password);
 
         // THEN
-        Assert.assertTrue(hash.check(password));
+        Assert.assertTrue(Password.check(password, hash));
     }
 
     @Test
@@ -347,9 +347,9 @@ public class BCryptFunctionTest
     @Test
     public void testBase64EncodeSimpleByteArrays()
     {
-        Assert.assertEquals(encodeBase64(new byte[]{0}, 1), "..");
-        Assert.assertEquals(encodeBase64(new byte[]{0, 0}, 2), "...");
-        Assert.assertEquals(encodeBase64(new byte[]{0, 0, 0}, 3), "....");
+        Assert.assertEquals("..", encodeBase64(new byte[]{0}, 1));
+        Assert.assertEquals("...", encodeBase64(new byte[]{0, 0}, 2));
+        Assert.assertEquals("....", encodeBase64(new byte[]{0, 0, 0}, 3));
     }
 
     @Test

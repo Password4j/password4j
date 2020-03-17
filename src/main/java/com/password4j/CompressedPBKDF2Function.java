@@ -22,26 +22,116 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Class containing the implementation of PBKDF2 function and its parameters.
+ * <p>
+ * The main difference between {@link PBKDF2Function} is the hash produced: the configurations of the CHF,
+ * the salt and the hash are encoded inside it.
+ * <p>
+ * The produced hash is in the form
+ * <p>
+ * <code>
+ * $algorithm$parameters$salt$hash
+ * </code>
+ * <p>
+ * Assuming {@code $} as delimiter.
+ * <p>
+ * <ul>
+ *     <li>
+ *         The algorithm is encoded with its numeric uid {@link Hmac#code()}
+ *     </li>
+ *     <li>
+ *         Parameters are encoded in one integer where the length occupies the first 32bit and
+ *          the number of iterations the remaining 32 bits.
+ *     </li>
+ *     <li>
+ *         Salt is encoded in Base64
+ *     </li>
+ *     <li>
+ *         Hash is encoded in Base64 as in {@link PBKDF2Function}
+ *     </li>
+ * </ul>
+ *
+ * @author David Bertoldi
+ * @see <a href="https://en.wikipedia.org/wiki/PBKDF2">PBKDF2</a>
+ * @since 0.1.0
+ */
 public class CompressedPBKDF2Function extends PBKDF2Function
 {
 
     private static Map<String, CompressedPBKDF2Function> instances = new ConcurrentHashMap<>();
+
+    private static final char DELIMITER = PropertyReader.readChar("hash.pbkdf2.delimiter", '$');
 
     protected CompressedPBKDF2Function()
     {
         super();
     }
 
+    /**
+     * Creates a singleton instance, depending on the provided
+     * algorithm, number of iterations and key length.
+     *
+     * @param algorithm  hmac algorithm
+     * @param iterations number of iterations
+     * @param length     length of the derived key
+     * @return a singleton instance
+     * @since 0.1.0
+     */
+    public static CompressedPBKDF2Function getInstance(Hmac algorithm, int iterations, int length)
+    {
+        String key = getUID(algorithm, iterations, length);
+        if (instances.containsKey(key))
+        {
+            return instances.get(key);
+        }
+        else
+        {
+            CompressedPBKDF2Function function = new CompressedPBKDF2Function(algorithm, iterations, length);
+            instances.put(key, function);
+            return function;
+        }
+    }
 
-    protected CompressedPBKDF2Function(Algorithm fromCode, int iterations, int length)
+    /**
+     * Creates a singleton instance, depending on the provided
+     * algorithm, number of iterations and key length.
+     *
+     * @param algorithm  string veriong of hmac algorithm
+     * @param iterations number of iterations
+     * @param length     length of the derived key
+     * @return a singleton instance
+     * @since 0.1.0
+     */
+    public static CompressedPBKDF2Function getInstance(String algorithm, int iterations, int length)
+    {
+        try
+        {
+            return getInstance(Hmac.valueOf(algorithm), iterations, length);
+        }
+        catch (IllegalArgumentException iae)
+        {
+            throw new UnsupportedOperationException("Algorithm `" + algorithm + "` is not recognized.", iae);
+        }
+    }
+
+
+    protected CompressedPBKDF2Function(Hmac fromCode, int iterations, int length)
     {
         super(fromCode, iterations, length);
     }
 
-
+    /**
+     * Reads the configuration contained in the given hash and
+     * builds a singleton instance based on these configurations.
+     *
+     * @param hashed an already hashed password
+     * @return a singleton instance based on the given hash
+     * @since 1.0.0
+     */
     public static CompressedPBKDF2Function getInstanceFromHash(String hashed)
     {
-        String[] parts = hashed.split("\\$");
+        String[] parts = getParts(hashed);
         if (parts.length == 5)
         {
             int algorithm = Integer.parseInt(parts[1]);
@@ -50,7 +140,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
             int iterations = (int) (configuration >> 32);
             int length = (int) configuration;
 
-            return CompressedPBKDF2Function.getInstance(Algorithm.fromCode(algorithm), iterations, length);
+            return CompressedPBKDF2Function.getInstance(Hmac.fromCode(algorithm), iterations, length);
         }
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }
@@ -66,25 +156,25 @@ public class CompressedPBKDF2Function extends PBKDF2Function
     }
 
     @Override
-    public boolean check(String password, String hashed)
+    public boolean check(CharSequence plainTexPassword, String hashed)
     {
         String salt = getSaltFromHash(hashed);
-        Hash internalHas = hash(password, salt);
+        Hash internalHas = hash(plainTexPassword, salt);
 
         return slowEquals(internalHas.getResult().getBytes(), hashed.getBytes());
     }
 
     @Override
-    public boolean check(String plain, String hashed, String salt)
+    public boolean check(CharSequence plainTextPassword, String hashed, String salt)
     {
         String realSalt = getSaltFromHash(hashed);
-        Hash internalHas = hash(plain, realSalt);
+        Hash internalHas = hash(plainTextPassword, realSalt);
         return slowEquals(internalHas.getResult().getBytes(), hashed.getBytes());
     }
 
     private String getSaltFromHash(String hashed)
     {
-        String[] parts = hashed.split("\\$");
+        String[] parts = getParts(hashed);
         if (parts.length == 5)
         {
             return new String(Base64.getDecoder().decode(parts[3].getBytes()));
@@ -92,30 +182,9 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }
 
-    public static CompressedPBKDF2Function getInstance(Algorithm algorithm, int iterations, int length)
-    {
-        String key = getUID(algorithm, iterations, length);
-        if (instances.containsKey(key))
-        {
-            return instances.get(key);
-        }
-        else
-        {
-            CompressedPBKDF2Function function = new CompressedPBKDF2Function(algorithm, iterations, length);
-            instances.put(key, function);
-            return function;
-        }
-    }
 
-    public static CompressedPBKDF2Function getInstance(String algorithm, int iterations, int length)
+    protected static String[] getParts(String hashed)
     {
-        try
-        {
-            return getInstance(Algorithm.valueOf(algorithm), iterations, length);
-        }
-        catch (IllegalArgumentException iae)
-        {
-            throw new UnsupportedOperationException("Algorithm `" + algorithm + "` is not recognized.", iae);
-        }
+        return hashed.split(new StringBuilder(2).append('\\').append(DELIMITER).toString());
     }
 }

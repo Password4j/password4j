@@ -25,10 +25,16 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
+/**
+ * Class containing the implementation of PBKDF2 function and its parameters.
+ *
+ * @author David Bertoldi
+ * @see <a href="https://en.wikipedia.org/wiki/PBKDF2">PBKDF2</a>
+ * @since 0.1.0
+ */
 public class PBKDF2Function extends AbstractHashingFunction
 {
-    private Algorithm algorithm;
+    private Hmac algorithm;
 
     private int iterations;
 
@@ -49,13 +55,23 @@ public class PBKDF2Function extends AbstractHashingFunction
         this.length = length;
     }
 
-    protected PBKDF2Function(Algorithm algorithm, int iterations, int length)
+    protected PBKDF2Function(Hmac algorithm, int iterations, int length)
     {
         this(iterations, length);
         this.algorithm = algorithm;
     }
 
-    public static PBKDF2Function getInstance(Algorithm algorithm, int iterations, int length)
+    /**
+     * Creates a singleton instance, depending on the provided
+     * algorithm, number of iterations and key length.
+     *
+     * @param algorithm  hmac algorithm
+     * @param iterations number of iterations
+     * @param length     length of the derived key
+     * @return a singleton instance
+     * @since 0.1.0
+     */
+    public static PBKDF2Function getInstance(Hmac algorithm, int iterations, int length)
     {
         String key = getUID(algorithm, iterations, length);
         if (instances.containsKey(key))
@@ -70,11 +86,21 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
     }
 
+    /**
+     * Creates a singleton instance, depending on the provided
+     * algorithm, number of iterations and key length.
+     *
+     * @param algorithm  string veriong of hmac algorithm
+     * @param iterations number of iterations
+     * @param length     length of the derived key
+     * @return a singleton instance
+     * @since 0.1.0
+     */
     public static PBKDF2Function getInstance(String algorithm, int iterations, int length)
     {
         try
         {
-            return getInstance(Algorithm.valueOf(algorithm), iterations, length);
+            return getInstance(Hmac.valueOf(algorithm), iterations, length);
         }
         catch (IllegalArgumentException iae)
         {
@@ -83,18 +109,18 @@ public class PBKDF2Function extends AbstractHashingFunction
     }
 
     @Override
-    public Hash hash(String plain)
+    public Hash hash(CharSequence plainTextPassword)
     {
         byte[] salt = SaltGenerator.generate();
-        return hash(plain, new String(salt));
+        return hash(plainTextPassword, new String(salt));
     }
 
     @Override
-    public Hash hash(String plain, String salt)
+    public Hash hash(CharSequence plainTextPassword, String salt)
     {
         try
         {
-            SecretKey key = internalHash(plain, salt, this.algorithm, this.iterations, this.length);
+            SecretKey key = internalHash(plainTextPassword, salt, this.algorithm, this.iterations, this.length);
             return new Hash(this, getHash(key, salt), salt);
         }
         catch (NoSuchAlgorithmException nsae)
@@ -109,13 +135,13 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
     }
 
-    protected static SecretKey internalHash(String plain, String salt, Algorithm algorithm, int iterations, int length)
+    protected static SecretKey internalHash(CharSequence plainTextPassword, String salt, Hmac algorithm, int iterations, int length)
             throws NoSuchAlgorithmException, InvalidKeySpecException
     {
-        return internalHash(plain.toCharArray(), salt.getBytes(), algorithm, iterations, length);
+        return internalHash(Utilities.fromCharSequenceToChars(plainTextPassword), salt.getBytes(), algorithm, iterations, length);
     }
 
-    protected static SecretKey internalHash(char[] plain, byte[] salt, Algorithm algorithm, int iterations, int length)
+    protected static SecretKey internalHash(char[] plain, byte[] salt, Hmac algorithm, int iterations, int length)
             throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(ALGORITHM_PREFIX + algorithm.name());
@@ -129,17 +155,17 @@ public class PBKDF2Function extends AbstractHashingFunction
     }
 
     @Override
-    public boolean check(String plain, String hashed, String salt)
+    public boolean check(CharSequence plainTextPassword, String hashed, String salt)
     {
-        Hash internalHash = hash(plain, salt);
+        Hash internalHash = hash(plainTextPassword, salt);
         return slowEquals(internalHash.getResult().getBytes(), hashed.getBytes());
     }
 
     @Override
-    public boolean check(String password, String hashed)
+    public boolean check(CharSequence plainTexPassword, String hashed)
     {
         throw new UnsupportedOperationException(
-                "This implementation requires an explicit salt. Use check(String, String, String) method instead.");
+                "This implementation requires an explicit salt. Use check(CharSequence, String, String) method instead.");
 
     }
 
@@ -160,7 +186,8 @@ public class PBKDF2Function extends AbstractHashingFunction
         return diff == 0;
     }
 
-    public Algorithm getAlgorithm()
+
+    public Hmac getAlgorithm()
     {
         return algorithm;
     }
@@ -175,46 +202,6 @@ public class PBKDF2Function extends AbstractHashingFunction
         return length;
     }
 
-    public enum Algorithm
-    {
-        SHA1(160, 1), //
-        SHA224(224, 2), //
-        SHA256(256, 3), //
-        SHA384(384, 4), //
-        SHA512(512, 5);
-
-        private int bits;
-
-        private int code;
-
-        Algorithm(int bits, int code)
-        {
-            this.bits = bits;
-            this.code = code;
-        }
-
-        public int bits()
-        {
-            return bits;
-        }
-
-        public int code()
-        {
-            return code;
-        }
-
-        public static Algorithm fromCode(int code)
-        {
-            for (Algorithm alg : values())
-            {
-                if (alg.code() == code)
-                {
-                    return alg;
-                }
-            }
-            return null;
-        }
-    }
 
     @Override
     public boolean equals(Object obj)
@@ -242,7 +229,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         return toString().hashCode();
     }
 
-    protected static String getUID(Algorithm algorithm, int iterations, int length)
+    protected static String getUID(Hmac algorithm, int iterations, int length)
     {
         return String.valueOf(algorithm.code()) + '|' + iterations + '|' + length;
     }

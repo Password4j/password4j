@@ -31,7 +31,7 @@ public class SCryptFunctionTest
     }
 
     @Test
-    public void testHash()
+    public void testHash1()
     {
         // GIVEN
         String password = "password";
@@ -42,6 +42,35 @@ public class SCryptFunctionTest
 
         // THEN
         Assert.assertEquals("$s0$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==", hash.getResult());
+
+    }
+
+    @Test
+    public void testHash2()
+    {
+        // GIVEN
+        String password = "password";
+        String salt = "salt";
+
+        // WHEN
+        boolean result = new SCryptFunction(16384, 8, 1).check(password, "$s0$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==");
+
+        // THEN
+        Assert.assertTrue(result);
+    }
+
+    @Test
+    public void testHash3()
+    {
+        // GIVEN
+        String password = "password";
+        String salt = "salt";
+
+        // WHEN
+        boolean result = new SCryptFunction(16384, 8, 1).check(password, "$s0$e0801$c2FsdA==$c2FsdA==");
+
+        // THEN
+        Assert.assertFalse(result);
     }
 
     @Test
@@ -57,6 +86,20 @@ public class SCryptFunctionTest
         // THEN
         Assert.assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
         Assert.assertEquals(sCryptFunction, SCryptFunction.getInstanceFromHash(hash.getResult()));
+    }
+
+    @Test
+    public void testWrongCheck()
+    {
+        // GIVEN
+        String password = "password";
+        String salt = "salt";
+
+        // WHEN
+        Hash hash = new SCryptFunction(16384, 8, 1).hash(password, salt);
+
+        // THEN
+        Assert.assertFalse(hash.getHashingFunction().check(password, "$s0$e0801$c2FsdA==$YXNkYXNkYXNkYXNk"));
     }
 
     @Test
@@ -102,6 +145,46 @@ public class SCryptFunctionTest
         Assert.assertTrue(StringUtils.contains(scrypt2.getRequiredMemory(), "MB"));
         Assert.assertEquals(128, scrypt3.getRequiredBytes());
         Assert.assertEquals("128B", scrypt3.getRequiredMemory());
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadParameters1()
+    {
+        // GIVEN
+        int r = 5;
+
+        // WHEN
+        SCryptFunction.getInstance((16777215/r) + 1, r, 1).hash("password");
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadParameters2()
+    {
+        // GIVEN
+        int p = 5;
+
+        // WHEN
+        SCryptFunction.getInstance(16, (16777215/p) + 1, p).hash("password");
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadParameters3()
+    {
+        // GIVEN
+        int p = 5;
+
+        // WHEN
+        new SCryptFunction(16384, 8, 1).check("password", "$s1$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==");
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadParameters4()
+    {
+        // GIVEN
+        int p = 5;
+
+        // WHEN
+        new SCryptFunction(16384, 8, 1).check("password", "$s0e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==");
     }
 
 }

@@ -11,22 +11,21 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Password4j_password4j&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=Password4j_password4j)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Password4j_password4j&metric=coverage)](https://sonarcloud.io/dashboard?id=Password4j_password4j)
 
-Password4j is a Java facade for hashing and checking passwords with different [Crypto Hashing Functions](https://en.wikipedia.org/wiki/Cryptographic_hash_function) (CHF) in
-an easy and configurable way.
+Password4j is a Java utility package for hashing and checking passwords with different [Crypto Hashing Functions](https://en.wikipedia.org/wiki/Cryptographic_hash_function) (CHFs).
 
 Algorithms can be configured **programmatically** or through a **property file** in your classpath <sup>see [Configuration section](#Configuration)</sup>.
 
 The configurations are mostly dependent on your environment. Password4j delivers a **tool that can create
-a set of optimal parameters** based on the system performance and the desired time threshold <sup>see [Performance section](#Performance)</sup>.
+a set of optimal parameters** based on the system performance and the desired maximum computational time <sup>see [Performance section](#Performance)</sup>.
 
 ![Hash and verify](https://i.imgur.com/zQMvGdG.png)
 
 The library fully supports **[BCrypt](https://en.wikipedia.org/wiki/Bcrypt)**, **[SCrypt](https://en.wikipedia.org/wiki/Scrypt)** and **[PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)** 
-and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/Salt_(cryptography))** and **[pepper](https://en.wikipedia.org/wiki/Pepper_(cryptography))**.
+and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/Salt_%28cryptography%29)** and **[pepper](https://en.wikipedia.org/wiki/Pepper_%28cryptography%29)**.
 
 
 # Installation
-Password4j runs on **Java 8** and **Java 12** of any vendor. It is supported by **Android API 26+** as well.
+Password4j runs on **Java 8**, **Java 9**, **Java 10** and **Java 11** by any vendor. It is supported by **Android API 26+** as well.
 
 The artifacts are deployed to [Maven Central](https://search.maven.org/).
 ## ![Maven](https://i.imgur.com/2TZzobp.png?1) Maven 
@@ -58,89 +57,77 @@ libraryDependencies += "com.password4j" % "password4j" % "1.2.1"
 ```
 
 # Usage
-Password4j provides two main methods to hash and verify passwords.
+Password4j provides three main features.
 
-## Password.*hash*()
-This method helps the developer to build a chain of parameters that the CHF will use to produce the hash.
+## Hash the password
+Here it is the easiest way to hash a password with a CHF (BCrypt in this case)
 
-Salt and pepper may be optionally added into the chain.
+```java
+Hash hash = Password.hash(password).withBCrypt();
+```
 
-Example with PBKDF2: 
+Salt and pepper may be optionally added to the builder (PBKDF2 in this case): 
+
 ```java
 // PBKDF2 with salt 12 bytes long (randomly generated).
-Hash hash = Password.hash("password").addRandomSalt(12).withPBKDF2();
+Hash hash = Password.hash(password).addRandomSalt(12).withPBKDF2();
 
 // PBKDF2 with a chosen salt.
-Hash hash = Password.hash("password").addSalt("fixed salt").withPBKDF2();
+Hash hash = Password.hash(password).addSalt(salt).withPBKDF2();
 
 // PBKDF2 with chosen salt and pepper.
-Hash hash = Password.hash("password").addSalt("fixed salt").addPepper("pepper").withPBKDF2();
+Hash hash = Password.hash(password).addSalt(salt).addPepper(pepper).withPBKDF2();
 
 // Custom PBKDF2 (PBKDF2 with HMAC-SHA512, 64000 iterations and 512bit length).
-Hash hash = Password.hash("password").with(PBKDF2Function.getInstance(Hmac.SHA512, 64000, 512));
+Hash hash = Password.hash(password).with(PBKDF2Function.getInstance(Hmac.SHA512, 64000, 512));
 
 ```
-The same structure can be adopted for the other algorithms, not just for PBKDF2.
+The same structure can be adopted for the other CHFs, not just for PBKDF2.
 
-### Customize Password.*hash*()
-If you need to add a new method in the chain of parameters or want to override one, here's the fastest way:
+
+## Verify the hash
+With the same ease you can verify an hash
 ```java
-Password.hash("password", CustomBuilder::new).addSalt("fixed salt").withOtherStuff().withBCrypt();
+boolean verified = Password.check(password, hash).withBCrypt();
 ```
+
+Salt and pepper may be optionally added to the builder (PBKDF2 in this case): 
+
 ```java
-public class CustomBuilder extends HashBuilder<CustomBuilder> {
-    
-    public CustomBuilder withOtherStuff() {
-        // do here your stuff
-        return this;
-    }
-
-    @Override
-    public Hash withBCrypt() {
-        return with(new MyBCryptVariant());               // Recommended way.
-    }                                                     // It must implement HashingFunction
-}
-```
-Create your custom `HashBuilder` and use it in `Password.hash()`.
-
-## Password.*check*()
-The verification process builds a chain of parameters, as well.
-```java
-String plaintext = "...";                                       // User provided password.
-String hash = "...";                                            // Hash retrieved from DB for that user.
-
-// Verify with PBKDF2.
-boolean verification = Password.check(plaintext, hash).withPBKDF2();
+/ Verify with PBKDF2.
+boolean verification = Password.check(password, hash).withPBKDF2();
 
 // Verify with PBKDF2 and manually provided salt.
-boolean verification = Password.check(plaintext, hash).addSalt("salt from db").withPBKDF2();
+boolean verification = Password.check(password, hash).addSalt(salt).withPBKDF2();
 
 // Verify with PBKDF2 and manually provided salt and pepper.
-boolean verification = Password.check(plaintext, hash).addSalt("salt from db").addPepper("pepper").withPBKDF2();
+boolean verification = Password.check(password, hash).addSalt(salt).addPepper(pepper).withPBKDF2();
 ```
  The same structure can be adopted for the other algorithms, not just for PBKDF2. Take in account that BCrypt and SCrypt store the salt
- inside the hash, so that the `addSalt()` method is not needed.
+ inside the hash, so the `addSalt()` method is not needed.
 
-### Customize Password.*check*()
-If you need to add a new method in the chain of parameters or want to override one, here's the fastest way:
-```java
-Password.check("password", "hash", CustomChecker::new).withOtherStuff().withBCrypt();
-```
-```java
-public class CustomChecker extends HashChecker<CustomChecker> {
-    
-    public CustomChecker withOtherStuff() {
-        // do here your stuff
-        return this;
-    }
 
-    @Override
-    public boolean withBCrypt() {
-        return with(new MyBCryptVariant());               // Recommended way.
-    }                                                     // It must implement HashingFunction
+## Update the hash
+When a configuration is not considered anymore secure  you can
+refresh the hash like this:
+```java
+HashUpdate update = Password.check(password, hash).update().withBCrypt();
+
+if(update.isVerified())
+{
+    Hash newHash = update.getHash();
 }
 ```
-Create your custom `HashChecker` and use it in `Password.check()`.
+Or if you want to switch from a CHF to another one:
+```java
+PBKDF2Function pbkdf2 = AlgorithmFinder.getPBKDF2Instance();
+HashUpdate update = Password.check(password, hash).update().withSCrypt(pbkdf2);
+
+if(update.isVerified())
+{
+    Hash newHash = update.getHash();
+}
+```
 
 ## Security of Strings
 `String`s are immutable objects and they are stored in the String Pool, a location in the heap memory.
@@ -171,6 +158,7 @@ SecureString secure = new SecureString(password, true);
 
 // At this point password = {\0, \0, \0, ...}
 ```
+The pepper can be expressed as `SecureString` as well.
 
 # Configuration
 Password4j makes available a portable way to configure the library.
@@ -188,6 +176,7 @@ hash.pbkdf2.iterations=64000
 hash.pbkdf2.length=256
 
 ### BCrypt
+hash.bcrypt.minor=b
 # logarithmic cost (cost = 2^12)
 hash.bcrypt.rounds=12
 

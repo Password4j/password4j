@@ -66,9 +66,9 @@ public class PublicPasswordTest
                     Password.hash(test.password).addSalt(test.salt).addPepper(test.pepper).with(test.hashingFunction)
                             .getResult());
 
-            HashUpdate update = Password.check(test.password, test.hash).addSalt(test.salt).addPepper(test.pepper).hashAgain().with(test.hashingFunction, test.hashingFunction);
-            Assert.assertTrue(update.isVerified());
-            Assert.assertEquals(Password.hash(test.password).addSalt(test.salt).addPepper(test.pepper).with(test.hashingFunction).getResult(), update.getHash().getResult());
+            HashUpdate update = Password.check(test.password, test.hash).addSalt(test.salt).addPepper(test.pepper).andUpdate().with(test.hashingFunction, test.hashingFunction);
+            Assert.assertTrue(test.hashingFunction.toString(), update.isVerified());
+            Assert.assertEquals(test.hashingFunction.toString(), Password.hash(test.password).addSalt(test.salt).addPepper(test.pepper).with(test.hashingFunction).getResult(), update.getHash().getResult());
 
         }
 

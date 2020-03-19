@@ -5,7 +5,7 @@
  * Capability of updating the hash (re-hash) with a new configuration just after the verification process
 ### Changed
  * `HashBuilder` and `HashChecker` are less extendable because there are more maintainability issues than effective advantages
- * Compatibility with Android API raised to 24+ (was 26+).
+ * Pepper can be provided either with `SecureString` or `String`.
 ### Removed
  * `Password.hash()` and `Password.check()` methods that accepts a custom `HashBuilder` or a custom `HashChecker`
 

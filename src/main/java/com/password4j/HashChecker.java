@@ -31,7 +31,7 @@ public class HashChecker
 
     private String salt;
 
-    private String pepper;
+    private CharSequence pepper;
 
     private CharSequence plainTextPassword;
 
@@ -46,7 +46,7 @@ public class HashChecker
      * @param hashed            the hash to verify
      * @since 1.0.0
      */
-    public HashChecker(CharSequence plainTextPassword, String hashed)
+    HashChecker(CharSequence plainTextPassword, String hashed)
     {
         this.hashed = hashed;
         this.plainTextPassword = plainTextPassword;
@@ -60,7 +60,7 @@ public class HashChecker
      * @return this builder
      * @since 1.0.0
      */
-    public HashChecker addPepper(String pepper)
+    public HashChecker addPepper(CharSequence pepper)
     {
         this.pepper = pepper;
         return this;
@@ -93,7 +93,7 @@ public class HashChecker
         return this;
     }
 
-    public HashUpdater hashAgain()
+    public HashUpdater andUpdate()
     {
         return new HashUpdater(this, new HashBuilder(plainTextPassword).addPepper(pepper).addSalt(salt));
     }
@@ -129,7 +129,7 @@ public class HashChecker
      * Check if the previously given hash was produced from the given plain text password
      * with {@link PBKDF2Function}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      *
      * @return true if the hash was produced by the given plain text password; false otherwise.
@@ -146,7 +146,7 @@ public class HashChecker
      * Check if the previously given hash was produced from the given plain text password
      * with {@link CompressedPBKDF2Function}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      *
      * @return true if the hash was produced by the given plain text password; false otherwise.
@@ -163,7 +163,7 @@ public class HashChecker
      * Check if the previously given hash was produced from the given plain text password
      * with {@link SCryptFunction}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      *
      * @return true if the hash was produced by the given plain text password; false otherwise.
@@ -180,7 +180,7 @@ public class HashChecker
      * Check if the previously given hash was produced from the given plain text password
      * with {@link BCryptFunction}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      *
      * @return true if the hash was produced by the given plain text password; false otherwise.

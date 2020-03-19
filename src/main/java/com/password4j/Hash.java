@@ -78,7 +78,7 @@ public class Hash
      * Represents the pepper: a secret added to the input password
      * prior to being hashed with a cryptographic hash function
      */
-    private String pepper;
+    private CharSequence pepper;
 
     /**
      * Represents the hashing function used to generate this object.
@@ -104,7 +104,7 @@ public class Hash
      * Constructs an {@link Hash} containing the basic information
      * used and produced by the computational process of hashing a password.
      * Other information, like <i>pepper</i> can be added with
-     * {@link #setPepper(String)}.
+     * {@link #setPepper(CharSequence)}.
      * <p>
      * This constructor populates the object's attributes.
      *
@@ -161,7 +161,7 @@ public class Hash
      * @return the pepper.
      * @since 0.1.0
      */
-    public String getPepper()
+    public CharSequence getPepper()
     {
         return pepper;
     }
@@ -174,7 +174,7 @@ public class Hash
      * @param pepper the pepper used.
      * @since 0.1.0
      */
-    void setPepper(String pepper)
+    void setPepper(CharSequence pepper)
     {
         this.pepper = pepper;
     }

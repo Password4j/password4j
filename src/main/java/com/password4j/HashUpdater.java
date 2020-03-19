@@ -28,7 +28,7 @@ public class HashUpdater
 
     protected HashBuilder hashBuilder;
 
-    public HashUpdater(HashChecker hashChecker, HashBuilder hashBuilder)
+    HashUpdater(HashChecker hashChecker, HashBuilder hashBuilder)
     {
         this.hashChecker = hashChecker;
         this.hashBuilder = hashBuilder;
@@ -67,6 +67,13 @@ public class HashUpdater
         }
     }
 
+    /**
+     * Adds new cryptographic salt to be applied in the hash update.
+     *
+     * @param salt cryptographic salt
+     * @return this builder
+     * @since 1.3.0
+     */
     public HashUpdater addNewSalt(String salt)
     {
         this.hashBuilder.addSalt(salt);
@@ -74,8 +81,8 @@ public class HashUpdater
     }
 
     /**
-     * Add a random cryptographic salt in the hashing process.
-     * The salt is applied differently depending on the chosen algorithm.
+     * Add a random cryptographic salt in the hash update process.
+     * The salt is applied differently depending on the new chosen algorithm.
      *
      * @return this builder
      * @see SaltGenerator#generate() for more information about the length of the product
@@ -88,8 +95,8 @@ public class HashUpdater
     }
 
     /**
-     * Add a random cryptographic salt in the hashing process with a given length.
-     * The salt is applied differently depending on the chosen algorithm.
+     * Add a random cryptographic salt in the hash update process with a given length.
+     * The salt is applied differently depending on the new chosen algorithm.
      *
      * @param length the length of the salt produced
      * @return this builder
@@ -105,7 +112,7 @@ public class HashUpdater
 
     /**
      * Concatenates the pepper configured in your `psw4j.properties` file with the plain text password.
-     * The produced sequence (in the form {@code pepper+password}) is processed by the algorithm.
+     * The produced sequence (in the form {@code pepper+password}) is processed by the new algorithm.
      *
      * @return this builder
      * @see PepperGenerator#get()
@@ -119,23 +126,16 @@ public class HashUpdater
 
     /**
      * Concatenates the provided string with the plain text password.
-     * The produced sequence (in the form {@code pepper+password}) is processed by the algorithm.
+     * The produced sequence (in the form {@code pepper+password}) is processed by the new algorithm.
      *
      * @param pepper cryptographic pepper
      * @return this builder
      * @since 1.3.0
      */
-    public HashUpdater addNewPepper(String pepper)
+    public HashUpdater addNewPepper(CharSequence pepper)
     {
         this.hashBuilder.addPepper(pepper);
         return this;
-    }
-
-
-    public HashUpdate withPBKDF2()
-    {
-        PBKDF2Function pbkdf2 = AlgorithmFinder.getPBKDF2Instance();
-        return withPBKDF2(pbkdf2);
     }
 
 
@@ -148,7 +148,28 @@ public class HashUpdater
      * <p>
      * Finally calls {@link #with(HashingFunction, HashingFunction)}
      *
-     * @return true if the hash was produced by the given plain text password; false otherwise.
+     * @return the result of the verification with the new hash
+     * @see AlgorithmFinder#getPBKDF2Instance()
+     * @see #with(HashingFunction, HashingFunction)
+     * @since 1.3.0
+     */
+    public HashUpdate withPBKDF2()
+    {
+        PBKDF2Function pbkdf2 = AlgorithmFinder.getPBKDF2Instance();
+        return withPBKDF2(pbkdf2);
+    }
+
+
+    /**
+     * Hashes the previously given plain text password
+     * with {@link PBKDF2Function}.
+     * <p>
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
+     * then the default parameters are used.
+     * <p>
+     * Finally calls {@link #with(HashingFunction, HashingFunction)}
+     *
+     * @return the result of the verification with the new hash
      * @see AlgorithmFinder#getPBKDF2Instance()
      * @see #with(HashingFunction, HashingFunction)
      * @since 1.3.0
@@ -163,12 +184,12 @@ public class HashUpdater
      * Hashes the previously given plain text password
      * with {@link CompressedPBKDF2Function}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction, HashingFunction)}
      *
-     * @return true if the hash was produced by the given plain text password; false otherwise.
+     * @return the result of the verification with the new hash
      * @see AlgorithmFinder#getCompressedPBKDF2Instance()
      * @see #with(HashingFunction, HashingFunction)
      * @since 1.3.0
@@ -183,12 +204,12 @@ public class HashUpdater
      * Hashes the previously given plain text password
      * with {@link CompressedPBKDF2Function}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction, HashingFunction)}
      *
-     * @return true if the hash was produced by the given plain text password; false otherwise.
+     * @return the result of the verification with the new hash
      * @see AlgorithmFinder#getCompressedPBKDF2Instance()
      * @see #with(HashingFunction, HashingFunction)
      * @since 1.3.0
@@ -203,12 +224,12 @@ public class HashUpdater
      * Hashes the previously given plain text password
      * with {@link BCryptFunction}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction, HashingFunction)}
      *
-     * @return true if the hash was produced by the given plain text password; false otherwise.
+     * @return the result of the verification with the new hash
      * @see AlgorithmFinder#getBCryptInstance()
      * @see #with(HashingFunction, HashingFunction)
      * @since 1.3.0
@@ -222,12 +243,12 @@ public class HashUpdater
      * Hashes the previously given plain text password
      * with {@link BCryptFunction}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction, HashingFunction)}
      *
-     * @return true if the hash was produced by the given plain text password; false otherwise.
+     * @return the result of the verification with the new hash
      * @see AlgorithmFinder#getBCryptInstance()
      * @see #with(HashingFunction, HashingFunction)
      * @since 1.3.0
@@ -241,12 +262,12 @@ public class HashUpdater
      * Hashes the previously given plain text password
      * with {@link SCryptFunction}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction, HashingFunction)}
      *
-     * @return true if the hash was produced by the given plain text password; false otherwise.
+     * @return the result of the verification with the new hash
      * @see AlgorithmFinder#getSCryptInstance()
      * @see #with(HashingFunction, HashingFunction)
      * @since 1.3.0
@@ -260,12 +281,12 @@ public class HashUpdater
      * Hashes the previously given plain text password
      * with {@link SCryptFunction}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction, HashingFunction)}
      *
-     * @return true if the hash was produced by the given plain text password; false otherwise.
+     * @return the result of the verification with the new hash
      * @see AlgorithmFinder#getSCryptInstance()
      * @see #with(HashingFunction, HashingFunction)
      * @since 1.3.0

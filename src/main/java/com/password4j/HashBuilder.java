@@ -31,7 +31,7 @@ public class HashBuilder
 
     private String salt;
 
-    private String pepper;
+    private CharSequence pepper;
 
     @SuppressWarnings("unused")
     private HashBuilder()
@@ -43,7 +43,7 @@ public class HashBuilder
      * @param plainTextPassword the plain text password
      * @since 1.0.0
      */
-    public HashBuilder(CharSequence plainTextPassword)
+    protected HashBuilder(CharSequence plainTextPassword)
     {
         this.plainTextPassword = plainTextPassword;
     }
@@ -122,7 +122,7 @@ public class HashBuilder
      * @return this builder
      * @since 1.0.0
      */
-    public HashBuilder addPepper(String pepper)
+    public HashBuilder addPepper(CharSequence pepper)
     {
         this.pepper = pepper;
         return this;
@@ -164,7 +164,7 @@ public class HashBuilder
      * Hashes the previously given plain text password
      * with {@link PBKDF2Function}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction)}
@@ -183,7 +183,7 @@ public class HashBuilder
      * Hashes the previously given plain text password
      * with {@link CompressedPBKDF2Function}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction)}
@@ -202,7 +202,7 @@ public class HashBuilder
      * Hashes the previously given plain text password
      * with {@link BCryptFunction}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction)}
@@ -221,7 +221,7 @@ public class HashBuilder
      * Hashes the previously given plain text password
      * with {@link SCryptFunction}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction)}

@@ -18,9 +18,6 @@ package com.password4j;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 /**
  * This class provides the two main operations on password: hash and verify.
  * <p>
@@ -56,7 +53,11 @@ public class Password
      */
     public static HashBuilder hash(CharSequence plainTextPassword)
     {
-        return hash(plainTextPassword, HashBuilder::new);
+        if (plainTextPassword == null)
+        {
+            throw new BadParametersException("Password cannot be null");
+        }
+        return new HashBuilder(plainTextPassword);
     }
 
     /**
@@ -75,7 +76,11 @@ public class Password
      */
     public static HashChecker check(CharSequence plainTextPassword, String hash)
     {
-        return check(plainTextPassword, hash, HashChecker::new);
+        if (hash == null || plainTextPassword == null)
+        {
+            throw new BadParametersException("Hash or plain cannot be null");
+        }
+        return new HashChecker(plainTextPassword, hash);
     }
 
     /**
@@ -111,82 +116,6 @@ public class Password
         }
 
         return hashObject.getHashingFunction().check(peppered, hashObject.getResult(), hashObject.getSalt());
-    }
-
-    /**
-     * Starts to hash the given plain text password with a custom builder.
-     * <p>
-     * This method is used to start the setup of a {@link HashBuilder}
-     * instance that finally should execute the {@link HashBuilder#with(HashingFunction)}
-     * method (or an equivalent method) to hash the password.
-     * <p>
-     * The extended {@link HashBuilder} is built with a {@link Function}
-     * because it is easier to invoke, rather than call
-     * the constructor with the same argument.
-     * <p>
-     * For example:<br/>
-     * <code>
-     * Passowrd.hash("password", CustomHashBuilder::new);
-     * </code>
-     *
-     * @param plainTextPassword the plain text password
-     * @param builderFunction   any lambda function or method reference
-     *                          that returns an instance of the extended
-     *                          {@link HashBuilder}.
-     * @return a builder instance of {@link HashBuilder}
-     * @throws BadParametersException if any of the arguments are null.
-     * @since 0.1.1
-     */
-    public static <B extends HashBuilder<?>> B hash(CharSequence plainTextPassword, Function<CharSequence, B> builderFunction)
-    {
-        if (builderFunction == null)
-        {
-            throw new BadParametersException("HashBuilder construction method cannot be null");
-        }
-        if (plainTextPassword == null)
-        {
-            throw new BadParametersException("Password cannot be null");
-        }
-        return builderFunction.apply(plainTextPassword);
-    }
-
-    /**
-     * Verify if an hash string has been generated with
-     * the given plain text password with a custom verifier.
-     * <p>
-     * This method is used to start the setup of a custom {@link HashChecker}
-     * instance that finally should execute the {@link HashChecker#with(HashingFunction)}
-     * (or an equivalent method) to verify the hash.
-     * <p>
-     * The extended {@link HashChecker} is built with a {@link BiFunction}
-     * because it is easier to invoke, rather than call
-     * the constructor with the same two arguments.
-     * <p>
-     * For example:<br/>
-     * <code>
-     * Passowrd.check("password", "hash", CustomHashChecker::new);
-     * </code>
-     *
-     * @param plainTextPassword the plain text password
-     * @param hash              an hash string
-     * @param checkerBiFunction any lambda function or method reference
-     *                          that returns an instance of the extended
-     *                          {@link HashChecker}.
-     * @return a builder instance of {@link HashChecker}
-     * @throws BadParametersException if any of the arguments are null.
-     * @since 0.2.1
-     */
-    public static <C extends HashChecker<?>> C check(CharSequence plainTextPassword, String hash, BiFunction<CharSequence, String, C> checkerBiFunction)
-    {
-        if (checkerBiFunction == null)
-        {
-            throw new BadParametersException("HashChecker construction method cannot be null");
-        }
-        if (hash == null || plainTextPassword == null)
-        {
-            throw new BadParametersException("Hash or plain cannot be null");
-        }
-        return checkerBiFunction.apply(plainTextPassword, hash);
     }
 
 }

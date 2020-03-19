@@ -138,6 +138,10 @@ public class PBKDF2Function extends AbstractHashingFunction
     protected static SecretKey internalHash(CharSequence plainTextPassword, String salt, Hmac algorithm, int iterations, int length)
             throws NoSuchAlgorithmException, InvalidKeySpecException
     {
+        if(salt == null)
+        {
+            throw new IllegalArgumentException("Salt cannot be null");
+        }
         return internalHash(Utilities.fromCharSequenceToChars(plainTextPassword), salt.getBytes(), algorithm, iterations, length);
     }
 

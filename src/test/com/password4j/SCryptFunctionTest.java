@@ -113,7 +113,7 @@ public class SCryptFunctionTest
 
         // THEN
         boolean eqNull = scrypt.equals(null);
-        boolean eqClass = scrypt.equals(new BCryptFunction(10));
+        boolean eqClass = scrypt.equals(new BCryptFunction(BCrypt.A,10));
         boolean difInst = scrypt.equals(SCryptFunction.getInstance(5, 4, 6));
         boolean sameInst = scrypt.equals(SCryptFunction.getInstance(N, r, p));
         String toString = scrypt.toString();

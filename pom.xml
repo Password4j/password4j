@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.password4j</groupId>
@@ -10,17 +11,18 @@
 
     <name>Password4j</name>
     <description>
-        Password4j is a Java facade for hashing and checking passwords
-        with different Crypto Hashing Functions (CHF).
+        Password4j is a Java utility package for hashing and checking
+        passwords with different Crypto Hashing Functions (CHF).
     </description>
     <url>https://password4j.com/</url>
+
 
     <scm>
         <connection>scm:git:git@github.com/Password4j/${project.artifactId}.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/Password4j/${project.artifactId}.git</developerConnection>
         <url>https://github.com/Password4j/password4j</url>
-      <tag>1.2.0</tag>
-  </scm>
+        <tag>1.2.0</tag>
+    </scm>
 
     <licenses>
         <license>
@@ -90,17 +92,17 @@
         <testSourceDirectory>src/test</testSourceDirectory>
         <plugins>
             <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>animal-sniffer-maven-plugin</artifactId>
-            <version>1.16</version>
-            <configuration>
-                <signature>
-                    <groupId>net.sf.androidscents.signature</groupId>
-                    <artifactId>android-api-level-26</artifactId>
-                    <version>8.0.0_r2</version>
-                </signature>
-            </configuration>
-        </plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+                <version>1.16</version>
+                <configuration>
+                    <signature>
+                        <groupId>net.sf.androidscents.signature</groupId>
+                        <artifactId>android-api-level-26</artifactId>
+                        <version>8.0.0_r2</version>
+                    </signature>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

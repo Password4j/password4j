@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [1.3.0](https://github.com/Password4j/password4j/releases/tag/1.3.0) - (2020-03-19)
 ### Added
  * Capability of updating the hash (re-hash) with a new configuration just after the verification process
 ### Changed

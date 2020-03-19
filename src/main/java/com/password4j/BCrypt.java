@@ -15,29 +15,29 @@
  *
  */
 
-package com.password4j.custom;
+package com.password4j;
 
-import com.password4j.Hash;
-import com.password4j.HashBuilder;
-
-public class CustomHashBuilder extends HashBuilder<CustomHashBuilder>
+public enum BCrypt
 {
+    A,
+    B,
+    X,
+    Y;
 
-    public static final String SAME_RESULT = "i always produce this hash";
-
-    public CustomHashBuilder(CharSequence plain)
+    public char minor()
     {
-        super(plain);
+        return name().toLowerCase().charAt(0);
     }
 
-    public Hash withTest()
+    public static BCrypt valueOf(char minor)
     {
-        return new Hash(null, SAME_RESULT, null);
-    }
-
-    @Override
-    public Hash withBCrypt()
-    {
-        return new Hash(null, SAME_RESULT, null);
+        for(BCrypt type : BCrypt.values())
+        {
+            if(type.minor() == minor)
+            {
+                return  type;
+            }
+        }
+        return null;
     }
 }

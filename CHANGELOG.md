@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+### Added
+ * Capability of updating the hash (re-hash) with a new configuration just after the verification process
+### Changed
+ * `HashBuilder` and `HashChecker` are less extendable because there are more maintainability issues than effective advantages
+ * Compatibility with Android API raised to 24+ (was 26+).
+### Removed
+ * `Password.hash()` and `Password.check()` methods that accepts a custom `HashBuilder` or a custom `HashChecker`
+
 ## [1.2.1](https://github.com/Password4j/password4j/releases/tag/1.2.1) - (2020-03-17)
 ### Added
  * Constant time equality in `SecureString`
@@ -9,6 +18,7 @@
 ## [1.2.0](https://github.com/Password4j/password4j/releases/tag/1.2.0) - (2020-03-15)
 ### Added
  * This CHANGELOG.md file
+### Security
  * Plain text passwords can be provided either with `SecureString` or `String`.
 
 ## [1.1.0](https://github.com/Password4j/password4j/releases/tag/1.1.0) - (2020-03-14)

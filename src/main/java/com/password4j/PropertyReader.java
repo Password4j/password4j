@@ -89,6 +89,17 @@ class PropertyReader
         return value;
     }
 
+    static char readChar(String key, char defaultValue, String message)
+    {
+        String str = readString(key);
+        if (str == null)
+        {
+            LOG.warn(MESSAGE, message, defaultValue, key);
+            return defaultValue;
+        }
+        return str.charAt(0);
+    }
+
     static char readChar(String key, char defaultValue)
     {
         String str = readString(key);

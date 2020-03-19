@@ -78,7 +78,7 @@ public class SystemChecker
             rounds++;
             long start = System.currentTimeMillis();
 
-            new BCryptFunction(rounds).hash(TO_BE_HASHED);
+            new BCryptFunction(BCrypt.A, rounds).hash(TO_BE_HASHED);
 
             long end = System.currentTimeMillis();
             elapsed = end - start;

@@ -17,31 +17,62 @@
 
 package com.password4j;
 
-import java.util.Optional;
+import java.util.Objects;
 
 /**
+ * This class represents the result of the password verification process
+ * along with the generated {@link Hash}.
+ * <p>
+ * If the verification passed a new hash is always provided.
+ *
  * @author David Bertoldi
  * @since 1.3.0
  */
 public class HashUpdate
 {
+    public static final HashUpdate UNVERIFIED = new HashUpdate();
+
     private Hash hash;
 
-    private boolean verified;
+    private HashUpdate()
+    {
+        //
+    }
 
-    public HashUpdate(Hash hash, boolean verified)
+    /**
+     * @param hash the new hash
+     * @throws BadParametersException if hash is null but verified is true
+     * @since 1.3.0
+     */
+    public HashUpdate(Hash hash)
     {
         this.hash = hash;
-        this.verified = verified;
     }
 
-    public Optional<Hash> getHash()
+    /**
+     * Returns the hash generated after a verification + update
+     * process.
+     * <p>
+     * It is never null if the hash is {@link #isVerified()}
+     * return true.
+     *
+     * @return the regenerated hash
+     * @since 1.3.0
+     */
+    public Hash getHash()
     {
-        return Optional.of(hash);
+        return this.hash;
     }
 
+    /**
+     * Returns the result of the verification process.
+     *
+     * @return true if the verification process was successful
+     * @since 1.3.0
+     */
     public boolean isVerified()
     {
-        return verified;
+        return hash != null;
     }
+
 }

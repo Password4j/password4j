@@ -60,6 +60,7 @@ import java.util.Objects;
  */
 public class Hash
 {
+
     /**
      * Represents the full output of a cryptographic hashing function.
      * Depending on the implementation of the CHF, it may contain

@@ -22,11 +22,10 @@ import org.apache.commons.lang3.StringUtils;
  * Builder class that helps to create a chain of parameters to be used
  * in the hashing process.
  *
- * @param <H> extends HashBuilder.
  * @author David Bertoldi
  * @since 1.0.0
  */
-public class HashBuilder<H extends HashBuilder<?>>
+public class HashBuilder
 {
     private CharSequence plainTextPassword;
 
@@ -57,24 +56,26 @@ public class HashBuilder<H extends HashBuilder<?>>
      * @return this builder
      * @since 1.0.0
      */
-    public H addSalt(String salt)
+    public HashBuilder addSalt(String salt)
     {
         this.salt = salt;
-        return (H) this;
+        return this;
     }
 
     /**
      * Add a random cryptographic salt in the hashing process.
      * The salt is applied differently depending on the chosen algorithm.
+     * <p>
+     * Calling this method can be omitted for all the CHFs that require a salt.
      *
      * @return this builder
      * @see SaltGenerator#generate() for more information about the length of the product
      * @since 1.0.0
      */
-    public H addRandomSalt()
+    public HashBuilder addRandomSalt()
     {
         this.salt = new String(SaltGenerator.generate());
-        return (H) this;
+        return this;
     }
 
     /**
@@ -87,7 +88,7 @@ public class HashBuilder<H extends HashBuilder<?>>
      * @see SaltGenerator#generate() for more information about the length of the product
      * @since 1.0.0
      */
-    public H addRandomSalt(int length)
+    public HashBuilder addRandomSalt(int length)
     {
         if (length <= 0)
         {
@@ -97,7 +98,7 @@ public class HashBuilder<H extends HashBuilder<?>>
         {
             this.salt = new String(SaltGenerator.generate(length));
         }
-        return (H) this;
+        return this;
     }
 
     /**
@@ -107,10 +108,10 @@ public class HashBuilder<H extends HashBuilder<?>>
      * @return this builder
      * @see PepperGenerator#get()
      */
-    public H addPepper()
+    public HashBuilder addPepper()
     {
         this.pepper = PepperGenerator.get();
-        return (H) this;
+        return this;
     }
 
     /**
@@ -121,10 +122,10 @@ public class HashBuilder<H extends HashBuilder<?>>
      * @return this builder
      * @since 1.0.0
      */
-    public H addPepper(String pepper)
+    public HashBuilder addPepper(String pepper)
     {
         this.pepper = pepper;
-        return (H) this;
+        return this;
     }
 
     /**

@@ -76,19 +76,19 @@ public class PropertyReaderTest
         // WHEN
         int backslash = PropertyReader.readChar(key, '/');
         int slash = PropertyReader.readChar(key + "abc", '/');
+        int backslash2 = PropertyReader.readChar(key, '/', null);
+        int slash2 = PropertyReader.readChar(key + "abc", '/', null);
 
         // THEN
         Assert.assertEquals('\\', backslash);
         Assert.assertEquals('/', slash);
+        Assert.assertEquals('\\', backslash2);
+        Assert.assertEquals('/', slash2);
     }
 
     @Test(expected = BadParametersException.class)
     public void testNull()
     {
-        // GIVEN
-        String key = "test.string";
-
-        // WHEN
-        String testString = PropertyReader.readString(null, "null", null);
+       PropertyReader.readString(null, "null", null);
     }
 }

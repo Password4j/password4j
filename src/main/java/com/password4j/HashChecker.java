@@ -22,21 +22,18 @@ import org.apache.commons.lang3.StringUtils;
  * Builder class that helps to create a chain of parameters to be used
  * in the verification process.
  *
- * @param <C> extends HashChecker.
  * @author David Bertoldi
  * @since 1.0.0
  */
-public class HashChecker<C extends HashChecker<?>>
+public class HashChecker
 {
-    private String hash;
+    private String hashed;
 
     private String salt;
 
     private String pepper;
 
     private CharSequence plainTextPassword;
-
-    private boolean autoUpdate = false;
 
     @SuppressWarnings("unused")
     private HashChecker()
@@ -46,12 +43,12 @@ public class HashChecker<C extends HashChecker<?>>
 
     /**
      * @param plainTextPassword the plain text password
-     * @param hash              the hash to verify
+     * @param hashed            the hash to verify
      * @since 1.0.0
      */
-    public HashChecker(CharSequence plainTextPassword, String hash)
+    public HashChecker(CharSequence plainTextPassword, String hashed)
     {
-        this.hash = hash;
+        this.hashed = hashed;
         this.plainTextPassword = plainTextPassword;
     }
 
@@ -63,10 +60,10 @@ public class HashChecker<C extends HashChecker<?>>
      * @return this builder
      * @since 1.0.0
      */
-    public C addPepper(String pepper)
+    public HashChecker addPepper(String pepper)
     {
         this.pepper = pepper;
-        return (C) this;
+        return this;
     }
 
     /**
@@ -76,10 +73,10 @@ public class HashChecker<C extends HashChecker<?>>
      * @return this builder
      * @see PepperGenerator#get()
      */
-    public C addPepper()
+    public HashChecker addPepper()
     {
         this.pepper = PepperGenerator.get();
-        return (C) this;
+        return this;
     }
 
     /**
@@ -90,18 +87,17 @@ public class HashChecker<C extends HashChecker<?>>
      * @return this builder
      * @since 1.0.0
      */
-    public C addSalt(String salt)
+    public HashChecker addSalt(String salt)
     {
         this.salt = salt;
-        return (C) this;
+        return this;
     }
 
-    public HashUpdate autoUpdate(HashingFunction hashingFunction)
+    public HashUpdater hashAgain()
     {
-
-        autoUpdate = true;
-        return (C) this;
+        return new HashUpdater(this, new HashBuilder(plainTextPassword).addPepper(pepper).addSalt(salt));
     }
+
 
     /**
      * Check if the previously given hash was produced from the given plain text password
@@ -126,14 +122,7 @@ public class HashChecker<C extends HashChecker<?>>
             peppered = Utilities.append(this.pepper, peppered);
         }
 
-        boolean result = hashingFunction.check(peppered, hash, salt);
-
-        if(autoUpdate || PropertyReader.readBoolean("global.autoupdate", false))
-        {
-
-        }
-
-        return result;
+        return hashingFunction.check(peppered, hashed, salt);
     }
 
     /**
@@ -203,5 +192,10 @@ public class HashChecker<C extends HashChecker<?>>
         return with(AlgorithmFinder.getBCryptInstance());
     }
 
+
+    protected String getHashed()
+    {
+        return hashed;
+    }
 
 }

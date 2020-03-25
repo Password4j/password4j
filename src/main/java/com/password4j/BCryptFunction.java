@@ -213,7 +213,7 @@ public class BCryptFunction extends AbstractHashingFunction
         }
         else
         {
-            BCryptFunction function = new BCryptFunction(BCrypt.A, logRounds);
+            BCryptFunction function = new BCryptFunction(type, logRounds);
             instances.put(uid, function);
             return function;
         }
@@ -277,15 +277,25 @@ public class BCryptFunction extends AbstractHashingFunction
         return this.logRounds == otherStrategy.logRounds;
     }
 
+    public int getLogarithmicRounds()
+    {
+        return logRounds;
+    }
+
+    public BCrypt getType()
+    {
+        return type;
+    }
+
     @Override
     public String toString()
     {
-        return getClass().getName() + '[' + getUID(type, logRounds) + ']';
+        return getClass().getSimpleName() + '[' + getUID(type, logRounds) + ']';
     }
 
     protected static String getUID(BCrypt type, int logRounds)
     {
-        return String.valueOf(type.minor() + '|' + logRounds);
+        return type.minor() + "|" + logRounds;
     }
 
     @Override

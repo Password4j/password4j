@@ -183,6 +183,21 @@ public class SCryptFunction extends AbstractHashingFunction
         return 128L * workFactor * resources * parallelization;
     }
 
+    public int getWorkFactor()
+    {
+        return workFactor;
+    }
+
+    public int getResources()
+    {
+        return resources;
+    }
+
+    public int getParallelization()
+    {
+        return parallelization;
+    }
+
     /**
      * A more readable version of {@link #getRequiredMemory()},
      * changing the unit (B, KB, MB) so that the number has at most
@@ -222,7 +237,7 @@ public class SCryptFunction extends AbstractHashingFunction
     @Override
     public String toString()
     {
-        return getClass().getName() + '[' + getUID(this.resources, this.workFactor, this.parallelization) + ']';
+        return getClass().getSimpleName() + '[' + getUID(this.resources, this.workFactor, this.parallelization) + ']';
     }
 
     @Override
@@ -233,7 +248,7 @@ public class SCryptFunction extends AbstractHashingFunction
 
     protected static String getUID(int resources, int workFactor, int parallelization)
     {
-        return String.valueOf(resources + '|' + workFactor + '|' + parallelization);
+        return workFactor + "|" + resources + "|" + parallelization;
     }
 
     /**

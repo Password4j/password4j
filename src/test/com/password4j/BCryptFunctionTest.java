@@ -502,5 +502,20 @@ public class BCryptFunctionTest
         Assert.assertFalse(BCryptFunction.equalsNoEarlyReturn("test", "pass"));
     }
 
+    @Test
+    public void testAccessors()
+    {
+        // GIVEN
+        int logRounds = 7;
+        BCrypt type = BCrypt.Y;
+
+        // WHEN
+        BCryptFunction bcrypt = BCryptFunction.getInstance(type, logRounds);
+
+        // THEN
+        Assert.assertEquals(logRounds, bcrypt.getLogarithmicRounds());
+        Assert.assertEquals(type, bcrypt.getType());
+        Assert.assertEquals("BCryptFunction[y|7]", bcrypt.toString());
+    }
 
 }

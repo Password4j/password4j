@@ -224,7 +224,7 @@ public class PBKDF2Function extends AbstractHashingFunction
     @Override
     public String toString()
     {
-        return getClass().getName() + '[' + getUID(this.algorithm, this.iterations, this.length) + ']';
+        return getClass().getSimpleName() + '[' + getUID(this.algorithm, this.iterations, this.length) + ']';
     }
 
     @Override
@@ -235,7 +235,7 @@ public class PBKDF2Function extends AbstractHashingFunction
 
     protected static String getUID(Hmac algorithm, int iterations, int length)
     {
-        return String.valueOf(algorithm.code()) + '|' + iterations + '|' + length;
+        return algorithm.code() + "|" + iterations + "|" + length;
     }
 
 }

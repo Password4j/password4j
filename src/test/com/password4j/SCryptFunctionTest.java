@@ -187,4 +187,22 @@ public class SCryptFunctionTest
         new SCryptFunction(16384, 8, 1).check("password", "$s0e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==");
     }
 
+    @Test
+    public void testAccessors()
+    {
+        // GIVEN
+        int workFactor = 3;
+        int resources = 5;
+        int parallelization = 7;
+
+        // WHEN
+        SCryptFunction scrypt = SCryptFunction.getInstance(workFactor, resources,parallelization);
+
+        // THEN
+        Assert.assertEquals(workFactor, scrypt.getWorkFactor());
+        Assert.assertEquals(resources, scrypt.getResources());
+        Assert.assertEquals(parallelization, scrypt.getParallelization());
+        Assert.assertEquals("SCryptFunction[3|5|7]", scrypt.toString());
+    }
+
 }

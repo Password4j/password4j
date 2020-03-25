@@ -260,15 +260,35 @@ public class PBKDF2FunctionTest
         {
             String password = PepperGenerator.generate(12);
             String salt = PepperGenerator.generate(i);
-            Hash hash = CompressedPBKDF2Function.getInstance(algorithm, 100*i, algorithm.bits()).hash(password, salt);
+            Hash hash = CompressedPBKDF2Function.getInstance(algorithm, 100 * i, algorithm.bits()).hash(password, salt);
 
-            Hash notCompressedHash = PBKDF2Function.getInstance(algorithm, 100*i, algorithm.bits()).hash(password, salt);
+            Hash notCompressedHash = PBKDF2Function.getInstance(algorithm, 100 * i, algorithm.bits()).hash(password, salt);
 
-            String params = Long.toString((((long) 100*i) << 32) | (algorithm.bits() & 0xffffffffL));
+            String params = Long.toString((((long) 100 * i) << 32) | (algorithm.bits() & 0xffffffffL));
             String expected = "$" + algorithm.code() + "$" + params + "$" + Base64.getEncoder().encodeToString(salt.getBytes()) + "$" + notCompressedHash.getResult();
 
             Assert.assertEquals(expected, hash.getResult());
         }
+    }
+
+    @Test
+    public void testAccessors()
+    {
+        // GIVEN
+        Hmac hmac = Hmac.SHA384;
+        int iterations = 5;
+        int length = 7;
+
+        // WHEN
+        PBKDF2Function pbkdf2 = PBKDF2Function.getInstance(hmac, iterations, length);
+        CompressedPBKDF2Function compressed = CompressedPBKDF2Function.getInstance(hmac, iterations, length);
+
+        // THEN
+        Assert.assertEquals(hmac, pbkdf2.getAlgorithm());
+        Assert.assertEquals(iterations, pbkdf2.getIterations());
+        Assert.assertEquals(length, pbkdf2.getLength());
+        Assert.assertEquals("PBKDF2Function[4|5|7]", pbkdf2.toString());
+        Assert.assertEquals("CompressedPBKDF2Function[4|5|7]", compressed.toString());
     }
 
 }

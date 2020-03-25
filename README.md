@@ -1,7 +1,7 @@
 ![logo](https://i.imgur.com/BAAwsxr.png "Password4j logo")
 
 [![Build Status](https://travis-ci.org/Password4j/password4j.svg?branch=master)](https://travis-ci.org/Password4j/password4j)
-[![Maven Central](https://img.shields.io/maven-central/v/com.password4j/password4j)](https://search.maven.org/artifact/com.password4j/password4j/1.3.0/jar)
+[![Maven Central](https://img.shields.io/maven-central/v/com.password4j/password4j)](https://search.maven.org/artifact/com.password4j/password4j/1.3.1/jar)
 [![javadoc](https://javadoc.io/badge2/com.password4j/password4j/javadoc.svg)](https://javadoc.io/doc/com.password4j/password4j)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -34,7 +34,7 @@ Add the dependency of the latest version to your `pom.xml`:
 <dependency>
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.3.0</version>
+    <version>1.3.1</version>
 </dependency>
 ```
 
@@ -46,14 +46,14 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.password4j:password4j:1.3.0'
+    implementation 'com.password4j:password4j:1.3.1'
 }
 ```
 
 ## ![Scala SBT](https://i.imgur.com/Nqv3mVd.png?1) Scala SBT 
 Add to the managed dependencies of your `build.sbt` the latest version:
 ```shell script
-libraryDependencies += "com.password4j" % "password4j" % "1.3.0"
+libraryDependencies += "com.password4j" % "password4j" % "1.3.1"
 ```
 
 # Usage

@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.1](https://github.com/Password4j/password4j/releases/tag/1.3.1) - (2020-03-25)
+### Fixed
+ *  `toString()` of some `HashingFunction` produced non-unique output ([#3](../../issues/3))
+ *  added missing getters for some `HashingFunction`s ([#4](../../issues/4))
+
 ## [1.3.0](https://github.com/Password4j/password4j/releases/tag/1.3.0) - (2020-03-19)
 ### Added
  * Capability of updating the hash (re-hash) with a new configuration just after the verification process

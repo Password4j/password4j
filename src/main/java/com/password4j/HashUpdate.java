@@ -17,8 +17,6 @@
 
 package com.password4j;
 
-import java.util.Objects;
-
 /**
  * This class represents the result of the password verification process
  * along with the generated {@link Hash}.

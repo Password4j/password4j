@@ -93,7 +93,7 @@ public class StringTest
     {
         SecureString ss = new SecureString(new char[0]);
 
-        Assert.assertEquals("SecureString[]", ss.toString());
+        Assert.assertEquals("SecureString[****]", ss.toString());
         Assert.assertEquals(0, ss.length());
         try
         {

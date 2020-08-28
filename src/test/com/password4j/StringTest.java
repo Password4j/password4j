@@ -139,12 +139,12 @@ public class StringTest
         String str = new String(password);
         SecureString ss = new SecureString(password);
 
-        Assert.assertTrue(ss.equals(str));
-        Assert.assertFalse(ss.equals(null));
-        Assert.assertTrue(ss.equals(CharBuffer.wrap(password)));
-        Assert.assertFalse(ss.equals("abc"));
-        Assert.assertFalse(ss.equals("cbad"));
-        Assert.assertTrue(ss.equals(ss));
+        Assert.assertEquals(ss, str);
+        Assert.assertNotEquals(null, ss);
+        Assert.assertEquals(ss, CharBuffer.wrap(password));
+        Assert.assertNotEquals("abc", ss);
+        Assert.assertNotEquals("cbad", ss);
+        Assert.assertEquals(ss, ss);
         Assert.assertEquals(Arrays.hashCode(password), ss.hashCode());
     }
 

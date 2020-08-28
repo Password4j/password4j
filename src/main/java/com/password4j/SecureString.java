@@ -139,20 +139,17 @@ public class SecureString implements CharSequence
     }
 
     /**
+     * Returns a constant {@link String} in order to prevent data leaks due
+     * to accidental usage of a {@link SecureString} objects in methods like
+     * {@link java.io.PrintStream#print(Object)}, loggers, etc.
+     *
      * @return a masked version of this object.
      * @since 1.2.0
      */
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder(chars.length + 2);
-        sb.append("SecureString[");
-        for (int i = 0; i < chars.length; i++)
-        {
-            sb.append('*');
-        }
-        sb.append(']');
-        return sb.toString();
+        return "SecureString[****]";
     }
 
     /**

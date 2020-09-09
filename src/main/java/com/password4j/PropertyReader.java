@@ -145,7 +145,7 @@ class PropertyReader
     }
 
 
-    private static InputStream getResource(String resource)
+    static InputStream getResource(String resource)
     {
         ClassLoader classLoader;
         InputStream in;

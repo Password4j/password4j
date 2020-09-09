@@ -36,6 +36,7 @@ public class PropertyReaderTest
     @Before
     public void setup()
     {
+        Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
         System.clearProperty("psw4j.configuration");
         PropertyReader.init();
     }
@@ -154,6 +155,17 @@ public class PropertyReaderTest
         // THEN
         Assert.assertFalse(PropertyReader.properties.isEmpty());
         Assert.assertEquals("hello!!", PropertyReader.readString("check.this.out", "kappa", null));
+    }
+
+    @Test
+    public void testResource1()
+    {
+        // GIVEN
+
+        // WHEN
+        InputStream in = PropertyReader.getResource("PropertyReader.class");
+        // THEN
+        Assert.assertNotNull(in);
     }
 
 }

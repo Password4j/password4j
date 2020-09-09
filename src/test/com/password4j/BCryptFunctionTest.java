@@ -245,7 +245,37 @@ public class BCryptFunctionTest
         {
             Hash hash = BCryptFunction.getInstance(test.rounds).hash(test.password, test.salt);
             Assert.assertEquals(hash.getResult(), test.expected);
+
+            int rounds = BCryptFunction.getInstanceFromHash(test.expected).getLogarithmicRounds();
+            Assert.assertEquals(test.rounds, rounds);
         }
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadFromHash1()
+    {
+        // GIVEN
+        String hash = "$2yS06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq";
+
+        // WHEN
+        BCryptFunction function = BCryptFunction.getInstanceFromHash(hash);
+
+        // THEN
+        Assert.assertEquals(6, function.getLogarithmicRounds());
+    }
+
+
+    @Test(expected = BadParametersException.class)
+    public void testBadFromHash2()
+    {
+        // GIVEN
+        String hash = "$a$06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq";
+
+        // WHEN
+        BCryptFunction function = BCryptFunction.getInstanceFromHash(hash);
+
+        // THEN
+        Assert.assertEquals(6, function.getLogarithmicRounds());
     }
 
 
@@ -267,6 +297,12 @@ public class BCryptFunctionTest
                 Assert.assertEquals(hashed2.getResult(), hashed1.getResult());
             }
         }
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void generateBadSalt()
+    {
+        BCryptFunction.generateSalt("S2", 10);
     }
 
 
@@ -444,6 +480,18 @@ public class BCryptFunctionTest
 
         // WHEN
         BCryptFunction.getInstance(10).hash(password, badSalt3);
+    }
+
+
+    @Test(expected = BadParametersException.class)
+    public void testBadSalt5()
+    {
+        // GIVEN
+        String password = "password";
+        String badSalt3 = "$2b$06%ehKGYiS4wt2HAr7KQXS5z.";
+
+        // WHEN
+        BCryptFunction.getInstance(10).cryptRaw(password.getBytes(), badSalt3.getBytes(), 6, false, 1);
     }
 
 

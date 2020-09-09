@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.3.2](https://github.com/Password4j/password4j/releases/tag/1.3.2) - (2020-03-25)
+## [1.3.2](https://github.com/Password4j/password4j/releases/tag/1.3.2) - (2020-09-09)
 ### Fixed
  *  The location of the configuration file is now customizable ([#5](../../issues/5))
 ### Security

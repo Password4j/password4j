@@ -296,7 +296,7 @@ public class PasswordTest
     public void testSecureNeverNull() throws ClassNotFoundException
     {
         // GIVEN
-        PropertyReader.PROPERTIES.put("global.random.strong", "true");
+        PropertyReader.properties.put("global.random.strong", "true");
 
         // WHEN
         SecureRandom sr = AlgorithmFinder.getSecureRandom();
@@ -304,7 +304,7 @@ public class PasswordTest
         // THEN
         Assert.assertNotNull(sr);
 
-        PropertyReader.PROPERTIES.put("global.random.strong", "false");
+        PropertyReader.properties.put("global.random.strong", "false");
 
     }
 

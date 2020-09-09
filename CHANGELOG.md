@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.2](https://github.com/Password4j/password4j/releases/tag/1.3.2) - (2020-03-25)
+### Fixed
+ *  The location of the configuration file is now customizable ([#5](../../issues/5))
+### Security
+ *  `SecureString.toString()` now hides the length of the string ([#6](../../issues/6))
+
 ## [1.3.1](https://github.com/Password4j/password4j/releases/tag/1.3.1) - (2020-03-25)
 ### Fixed
  *  `toString()` of some `HashingFunction` produced non-unique output ([#3](../../issues/3))

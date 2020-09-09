@@ -16,12 +16,31 @@
  */
 package com.password4j;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Properties;
 
 
 public class PropertyReaderTest
 {
+
+    @After
+    @Before
+    public void setup()
+    {
+        Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
+        System.clearProperty("psw4j.configuration");
+        PropertyReader.init();
+    }
+
     @Test
     public void testInt()
     {
@@ -91,4 +110,62 @@ public class PropertyReaderTest
     {
        PropertyReader.readString(null, "null", null);
     }
+
+    @Test
+    public void testInitInvalidPath()
+    {
+        // GIVEN
+        System.setProperty("psw4j.configuration", "/my/improbable/path/xyz.properties");
+
+        // WHEN
+        PropertyReader.init();
+
+        // THEN
+        Assert.assertTrue(PropertyReader.properties.isEmpty());
+    }
+
+    @Test
+    public void testInitCustomPath() throws Exception
+    {
+        // GIVEN
+        String path = new File(".").getCanonicalPath() + "/src/test/my/custom/path/to/some.properties";
+        System.out.println(path);
+        System.setProperty("psw4j.configuration", path);
+
+        // WHEN
+        PropertyReader.init();
+
+        // THEN
+        Assert.assertFalse(PropertyReader.properties.isEmpty());
+        Assert.assertEquals("hello!!", PropertyReader.readString("check.this.out", "kappa", null));
+    }
+
+    @Test
+    public void testNoThreadClassLoader() throws Exception
+    {
+        // GIVEN
+        String path = new File(".").getCanonicalPath() + "/src/test/my/custom/path/to/some.properties";
+        System.out.println(path);
+        System.setProperty("psw4j.configuration", path);
+        Thread.currentThread().setContextClassLoader(null);
+
+        // WHEN
+        PropertyReader.init();
+
+        // THEN
+        Assert.assertFalse(PropertyReader.properties.isEmpty());
+        Assert.assertEquals("hello!!", PropertyReader.readString("check.this.out", "kappa", null));
+    }
+
+    @Test
+    public void testResource1()
+    {
+        // GIVEN
+
+        // WHEN
+        InputStream in = PropertyReader.getResource("PropertyReader.class");
+        // THEN
+        Assert.assertNotNull(in);
+    }
+
 }

@@ -94,7 +94,7 @@ boolean verified = Password.check(password, hash).withBCrypt();
 Salt and pepper may be optionally added to the builder (PBKDF2 in this case): 
 
 ```java
-/ Verify with PBKDF2.
+// Verify with PBKDF2.
 boolean verification = Password.check(password, hash).withPBKDF2();
 
 // Verify with PBKDF2 and manually provided salt.

@@ -40,7 +40,7 @@ public class PBKDF2Function extends AbstractHashingFunction
 
     private int length;
 
-    private static Map<String, PBKDF2Function> instances = new ConcurrentHashMap<>();
+    private static final Map<String, PBKDF2Function> INSTANCES = new ConcurrentHashMap<>();
 
     private static final String ALGORITHM_PREFIX = "PBKDF2WithHmac";
 
@@ -74,14 +74,14 @@ public class PBKDF2Function extends AbstractHashingFunction
     public static PBKDF2Function getInstance(Hmac algorithm, int iterations, int length)
     {
         String key = getUID(algorithm, iterations, length);
-        if (instances.containsKey(key))
+        if (INSTANCES.containsKey(key))
         {
-            return instances.get(key);
+            return INSTANCES.get(key);
         }
         else
         {
             PBKDF2Function function = new PBKDF2Function(algorithm, iterations, length);
-            instances.put(key, function);
+            INSTANCES.put(key, function);
             return function;
         }
     }
@@ -153,6 +153,13 @@ public class PBKDF2Function extends AbstractHashingFunction
         return secretKeyFactory.generateSecret(spec);
     }
 
+    /**
+     * Overridable PBKDF2 generator
+     *
+     * @param key secret key
+     * @param salt cryptographic salt
+     * @return the PBKDF2 hash string
+     */
     protected String getHash(SecretKey key, String salt)
     {
         return Base64.getEncoder().encodeToString(key.getEncoded());

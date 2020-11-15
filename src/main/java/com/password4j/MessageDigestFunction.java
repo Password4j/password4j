@@ -46,12 +46,28 @@ public class MessageDigestFunction extends AbstractHashingFunction
         this.saltOption = saltOption;
     }
 
+    /**
+     * Creates a singleton instance, depending on the provided
+     * algorithm, number of iterations and key length.
+     *
+     * @param algorithm  message digest algorithm
+     * @return a singleton instance
+     * @since 1.4.0
+     */
     public static MessageDigestFunction getInstance(String algorithm)
     {
         return getInstance(algorithm, DEFAULT_SALT_OPTION);
     }
 
-
+    /**
+     * Creates a singleton instance, depending on the provided
+     * algorithm, number of iterations and key length.
+     *
+     * @param algorithm  hmac algorithm
+     * @param saltOption a configuration that specifies how the salt is concatenated to the plain text password
+     * @return a singleton instance
+     * @since 1.4.0
+     */
     public static MessageDigestFunction getInstance(String algorithm, SaltOption saltOption)
     {
         String key = getUID(algorithm, saltOption);

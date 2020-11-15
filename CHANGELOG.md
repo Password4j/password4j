@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.4.0](https://github.com/Password4j/password4j/releases/tag/1.4.0) - (2020-11-15)
+### Added
+ * CHFs like MD5, SHA-1, SHA-2 and SHA-3 in order to increase compatibility with legacy systems.
+### Changed
+ * `PBKDF2Function.getAlgorithm()` returns a `String` instead of an `Hmac` enum. This make `PBKDF2Function.toString()` and `CompressedPBKDF2Function.toString()` more readable. 
+ * `SystemChecker.isPBKDF2Supported()` accepts a `String` instead of an `Hmac` enum.
+### Fixed
+ * Some typos along the code.
+
 ## [1.3.2](https://github.com/Password4j/password4j/releases/tag/1.3.2) - (2020-09-09)
 ### Fixed
  *  The location of the configuration file is now customizable ([#5](../../issues/5))

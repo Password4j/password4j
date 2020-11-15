@@ -130,6 +130,35 @@ if(update.isVerified())
 }
 ```
 
+## Unsecure Algorithms
+Many systems may still use unsecure algorithms for storing the passwords, like [MD5](https://en.wikipedia.org/wiki/MD5) or [SHA-256](https://en.wikipedia.org/wiki/SHA-2).
+You can easily migrate to stronger algorithms with Password4j
+```java
+MessageDigestFunction md = MessageDigestFunction.getInstance("SHA-256");
+HashUpdate update = Password.check(password, hash).update().withSCrypt(md);
+
+if(update.isVerified())
+{
+    Hash newHash = update.getHash();
+}
+```
+
+## List of supported algorithms
+| Key derivation Functions | Since | Notes                                                |
+|--------------------------|-------|------------------------------------------------------|
+| PBKDF2                   | 1.0.0 | Depending on the Security Services your JVM provides |
+| BCrypt                   | 1.0.0 |                                                      |
+| SCrypt                   | 1.0.0 |                                                      |
+| Argon2                   | TBA   |                                                      |
+
+| Cryptographic Hash Functions | Since | Notes                                                 |
+|------------------------------|-------|-------------------------------------------------------|
+| MD Family                    | 1.4.0 |                                                       |
+| SHA1 Family                  | 1.4.0 |                                                       |
+| SHA2 Family                  | 1.4.0 |                                                       |
+| SHA3 FAmily                  | 1.4.0 | Depending on the Security Providers your JVM provides |
+
+
 ## Security of Strings
 `String`s are immutable objects and they are stored in the String Pool, a location in the heap memory.
 Since you do not have control on the Garbage Collector, an attacker that has access to the memory could read the password
@@ -194,6 +223,12 @@ hash.scrypt.workfactor=16384
 hash.scrypt.resources=16
 # p
 hash.scrypt.parallelization=1
+
+### Legacy
+# algorithm
+hash.md.algorithm=SHA-512
+# append/prepend salt
+hash.md.salt.option=append
 ```
 Additionally you can define here your shared pepper
 ```properties

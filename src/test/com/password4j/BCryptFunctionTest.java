@@ -278,6 +278,19 @@ public class BCryptFunctionTest
         Assert.assertEquals(6, function.getLogarithmicRounds());
     }
 
+    @Test
+    public void testFromHash()
+    {
+        // GIVEN
+        String hash = "$2$06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq";
+
+        // WHEN
+        BCryptFunction function = BCryptFunction.getInstanceFromHash(hash);
+
+        // THEN
+        Assert.assertEquals(6, function.getLogarithmicRounds());
+    }
+
 
     /**
      * Test method for 'BCrypt.gensalt(int)'
@@ -300,9 +313,27 @@ public class BCryptFunctionTest
     }
 
     @Test(expected = BadParametersException.class)
-    public void generateBadSalt()
+    public void generateBadSalt1()
     {
         BCryptFunction.generateSalt("S2", 10);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void generateBadSalt2()
+    {
+        BCryptFunction.generateSalt("$2D", 10);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void generateBadSalt3()
+    {
+        BCryptFunction.generateSalt("$2" + BCrypt.A.minor(), 3);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void generateBadSalt4()
+    {
+        BCryptFunction.generateSalt("$2" + BCrypt.B.minor(), 32);
     }
 
 

@@ -145,15 +145,14 @@ public class StringTest
 
         Assert.assertTrue(((CharSequence) ss).equals(str) && ((CharSequence) ss).equals(CharBuffer.wrap(password)));
         Assert.assertNotEquals(null, ss);
-        Assert.assertNotEquals("abc", ss);
         Assert.assertNotEquals("cbad", ss);
-        Assert.assertTrue(new SecureString(password).equals(ss));
-        Assert.assertFalse(new SecureString(new char[] { 'b', 'b', 'b', 'b' }).equals(ss));
+        Assert.assertEquals(new SecureString(password), ss);
+        Assert.assertNotEquals(new SecureString(new char[] { 'b', 'b', 'b', 'b' }), ss);
         Assert.assertEquals(ss, ss);
         Assert.assertEquals(Arrays.hashCode(password), ss.hashCode());
 
-        Assert.assertFalse(ss.equals(123));
-        Assert.assertFalse(ss2.equals(ss));
+        Assert.assertNotEquals(ss, 123);
+        Assert.assertNotEquals(ss2, ss);
     }
 
     @Test

@@ -17,6 +17,8 @@
 
 package com.password4j;
 
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -78,7 +80,31 @@ public class SystemCheckTest
         //GIVEN
 
         // WHEN
-       SystemChecker.isPBKDF2Supported(Hmac.SHA256);
+       SystemChecker.isPBKDF2Supported(Hmac.SHA256.name());
+    }
+
+
+    @Test(expected = BadParametersException.class)
+    public void testWrongAlgs()
+    {
+        //GIVEN
+
+        // WHEN
+        SystemChecker.isMessageDigestSupported(null);
+    }
+
+    @Test
+    public void testAlgs()
+    {
+        //GIVEN
+
+        // WHEN
+        Set<String> mds = AlgorithmFinder.getAllMessageDigests();
+        for(String md : mds)
+        {
+            Assert.assertTrue(SystemChecker.isMessageDigestSupported(md));
+        }
+
     }
 
 

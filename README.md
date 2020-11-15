@@ -11,7 +11,8 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Password4j_password4j&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=Password4j_password4j)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Password4j_password4j&metric=coverage)](https://sonarcloud.io/dashboard?id=Password4j_password4j)
 
-Password4j is a Java utility package for hashing and checking passwords with different [Cryptographic hash function](https://en.wikipedia.org/wiki/Cryptographic_hash_function) (CHFs).
+Password4j is a Java utility package for hashing and checking passwords with different [Key derivation functions](https://en.wikipedia.org/wiki/Key_derivation_function) (KDFs) 
+and [Cryptographic hash functions](https://en.wikipedia.org/wiki/Cryptographic_hash_function) (CHFs).
 
 Algorithms can be configured **programmatically** or through a **property file** in your classpath <sup>see [Configuration section](#Configuration)</sup>.
 

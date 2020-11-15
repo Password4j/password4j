@@ -16,23 +16,24 @@
  */
 package com.password4j;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 
-public class PBKDF2FunctionTest
+public class MessageDigestFunctionTest
 {
 
 
     @Test
-    public void testPBKDF2()
+    public void testMD5()
     {
         // GIVEN
-        HashingFunction strategy = CompressedPBKDF2Function.getInstance(Hmac.SHA256, 10_000, 256);
+        HashingFunction strategy = MessageDigestFunction.getInstance("MD5");
         String password = "password";
         String salt = "abc";
 
@@ -40,32 +41,68 @@ public class PBKDF2FunctionTest
         Hash hash = strategy.hash(password, salt);
 
         // THEN
-        Assert.assertEquals("$3$42949672960256$YWJj$/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=", hash.getResult());
+        Assert.assertEquals("8223fe8dc0533c6ebbb717e7fda2833c", hash.getResult());
+    }
+
+
+    @Test
+    public void testMD5noSalt()
+    {
+        // GIVEN
+        HashingFunction strategy = MessageDigestFunction.getInstance("MD5");
+        String password = "password";
+
+        // WHEN
+        Hash hash = strategy.hash(password);
+
+        // THEN
+        Assert.assertEquals("5f4dcc3b5aa765d61d8327deb882cf99", hash.getResult());
     }
 
     @Test
-    public void testPBKDF2EachVariants()
+    public void testDifferentConcatenations()
     {
-        for (Hmac alg : Hmac.values())
+        // GIVEN
+        HashingFunction strategy1 = MessageDigestFunction.getInstance("MD5", SaltOption.PREPEND);
+        HashingFunction strategy2 = MessageDigestFunction.getInstance("MD5", SaltOption.APPEND);
+
+        String password = "password";
+        String salt = "abc";
+
+        // WHEN
+        Hash hash1 = strategy1.hash(password, salt);
+        Hash hash2 = strategy2.hash(password, salt);
+
+        // THEN
+        Assert.assertNotEquals(hash1.getResult(), hash2.getResult());
+    }
+
+    @Test
+    public void testMDVariants()
+    {
+        Set<String> algorithms = AlgorithmFinder.getAllMessageDigests();
+        for (String alg : algorithms)
         {
             // GIVEN
-            HashingFunction strategy = CompressedPBKDF2Function.getInstance(alg, 10_000, 256);
+            MessageDigestFunction strategy = MessageDigestFunction.getInstance(alg);
             String password = "password";
             String salt = "abc";
 
             // WHEN
-            Hash hash = strategy.hash(password, salt);
+            Hash hash = strategy.hash(password);
+            Hash hashWithSalt = strategy.hash(password, salt);
 
             // THEN
-            Assert.assertTrue(hash.getResult().startsWith("$" + alg.code() + "$"));
+            Assert.assertTrue(strategy.check(password, hash.getResult()));
+            Assert.assertTrue(strategy.check(password, hashWithSalt.getResult(), salt));
         }
     }
 
     @Test(expected = UnsupportedOperationException.class)
-    public void testPBKDF2WrongAlgorithm()
+    public void testMDWrongAlgorithm()
     {
         // GIVEN
-        HashingFunction strategy = PBKDF2Function.getInstance("notAnAlgorithm", 10_000, 256);
+        HashingFunction strategy = MessageDigestFunction.getInstance("notAnAlgorithm");
         String password = "password";
         String salt = "abc";
 
@@ -75,60 +112,6 @@ public class PBKDF2FunctionTest
         // THEN
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testPBKDF2WrongAlgorithm2()
-    {
-        // GIVEN
-        HashingFunction strategy = CompressedPBKDF2Function.getInstance("notAnAlgorithm", 10_000, 256);
-        String password = "password";
-        String salt = "abc";
-
-        // WHEN
-        strategy.hash(password, salt);
-
-        // THEN
-    }
-
-    @Test(expected = BadParametersException.class)
-    public void testPBKDF2WrongSalt()
-    {
-        // GIVEN
-        HashingFunction strategy = PBKDF2Function.getInstance(Hmac.SHA224, 10_000, 224);
-        String password = "password";
-        String salt = new String(new byte[0]);
-
-        // WHEN
-        strategy.hash(password, salt);
-
-        // THEN
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testPBKDF2WrongAlgorithmSalt()
-    {
-        // GIVEN
-        HashingFunction strategy = PBKDF2Function.getInstance("notAnAlgorithm", 10_000, 256);
-        String password = "password";
-        String salt = new String(new byte[0]);
-
-        // WHEN
-        strategy.hash(password, salt);
-
-        // THEN
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testPBKDF2WrongCheck()
-    {
-        // GIVEN
-        HashingFunction strategy = AlgorithmFinder.getPBKDF2Instance();
-        String password = "password";
-        String salt = "salt";
-        Hash hash = strategy.hash(password, salt);
-
-        // WHEN
-        strategy.check(password, hash.getResult());
-    }
 
     @Test
     public void testPBKDF2Check()

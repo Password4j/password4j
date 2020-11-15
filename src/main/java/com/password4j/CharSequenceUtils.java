@@ -22,10 +22,12 @@ import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-class Utilities
+class CharSequenceUtils
 {
 
-    private Utilities()
+    private static final char[] HEX_ALPHABET = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+
+    private CharSequenceUtils()
     {
         //
     }
@@ -80,6 +82,19 @@ class Utilities
 
         return new SecureString(result);
 
+    }
+
+    static String toHex(byte[] bytes)
+    {
+        final int length = bytes.length;
+        final char[] output = new char[length << 1];
+        int j = 0;
+        for (byte aByte : bytes)
+        {
+            output[j++] = HEX_ALPHABET[(0xF0 & aByte) >>> 4];
+            output[j++] = HEX_ALPHABET[0x0F & aByte];
+        }
+        return new String(output);
     }
 
 

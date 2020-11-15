@@ -112,7 +112,7 @@ public class Password
         CharSequence peppered = plainTextPassword;
         if (StringUtils.isNotEmpty(hashObject.getPepper()))
         {
-            peppered = Utilities.append(hashObject.getPepper(), peppered);
+            peppered = CharSequenceUtils.append(hashObject.getPepper(), peppered);
         }
 
         return hashObject.getHashingFunction().check(peppered, hashObject.getResult(), hashObject.getSalt());

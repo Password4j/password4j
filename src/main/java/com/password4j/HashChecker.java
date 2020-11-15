@@ -119,7 +119,7 @@ public class HashChecker
         CharSequence peppered = plainTextPassword;
         if (StringUtils.isNotEmpty(this.pepper))
         {
-            peppered = Utilities.append(this.pepper, peppered);
+            peppered = CharSequenceUtils.append(this.pepper, peppered);
         }
 
         return hashingFunction.check(peppered, hashed, salt);
@@ -190,6 +190,22 @@ public class HashChecker
     public boolean withBCrypt()
     {
         return with(AlgorithmFinder.getBCryptInstance());
+    }
+
+    /**
+     * Check if the previously given hash was produced from the given plain text password
+     * with {@link MessageDigestFunction}.
+     * <p>
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
+     * then the default parameters are used.
+     *
+     * @return true if the hash was produced by the given plain text password; false otherwise.
+     * @see AlgorithmFinder#getMessageDigestInstance()
+     * @since 1.4.0
+     */
+    public boolean withMessageDigest()
+    {
+        return with(AlgorithmFinder.getMessageDigestInstance());
     }
 
 

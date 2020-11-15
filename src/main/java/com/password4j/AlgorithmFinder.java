@@ -26,6 +26,8 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 
 /**
  * This utility class finds algorithms with their configuration
@@ -223,7 +225,7 @@ public class AlgorithmFinder
      */
     public static BCryptFunction getBCryptInstance()
     {
-        char minor = PropertyReader.readChar("hash.bcrypt.minor", 'b', "BCrypt minor version is defined");
+        char minor = PropertyReader.readChar("hash.bcrypt.minor", 'b', "BCrypt minor version is not defined");
         int rounds = PropertyReader.readInt("hash.bcrypt.rounds", 10, "BCrypt rounds are not defined");
         return BCryptFunction.getInstance(BCrypt.valueOf(minor), rounds);
     }
@@ -269,6 +271,21 @@ public class AlgorithmFinder
         return SCryptFunction.getInstance(workFactor, resources, parallelization);
     }
 
+    public static MessageDigestFunction getMessageDigestInstance()
+    {
+        String algorithm = PropertyReader.readString("hash.md.algorithm", "SHA-512", "Message Digest algorithm is not defined");
+        String saltOption = PropertyReader.readString("hash.md.salt.option", "APPEND", "Salt option is not defined");
+        try
+        {
+            return MessageDigestFunction.getInstance(algorithm, SaltOption.valueOf(saltOption.toUpperCase()));
+        }
+        catch (IllegalArgumentException iae)
+        {
+            LOG.warn("{} is not a valid option. Fallback to default.", saltOption);
+            return MessageDigestFunction.getInstance(algorithm);
+        }
+    }
+
     /**
      * Finds the list of supported PBKDF2 algorithms by
      * the environment's {@link Provider}s.
@@ -290,6 +307,11 @@ public class AlgorithmFinder
             }
         }
         return result;
+    }
+
+    public static Set<String> getAllMessageDigests()
+    {
+        return Security.getAlgorithms("MessageDigest");
     }
 
     private static boolean useStrongRandom()

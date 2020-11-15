@@ -18,6 +18,8 @@
 package com.password4j;
 
 import java.util.List;
+import java.util.Set;
+
 
 /**
  * This class benchmarks the target environment.
@@ -46,14 +48,32 @@ public class SystemChecker
      * @param algorithm the algorithm to check
      * @return true if the algorithm is supported; false otherwise
      */
-    public static boolean isPBKDF2Supported(Hmac algorithm)
+    public static boolean isPBKDF2Supported(String algorithm)
     {
         if (algorithm == null)
         {
             throw new BadParametersException("Algorithm cannot be null.");
         }
         List<String> variants = AlgorithmFinder.getAllPBKDF2Variants();
-        return variants.stream().anyMatch(v -> algorithm.name().equals(v));
+        return variants.stream().anyMatch(algorithm::equals);
+    }
+
+    /**
+     * Verifies if the algorithm is supported by the current environment.
+     * Message digest algorithms are available if the JVM has a corresponding
+     * {@link java.security.Provider.Service}
+     *
+     * @param algorithm the algorithm to check
+     * @return true if the algorithm is supported; false otherwise
+     */
+    public static boolean isMessageDigestSupported(String algorithm)
+    {
+        if (algorithm == null)
+        {
+            throw new BadParametersException("Algorithm cannot be null.");
+        }
+        Set<String> mds = AlgorithmFinder.getAllMessageDigests();
+        return mds.stream().anyMatch(algorithm::equals);
     }
 
     /**

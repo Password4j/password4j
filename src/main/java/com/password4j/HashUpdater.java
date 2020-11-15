@@ -155,8 +155,7 @@ public class HashUpdater
      */
     public HashUpdate withPBKDF2()
     {
-        PBKDF2Function pbkdf2 = AlgorithmFinder.getPBKDF2Instance();
-        return withPBKDF2(pbkdf2);
+        return withPBKDF2(AlgorithmFinder.getPBKDF2Instance());
     }
 
 
@@ -176,8 +175,7 @@ public class HashUpdater
      */
     public HashUpdate withPBKDF2(HashingFunction newHashingFunction)
     {
-        PBKDF2Function pbkdf2 = AlgorithmFinder.getPBKDF2Instance();
-        return with(pbkdf2, newHashingFunction);
+        return with(AlgorithmFinder.getPBKDF2Instance(), newHashingFunction);
     }
 
     /**
@@ -294,5 +292,43 @@ public class HashUpdater
     public HashUpdate withSCrypt(HashingFunction newHashingFunction)
     {
         return with(SCryptFunction.getInstanceFromHash(hashChecker.getHashed()), newHashingFunction);
+    }
+
+    /**
+     * Hashes the previously given plain text password
+     * with {@link MessageDigestFunction}.
+     * <p>
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
+     * then the default parameters are used.
+     * <p>
+     * Finally calls {@link #with(HashingFunction, HashingFunction)}
+     *
+     * @return the result of the verification with the new hash
+     * @see AlgorithmFinder#getMessageDigestInstance()
+     * @see #with(HashingFunction, HashingFunction)
+     * @since 1.4.0
+     */
+    public HashUpdate withMessageDigest()
+    {
+        return withMessageDigest(AlgorithmFinder.getMessageDigestInstance());
+    }
+
+    /**
+     * Hashes the previously given plain text password
+     * with {@link MessageDigestFunction}.
+     * <p>
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
+     * then the default parameters are used.
+     * <p>
+     * Finally calls {@link #with(HashingFunction, HashingFunction)}
+     *
+     * @return the result of the verification with the new hash
+     * @see AlgorithmFinder#getMessageDigestInstance()
+     * @see #with(HashingFunction, HashingFunction)
+     * @since 1.4.0
+     */
+    public HashUpdate withMessageDigest(HashingFunction newHashingFunction)
+    {
+        return with(AlgorithmFinder.getMessageDigestInstance(), newHashingFunction);
     }
 }

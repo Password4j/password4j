@@ -120,7 +120,7 @@ public class SCryptFunction extends AbstractHashingFunction
         try
         {
             byte[] saltAsBytes = salt.getBytes(StandardCharsets.UTF_8);
-            byte[] derived = scrypt(Utilities.fromCharSequenceToBytes(plainTextPassword), saltAsBytes, 64);
+            byte[] derived = scrypt(CharSequenceUtils.fromCharSequenceToBytes(plainTextPassword), saltAsBytes, 64);
             String params = Long.toString(log2(workFactor) << 16 | resources << 8 | parallelization, 16);
             String sb = "$s0$" + params + '$' + Base64.getEncoder().encodeToString(saltAsBytes) + '$' + Base64.getEncoder()
                     .encodeToString(derived);
@@ -134,7 +134,7 @@ public class SCryptFunction extends AbstractHashingFunction
     }
 
     @Override
-    public boolean check(CharSequence plainTexPassword, String hashed)
+    public boolean check(CharSequence plainTextPassword, String hashed)
     {
         try
         {
@@ -143,7 +143,7 @@ public class SCryptFunction extends AbstractHashingFunction
             {
                 byte[] salt = Base64.getDecoder().decode(parts[3]);
                 byte[] derived0 = Base64.getDecoder().decode(parts[4]);
-                byte[] derived1 = scrypt(Utilities.fromCharSequenceToBytes(plainTexPassword), salt, 64);
+                byte[] derived1 = scrypt(CharSequenceUtils.fromCharSequenceToBytes(plainTextPassword), salt, 64);
                 if (derived0.length != derived1.length)
                 {
                     return false;
@@ -302,7 +302,7 @@ public class SCryptFunction extends AbstractHashingFunction
                 byte[] xyArray = new byte[256 * resources];
                 byte[] vArray = new byte[128 * resources * workFactor];
                 byte[] intensiveSalt = PBKDF2Function
-                        .internalHash(new String(passwd).toCharArray(), salt, Hmac.SHA256, 1,
+                        .internalHash(new String(passwd).toCharArray(), salt, Hmac.SHA256.name(), 1,
                                 8 * parallelization * 128 * resources).getEncoded();
 
                 for (int i = 0; i < parallelization; ++i)
@@ -311,7 +311,7 @@ public class SCryptFunction extends AbstractHashingFunction
                 }
 
                 return PBKDF2Function
-                        .internalHash(new String(passwd).toCharArray(), intensiveSalt, Hmac.SHA256, 1,
+                        .internalHash(new String(passwd).toCharArray(), intensiveSalt, Hmac.SHA256.name(), 1,
                                 8 * dkLen).getEncoded();
             }
         }

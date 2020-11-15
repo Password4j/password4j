@@ -55,6 +55,7 @@ import java.util.Objects;
  *
  * @author David Bertoldi
  * @see <a href="https://owasp.org/www-project-cheat-sheets/cheatsheets/Password_Storage_Cheat_Sheet">OWASP Password Storage Cheat Sheet</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Key_derivation_function">Key derivation function</a>
  * @see <a href="https://en.wikipedia.org/wiki/Cryptographic_hash_function">Cryptographic hash function</a>
  * @since 0.1.0
  */

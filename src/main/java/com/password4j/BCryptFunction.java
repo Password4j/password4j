@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentMap;
 public class BCryptFunction extends AbstractHashingFunction
 {
 
-    private static ConcurrentMap<String, BCryptFunction> instances = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, BCryptFunction> INSTANCES = new ConcurrentHashMap<>();
 
     private static final int BCRYPT_SALT_LEN = 16;
 
@@ -207,14 +207,14 @@ public class BCryptFunction extends AbstractHashingFunction
     public static BCryptFunction getInstance(BCrypt type, int logRounds)
     {
         String uid = getUID(type, logRounds);
-        if (instances.containsKey(uid))
+        if (INSTANCES.containsKey(uid))
         {
-            return instances.get(uid);
+            return INSTANCES.get(uid);
         }
         else
         {
             BCryptFunction function = new BCryptFunction(type, logRounds);
-            instances.put(uid, function);
+            INSTANCES.put(uid, function);
             return function;
         }
     }
@@ -254,9 +254,9 @@ public class BCryptFunction extends AbstractHashingFunction
     }
 
     @Override
-    public boolean check(CharSequence plainTexPassword, String hashed)
+    public boolean check(CharSequence plainTextPassword, String hashed)
     {
-        return checkPw(plainTexPassword, hashed);
+        return checkPw(plainTextPassword, hashed);
     }
 
     private Hash internalHash(CharSequence plainTextPassword, String salt)
@@ -677,7 +677,7 @@ public class BCryptFunction extends AbstractHashingFunction
      */
     protected String hashPw(CharSequence password, String salt)
     {
-        byte[] passwordb = Utilities.fromCharSequenceToBytes(password);
+        byte[] passwordb = CharSequenceUtils.fromCharSequenceToBytes(password);
 
         return hashPw(passwordb, salt);
     }

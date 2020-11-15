@@ -94,12 +94,27 @@ public class PasswordTest
         Assert.assertTrue(Password.check(PASSWORD, hashed).addPepper(PEPPER).withSCrypt());
     }
 
+
+    @Test
+    public void testRawCheck4()
+    {
+        // GIVEN
+        Hash hash = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withMessageDigest();
+        String hashed = hash.getResult();
+
+        // WHEN
+        MessageDigestFunction strategy = MessageDigestFunction.getInstance("SHA-512");
+
+        // THEN
+        Assert.assertTrue(strategy.check(PEPPER + PASSWORD + SALT, hashed));
+        Assert.assertTrue(Password.check(PASSWORD, hashed).addSalt(SALT).addPepper(PEPPER).withMessageDigest());
+    }
+
     @Test
     public void testRawUpdate1()
     {
         // GIVEN
         Hash hash = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withCompressedPBKDF2();
-        String hashed = hash.getResult();
 
         // WHEN
         HashUpdate update = Password.check(PASSWORD, hash.getResult()).addPepper(PEPPER).addSalt(SALT)
@@ -115,7 +130,6 @@ public class PasswordTest
     {
         // GIVEN
         Hash hash = Password.hash(PASSWORD).addPepper(PEPPER).withBCrypt();
-        String hashed = hash.getResult();
 
         // WHEN
         HashUpdate update = Password.check(PASSWORD, hash.getResult()).addPepper(PEPPER).addSalt(SALT)
@@ -131,7 +145,6 @@ public class PasswordTest
     {
         // GIVEN
         Hash hash = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withSCrypt();
-        String hashed = hash.getResult();
 
         // WHEN
         HashUpdate update = Password.check(PASSWORD, hash.getResult()).addPepper(PEPPER).addSalt(SALT)
@@ -140,6 +153,22 @@ public class PasswordTest
         // THEN
         Assert.assertTrue(update.isVerified());
         Assert.assertEquals(Password.hash(PASSWORD).addPepper("newpepper").addSalt("newsalt").withSCrypt().getResult(), update.getHash().getResult());
+    }
+
+
+    @Test
+    public void testRawUpdate4()
+    {
+        // GIVEN
+        Hash hash = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withMessageDigest();
+
+        // WHEN
+        HashUpdate update = Password.check(PASSWORD, hash.getResult()).addPepper(PEPPER).addSalt(SALT)
+                .andUpdate().addNewSalt("newsalt").addNewPepper("newpepper").withMessageDigest();
+
+        // THEN
+        Assert.assertTrue(update.isVerified());
+        Assert.assertEquals(Password.hash(PASSWORD).addPepper("newpepper").addSalt("newsalt").withMessageDigest().getResult(), update.getHash().getResult());
     }
 
     @Test
@@ -170,6 +199,25 @@ public class PasswordTest
         HashUpdate update = Password.check(PASSWORD, oldHash.getResult()).addPepper(PEPPER)
                 .andUpdate()
                 .with(AlgorithmFinder.getCompressedPBKDF2Instance(), AlgorithmFinder.getSCryptInstance());
+
+        boolean newCheck = Password.check(PASSWORD, update.getHash().getResult()).addPepper(PEPPER).withSCrypt();
+
+
+        // THEN
+        Assert.assertTrue(update.isVerified());
+        Assert.assertTrue(newCheck);
+    }
+
+    @Test
+    public void testMigration3()
+    {
+        // GIVEN
+        Hash oldHash = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withMessageDigest();
+
+        // WHEN
+        HashUpdate update = Password.check(PASSWORD, oldHash.getResult()).addPepper(PEPPER).addSalt(SALT)
+                .andUpdate()
+                .with(AlgorithmFinder.getMessageDigestInstance(), AlgorithmFinder.getSCryptInstance());
 
         boolean newCheck = Password.check(PASSWORD, update.getHash().getResult()).addPepper(PEPPER).withSCrypt();
 
@@ -336,7 +384,7 @@ public class PasswordTest
         PBKDF2Function strategy = CompressedPBKDF2Function.getInstanceFromHash(hashed);
 
         // THEN
-        Assert.assertTrue(strategy.check(Utilities.append(PEPPER, SECURE_PASSWORD), hashed));
+        Assert.assertTrue(strategy.check(CharSequenceUtils.append(PEPPER, SECURE_PASSWORD), hashed));
         Assert.assertTrue(Password.check(SECURE_PASSWORD, hashed).addPepper(PEPPER).withCompressedPBKDF2());
     }
 
@@ -351,7 +399,7 @@ public class PasswordTest
         BCryptFunction strategy = AlgorithmFinder.getBCryptInstance();
 
         // THEN
-        Assert.assertTrue(strategy.check(Utilities.append(PEPPER, SECURE_PASSWORD), hashed));
+        Assert.assertTrue(strategy.check(CharSequenceUtils.append(PEPPER, SECURE_PASSWORD), hashed));
         Assert.assertTrue(Password.check(SECURE_PASSWORD, hashed).addPepper(PEPPER).withBCrypt());
     }
 
@@ -366,7 +414,7 @@ public class PasswordTest
         SCryptFunction strategy = SCryptFunction.getInstanceFromHash(hashed);
 
         // THEN
-        Assert.assertTrue(strategy.check(Utilities.append(PEPPER, SECURE_PASSWORD), hashed));
+        Assert.assertTrue(strategy.check(CharSequenceUtils.append(PEPPER, SECURE_PASSWORD), hashed));
         Assert.assertTrue(Password.check(SECURE_PASSWORD, hashed).addPepper(PEPPER).withSCrypt());
     }
 

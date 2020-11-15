@@ -34,15 +34,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PBKDF2Function extends AbstractHashingFunction
 {
-    private Hmac algorithm;
-
-    private int iterations;
-
-    private int length;
-
     private static final Map<String, PBKDF2Function> INSTANCES = new ConcurrentHashMap<>();
 
     private static final String ALGORITHM_PREFIX = "PBKDF2WithHmac";
+
+    protected Hmac algorithm;
+
+    protected String algorithmAsString;
+
+    protected int iterations;
+
+    protected int length;
 
     protected PBKDF2Function()
     {
@@ -59,6 +61,13 @@ public class PBKDF2Function extends AbstractHashingFunction
     {
         this(iterations, length);
         this.algorithm = algorithm;
+        this.algorithmAsString = algorithm.name();
+    }
+
+    protected PBKDF2Function(String algorithm, int iterations, int length)
+    {
+        this(iterations, length);
+        this.algorithmAsString = algorithm;
     }
 
     /**
@@ -68,10 +77,27 @@ public class PBKDF2Function extends AbstractHashingFunction
      * @param algorithm  hmac algorithm
      * @param iterations number of iterations
      * @param length     length of the derived key
+     * @throws UnsupportedOperationException if ${@code algorithm} is not supported by your JVM
      * @return a singleton instance
      * @since 0.1.0
      */
     public static PBKDF2Function getInstance(Hmac algorithm, int iterations, int length)
+    {
+        return getInstance(algorithm.name(), iterations, length);
+    }
+
+    /**
+     * Creates a singleton instance, depending on the provided
+     * algorithm, number of iterations and key length.
+     *
+     * @param algorithm  string version of hmac algorithm
+     * @param iterations number of iterations
+     * @param length     length of the derived key
+     * @throws UnsupportedOperationException if ${@code algorithm} is not supported by your JVM
+     * @return a singleton instance
+     * @since 0.1.0
+     */
+    public static PBKDF2Function getInstance(String algorithm, int iterations, int length)
     {
         String key = getUID(algorithm, iterations, length);
         if (INSTANCES.containsKey(key))
@@ -83,28 +109,6 @@ public class PBKDF2Function extends AbstractHashingFunction
             PBKDF2Function function = new PBKDF2Function(algorithm, iterations, length);
             INSTANCES.put(key, function);
             return function;
-        }
-    }
-
-    /**
-     * Creates a singleton instance, depending on the provided
-     * algorithm, number of iterations and key length.
-     *
-     * @param algorithm  string veriong of hmac algorithm
-     * @param iterations number of iterations
-     * @param length     length of the derived key
-     * @return a singleton instance
-     * @since 0.1.0
-     */
-    public static PBKDF2Function getInstance(String algorithm, int iterations, int length)
-    {
-        try
-        {
-            return getInstance(Hmac.valueOf(algorithm), iterations, length);
-        }
-        catch (IllegalArgumentException iae)
-        {
-            throw new UnsupportedOperationException("Algorithm `" + algorithm + "` is not recognized.", iae);
         }
     }
 
@@ -120,7 +124,7 @@ public class PBKDF2Function extends AbstractHashingFunction
     {
         try
         {
-            SecretKey key = internalHash(plainTextPassword, salt, this.algorithm, this.iterations, this.length);
+            SecretKey key = internalHash(plainTextPassword, salt, this.algorithmAsString, this.iterations, this.length);
             return new Hash(this, getHash(key, salt), salt);
         }
         catch (NoSuchAlgorithmException nsae)
@@ -135,20 +139,20 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
     }
 
-    protected static SecretKey internalHash(CharSequence plainTextPassword, String salt, Hmac algorithm, int iterations, int length)
+    protected static SecretKey internalHash(CharSequence plainTextPassword, String salt, String algorithm, int iterations, int length)
             throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         if(salt == null)
         {
             throw new IllegalArgumentException("Salt cannot be null");
         }
-        return internalHash(Utilities.fromCharSequenceToChars(plainTextPassword), salt.getBytes(), algorithm, iterations, length);
+        return internalHash(CharSequenceUtils.fromCharSequenceToChars(plainTextPassword), salt.getBytes(), algorithm, iterations, length);
     }
 
-    protected static SecretKey internalHash(char[] plain, byte[] salt, Hmac algorithm, int iterations, int length)
+    protected static SecretKey internalHash(char[] plain, byte[] salt, String algorithm, int iterations, int length)
             throws NoSuchAlgorithmException, InvalidKeySpecException
     {
-        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(ALGORITHM_PREFIX + algorithm.name());
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(ALGORITHM_PREFIX + algorithm);
         PBEKeySpec spec = new PBEKeySpec(plain, salt, iterations, length);
         return secretKeyFactory.generateSecret(spec);
     }
@@ -173,34 +177,17 @@ public class PBKDF2Function extends AbstractHashingFunction
     }
 
     @Override
-    public boolean check(CharSequence plainTexPassword, String hashed)
+    public boolean check(CharSequence plainTextPassword, String hashed)
     {
         throw new UnsupportedOperationException(
                 "This implementation requires an explicit salt. Use check(CharSequence, String, String) method instead.");
 
     }
 
-    /**
-     * Compares two byte arrays in length-constant time. This comparison method
-     * is used so that password hashes cannot be extracted from an on-line
-     * system using a timing attack and then attacked off-line.
-     *
-     * @param a the first byte array
-     * @param b the second byte array
-     * @return true if both byte arrays are the same, false if not
-     */
-    protected static boolean slowEquals(byte[] a, byte[] b)
-    {
-        int diff = a.length ^ b.length;
-        for (int i = 0; i < a.length && i < b.length; i++)
-            diff |= a[i] ^ b[i];
-        return diff == 0;
-    }
 
-
-    public Hmac getAlgorithm()
+    public String getAlgorithm()
     {
-        return algorithm;
+        return algorithmAsString;
     }
 
     public int getIterations()
@@ -223,7 +210,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
 
         PBKDF2Function otherStrategy = (PBKDF2Function) obj;
-        return this.algorithm.equals(otherStrategy.algorithm) //
+        return this.algorithmAsString.equals(otherStrategy.algorithmAsString) //
                 && this.iterations == otherStrategy.iterations //
                 && this.length == otherStrategy.length;
     }
@@ -231,7 +218,7 @@ public class PBKDF2Function extends AbstractHashingFunction
     @Override
     public String toString()
     {
-        return getClass().getSimpleName() + '[' + getUID(this.algorithm, this.iterations, this.length) + ']';
+        return getClass().getSimpleName() + '[' + getUID(this.algorithmAsString, this.iterations, this.length) + ']';
     }
 
     @Override
@@ -240,9 +227,9 @@ public class PBKDF2Function extends AbstractHashingFunction
         return toString().hashCode();
     }
 
-    protected static String getUID(Hmac algorithm, int iterations, int length)
+    protected static String getUID(String algorithm, int iterations, int length)
     {
-        return algorithm.code() + "|" + iterations + "|" + length;
+        return algorithm + "|" + iterations + "|" + length;
     }
 
 }

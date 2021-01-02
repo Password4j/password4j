@@ -189,7 +189,7 @@ public class HashChecker
      */
     public boolean withBCrypt()
     {
-        return with(AlgorithmFinder.getBCryptInstance());
+        return with(BCryptFunction.getInstanceFromHash(hashed));
     }
 
     /**

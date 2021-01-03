@@ -31,7 +31,7 @@ public class BCryptFunctionTest
     public void testBCryptBadParams()
     {
         // GIVEN
-        HashingFunction strategy = new BCryptFunction(-1);
+        HashingFunction strategy = new BCryptFunction(BCrypt.Y,-1);
         String password = "password";
 
         // WHEN
@@ -47,7 +47,7 @@ public class BCryptFunctionTest
         String password = "password";
 
         // WHEN
-        Hash hash = new BCryptFunction(10).hash(password);
+        Hash hash = new BCryptFunction(BCrypt.A,10).hash(password);
 
         // THEN
         Assert.assertTrue(Password.check(password, hash));
@@ -61,7 +61,7 @@ public class BCryptFunctionTest
         String password = "password";
 
         // WHEN
-        Hash hash = new BCryptFunction(12).hash(password);
+        Hash hash = new BCryptFunction(BCrypt.A,12).hash(password);
 
         // THEN
         Assert.assertTrue(Password.check(password, hash));
@@ -71,11 +71,11 @@ public class BCryptFunctionTest
     public void testBCryptequality()
     {
         // GIVEN
-        BCryptFunction strategy1 = new BCryptFunction(10);
-        BCryptFunction strategy2 = new BCryptFunction(10);
-        BCryptFunction strategy3 = new BCryptFunction(15);
-        BCryptFunction strategy4 = new BCryptFunction(15);
-        BCryptFunction strategy5 = new BCryptFunction(8);
+        BCryptFunction strategy1 = new BCryptFunction(BCrypt.A,10);
+        BCryptFunction strategy2 = new BCryptFunction(BCrypt.A,10);
+        BCryptFunction strategy3 = new BCryptFunction(BCrypt.A,15);
+        BCryptFunction strategy4 = new BCryptFunction(BCrypt.A,15);
+        BCryptFunction strategy5 = new BCryptFunction(BCrypt.A,8);
 
         // WHEN
         Map<BCryptFunction, String> map = new HashMap<>();
@@ -100,8 +100,8 @@ public class BCryptFunctionTest
         String salt = "$2a$10$bJ2SJm8Xyp8H9KLeyNE5EO";
 
         // WHEN
-        Hash hash1 = new BCryptFunction(10).hash(password1, salt);
-        Hash hash2 = new BCryptFunction(10).hash(password2, salt);
+        Hash hash1 = new BCryptFunction(BCrypt.A, 10).hash(password1, salt);
+        Hash hash2 = new BCryptFunction(BCrypt.A,10).hash(password2, salt);
 
         // THEN
         Assert.assertEquals(hash1, hash2);
@@ -113,13 +113,13 @@ public class BCryptFunctionTest
     {
         // GIVEN
         int rounds = 8;
-        BCryptFunction bcrypt = new BCryptFunction(rounds);
+        BCryptFunction bcrypt = new BCryptFunction(BCrypt.A,rounds);
 
         // THEN
         boolean eqNull = bcrypt.equals(null);
-        boolean eqClass = bcrypt.equals(new BCryptFunction(10));
-        boolean difInst = bcrypt.equals(new BCryptFunction(10));
-        boolean sameInst = bcrypt.equals(new BCryptFunction(rounds));
+        boolean eqClass = bcrypt.equals(new BCryptFunction(BCrypt.A,10));
+        boolean difInst = bcrypt.equals(new BCryptFunction(BCrypt.A,10));
+        boolean sameInst = bcrypt.equals(new BCryptFunction(BCrypt.A,rounds));
 
         // END
         Assert.assertFalse(eqNull);
@@ -130,15 +130,17 @@ public class BCryptFunctionTest
 
     private static class TestObject<T>
     {
-        private final T password;
-        private final String salt;
-        private final String expected;
+        private T password;
+        private String salt;
+        private String expected;
+        private int rounds;
 
-        private TestObject(T password, String salt, String expected)
+        private TestObject(T password, String salt, String expected, int rounds)
         {
             this.password = password;
             this.salt = salt;
             this.expected = expected;
+            this.rounds = rounds;
         }
     }
 
@@ -150,85 +152,85 @@ public class BCryptFunctionTest
     {
         testObjectsString = new ArrayList<>();
         testObjectsString.add(new TestObject<>("", "$2a$06$DCq7YPn5Rq63x1Lad4cll.",
-                "$2a$06$DCq7YPn5Rq63x1Lad4cll.TV4S6ytwfsfvkgY8jIucDrjc8deX1s."));
+                "$2a$06$DCq7YPn5Rq63x1Lad4cll.TV4S6ytwfsfvkgY8jIucDrjc8deX1s.", 6));
         testObjectsString.add(new TestObject<>("", "$2a$08$HqWuK6/Ng6sg9gQzbLrgb.",
-                "$2a$08$HqWuK6/Ng6sg9gQzbLrgb.Tl.ZHfXLhvt/SgVyWhQqgqcZ7ZuUtye"));
+                "$2a$08$HqWuK6/Ng6sg9gQzbLrgb.Tl.ZHfXLhvt/SgVyWhQqgqcZ7ZuUtye", 8));
         testObjectsString.add(new TestObject<>("", "$2a$10$k1wbIrmNyFAPwPVPSVa/ze",
-                "$2a$10$k1wbIrmNyFAPwPVPSVa/zecw2BCEnBwVS2GbrmgzxFUOqW9dk4TCW"));
+                "$2a$10$k1wbIrmNyFAPwPVPSVa/zecw2BCEnBwVS2GbrmgzxFUOqW9dk4TCW", 10));
         testObjectsString.add(new TestObject<>("", "$2a$12$k42ZFHFWqBp3vWli.nIn8u",
-                "$2a$12$k42ZFHFWqBp3vWli.nIn8uYyIkbvYRvodzbfbK18SSsY.CsIQPlxO"));
+                "$2a$12$k42ZFHFWqBp3vWli.nIn8uYyIkbvYRvodzbfbK18SSsY.CsIQPlxO", 12));
         testObjectsString.add(new TestObject<>("", "$2b$06$8eVN9RiU8Yki430X.wBvN.",
-                "$2b$06$8eVN9RiU8Yki430X.wBvN.LWaqh2962emLVSVXVZIXJvDYLsV0oFu"));
+                "$2b$06$8eVN9RiU8Yki430X.wBvN.LWaqh2962emLVSVXVZIXJvDYLsV0oFu", 6));
         testObjectsString.add(new TestObject<>("", "$2b$06$NlgfNgpIc6GlHciCkMEW8u",
-                "$2b$06$NlgfNgpIc6GlHciCkMEW8uKOBsyvAp7QwlHpysOlKdtyEw50WQua2"));
+                "$2b$06$NlgfNgpIc6GlHciCkMEW8uKOBsyvAp7QwlHpysOlKdtyEw50WQua2", 6));
         testObjectsString.add(new TestObject<>("", "$2y$06$mFDtkz6UN7B3GZ2qi2hhaO",
-                "$2y$06$mFDtkz6UN7B3GZ2qi2hhaO3OFWzNEdcY84ELw6iHCPruuQfSAXBLK"));
+                "$2y$06$mFDtkz6UN7B3GZ2qi2hhaO3OFWzNEdcY84ELw6iHCPruuQfSAXBLK", 6));
         testObjectsString.add(new TestObject<>("", "$2y$06$88kSqVttBx.e9iXTPCLa5u",
-                "$2y$06$88kSqVttBx.e9iXTPCLa5uFPrVFjfLH4D.KcO6pBiAmvUkvdg0EYy"));
+                "$2y$06$88kSqVttBx.e9iXTPCLa5uFPrVFjfLH4D.KcO6pBiAmvUkvdg0EYy", 6));
         testObjectsString.add(new TestObject<>("a", "$2a$06$m0CrhHm10qJ3lXRY.5zDGO",
-                "$2a$06$m0CrhHm10qJ3lXRY.5zDGO3rS2KdeeWLuGmsfGlMfOxih58VYVfxe"));
+                "$2a$06$m0CrhHm10qJ3lXRY.5zDGO3rS2KdeeWLuGmsfGlMfOxih58VYVfxe", 6));
         testObjectsString.add(new TestObject<>("a", "$2a$08$cfcvVd2aQ8CMvoMpP2EBfe",
-                "$2a$08$cfcvVd2aQ8CMvoMpP2EBfeodLEkkFJ9umNEfPD18.hUF62qqlC/V."));
+                "$2a$08$cfcvVd2aQ8CMvoMpP2EBfeodLEkkFJ9umNEfPD18.hUF62qqlC/V.", 8));
         testObjectsString.add(new TestObject<>("a", "$2a$10$k87L/MF28Q673VKh8/cPi.",
-                "$2a$10$k87L/MF28Q673VKh8/cPi.SUl7MU/rWuSiIDDFayrKk/1tBsSQu4u"));
+                "$2a$10$k87L/MF28Q673VKh8/cPi.SUl7MU/rWuSiIDDFayrKk/1tBsSQu4u", 10));
         testObjectsString.add(new TestObject<>("a", "$2a$12$8NJH3LsPrANStV6XtBakCe",
-                "$2a$12$8NJH3LsPrANStV6XtBakCez0cKHXVxmvxIlcz785vxAIZrihHZpeS"));
+                "$2a$12$8NJH3LsPrANStV6XtBakCez0cKHXVxmvxIlcz785vxAIZrihHZpeS", 12));
         testObjectsString.add(new TestObject<>("a", "$2b$06$ehKGYiS4wt2HAr7KQXS5z.",
-                "$2b$06$ehKGYiS4wt2HAr7KQXS5z.OaRjB4jHO7rBHJKlGXbqEH3QVJfO7iO"));
+                "$2b$06$ehKGYiS4wt2HAr7KQXS5z.OaRjB4jHO7rBHJKlGXbqEH3QVJfO7iO", 6));
         testObjectsString.add(new TestObject<>("a", "$2b$06$PWxFFHA3HiCD46TNOZh30e",
-                "$2b$06$PWxFFHA3HiCD46TNOZh30eNto1hg5uM9tHBlI4q/b03SW/gGKUYk6"));
+                "$2b$06$PWxFFHA3HiCD46TNOZh30eNto1hg5uM9tHBlI4q/b03SW/gGKUYk6", 6));
         testObjectsString.add(new TestObject<>("a", "$2y$06$LUdD6/aD0e/UbnxVAVbvGu",
-                "$2y$06$LUdD6/aD0e/UbnxVAVbvGuUmIoJ3l/OK94ThhadpMWwKC34LrGEey"));
+                "$2y$06$LUdD6/aD0e/UbnxVAVbvGuUmIoJ3l/OK94ThhadpMWwKC34LrGEey", 6));
         testObjectsString.add(new TestObject<>("a", "$2y$06$eqgY.T2yloESMZxgp76deO",
-                "$2y$06$eqgY.T2yloESMZxgp76deOROa7nzXDxbO0k.PJvuClTa.Vu1AuemG"));
+                "$2y$06$eqgY.T2yloESMZxgp76deOROa7nzXDxbO0k.PJvuClTa.Vu1AuemG", 6));
         testObjectsString.add(new TestObject<>("abc", "$2a$06$If6bvum7DFjUnE9p2uDeDu",
-                "$2a$06$If6bvum7DFjUnE9p2uDeDu0YHzrHM6tf.iqN8.yx.jNN1ILEf7h0i"));
+                "$2a$06$If6bvum7DFjUnE9p2uDeDu0YHzrHM6tf.iqN8.yx.jNN1ILEf7h0i", 6));
         testObjectsString.add(new TestObject<>("abc", "$2a$08$Ro0CUfOqk6cXEKf3dyaM7O",
-                "$2a$08$Ro0CUfOqk6cXEKf3dyaM7OhSCvnwM9s4wIX9JeLapehKK5YdLxKcm"));
+                "$2a$08$Ro0CUfOqk6cXEKf3dyaM7OhSCvnwM9s4wIX9JeLapehKK5YdLxKcm", 8));
         testObjectsString.add(new TestObject<>("abc", "$2a$10$WvvTPHKwdBJ3uk0Z37EMR.",
-                "$2a$10$WvvTPHKwdBJ3uk0Z37EMR.hLA2W6N9AEBhEgrAOljy2Ae5MtaSIUi"));
+                "$2a$10$WvvTPHKwdBJ3uk0Z37EMR.hLA2W6N9AEBhEgrAOljy2Ae5MtaSIUi", 10));
         testObjectsString.add(new TestObject<>("abc", "$2a$12$EXRkfkdmXn2gzds2SSitu.",
-                "$2a$12$EXRkfkdmXn2gzds2SSitu.MW9.gAVqa9eLS1//RYtYCmB1eLHg.9q"));
+                "$2a$12$EXRkfkdmXn2gzds2SSitu.MW9.gAVqa9eLS1//RYtYCmB1eLHg.9q", 12));
         testObjectsString.add(new TestObject<>("abc", "$2b$06$5FyQoicpbox1xSHFfhhdXu",
-                "$2b$06$5FyQoicpbox1xSHFfhhdXuR2oxLpO1rYsQh5RTkI/9.RIjtoF0/ta"));
+                "$2b$06$5FyQoicpbox1xSHFfhhdXuR2oxLpO1rYsQh5RTkI/9.RIjtoF0/ta", 6));
         testObjectsString.add(new TestObject<>("abc", "$2b$06$1kJyuho8MCVP3HHsjnRMkO",
-                "$2b$06$1kJyuho8MCVP3HHsjnRMkO1nvCOaKTqLnjG2TX1lyMFbXH/aOkgc."));
+                "$2b$06$1kJyuho8MCVP3HHsjnRMkO1nvCOaKTqLnjG2TX1lyMFbXH/aOkgc.", 6));
         testObjectsString.add(new TestObject<>("abc", "$2y$06$ACfku9dT6.H8VjdKb8nhlu",
-                "$2y$06$ACfku9dT6.H8VjdKb8nhluaoBmhJyK7GfoNScEfOfrJffUxoUeCjK"));
+                "$2y$06$ACfku9dT6.H8VjdKb8nhluaoBmhJyK7GfoNScEfOfrJffUxoUeCjK", 6));
         testObjectsString.add(new TestObject<>("abc", "$2y$06$9JujYcoWPmifvFA3RUP90e",
-                "$2y$06$9JujYcoWPmifvFA3RUP90e5rSEHAb5Ye6iv3.G9ikiHNv5cxjNEse"));
+                "$2y$06$9JujYcoWPmifvFA3RUP90e5rSEHAb5Ye6iv3.G9ikiHNv5cxjNEse", 6));
         testObjectsString.add(new TestObject<>("abcdefghijklmnopqrstuvwxyz", "$2a$06$.rCVZVOThsIa97pEDOxvGu",
-                "$2a$06$.rCVZVOThsIa97pEDOxvGuRRgzG64bvtJ0938xuqzv18d3ZpQhstC"));
+                "$2a$06$.rCVZVOThsIa97pEDOxvGuRRgzG64bvtJ0938xuqzv18d3ZpQhstC", 6));
         testObjectsString.add(new TestObject<>("abcdefghijklmnopqrstuvwxyz", "$2a$08$aTsUwsyowQuzRrDqFflhge",
-                "$2a$08$aTsUwsyowQuzRrDqFflhgekJ8d9/7Z3GV3UcgvzQW3J5zMyrTvlz."));
+                "$2a$08$aTsUwsyowQuzRrDqFflhgekJ8d9/7Z3GV3UcgvzQW3J5zMyrTvlz.", 8));
         testObjectsString.add(new TestObject<>("abcdefghijklmnopqrstuvwxyz", "$2a$10$fVH8e28OQRj9tqiDXs1e1u",
-                "$2a$10$fVH8e28OQRj9tqiDXs1e1uxpsjN0c7II7YPKXua2NAKYvM6iQk7dq"));
+                "$2a$10$fVH8e28OQRj9tqiDXs1e1uxpsjN0c7II7YPKXua2NAKYvM6iQk7dq", 10));
         testObjectsString.add(new TestObject<>("abcdefghijklmnopqrstuvwxyz", "$2a$12$D4G5f18o7aMMfwasBL7Gpu",
-                "$2a$12$D4G5f18o7aMMfwasBL7GpuQWuP3pkrZrOAnqP.bmezbMng.QwJ/pG"));
+                "$2a$12$D4G5f18o7aMMfwasBL7GpuQWuP3pkrZrOAnqP.bmezbMng.QwJ/pG", 12));
         testObjectsString.add(new TestObject<>("abcdefghijklmnopqrstuvwxyz", "$2b$06$O8E89AQPj1zJQA05YvIAU.",
-                "$2b$06$O8E89AQPj1zJQA05YvIAU.hMpj25BXri1bupl/Q7CJMlpLwZDNBoO"));
+                "$2b$06$O8E89AQPj1zJQA05YvIAU.hMpj25BXri1bupl/Q7CJMlpLwZDNBoO", 6));
         testObjectsString.add(new TestObject<>("abcdefghijklmnopqrstuvwxyz", "$2b$06$PDqIWr./o/P3EE/P.Q0A/u",
-                "$2b$06$PDqIWr./o/P3EE/P.Q0A/uFg86WL/PXTbaW267TDALEwDylqk00Z."));
+                "$2b$06$PDqIWr./o/P3EE/P.Q0A/uFg86WL/PXTbaW267TDALEwDylqk00Z.", 6));
         testObjectsString.add(new TestObject<>("abcdefghijklmnopqrstuvwxyz", "$2y$06$34MG90ZLah8/ZNr3ltlHCu",
-                "$2y$06$34MG90ZLah8/ZNr3ltlHCuz6bachF8/3S5jTuzF1h2qg2cUk11sFW"));
+                "$2y$06$34MG90ZLah8/ZNr3ltlHCuz6bachF8/3S5jTuzF1h2qg2cUk11sFW", 6));
         testObjectsString.add(new TestObject<>("abcdefghijklmnopqrstuvwxyz", "$2y$06$AK.hSLfMyw706iEW24i68u",
-                "$2y$06$AK.hSLfMyw706iEW24i68uKAc2yorPTrB0cimvjJHEBUrPkOq7VvG"));
+                "$2y$06$AK.hSLfMyw706iEW24i68uKAc2yorPTrB0cimvjJHEBUrPkOq7VvG", 6));
         testObjectsString.add(new TestObject<>("~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2a$06$fPIsBO8qRqkjj273rfaOI.",
-                "$2a$06$fPIsBO8qRqkjj273rfaOI.HtSV9jLDpTbZn782DC6/t7qT67P6FfO"));
+                "$2a$06$fPIsBO8qRqkjj273rfaOI.HtSV9jLDpTbZn782DC6/t7qT67P6FfO", 6));
         testObjectsString.add(new TestObject<>("~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2a$08$Eq2r4G/76Wv39MzSX262hu",
-                "$2a$08$Eq2r4G/76Wv39MzSX262huzPz612MZiYHVUJe/OcOql2jo4.9UxTW"));
+                "$2a$08$Eq2r4G/76Wv39MzSX262huzPz612MZiYHVUJe/OcOql2jo4.9UxTW", 8));
         testObjectsString.add(new TestObject<>("~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2a$10$LgfYWkbzEvQ4JakH7rOvHe",
-                "$2a$10$LgfYWkbzEvQ4JakH7rOvHe0y8pHKF9OaFgwUZ2q7W2FFZmZzJYlfS"));
+                "$2a$10$LgfYWkbzEvQ4JakH7rOvHe0y8pHKF9OaFgwUZ2q7W2FFZmZzJYlfS", 10));
         testObjectsString.add(new TestObject<>("~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2a$12$WApznUOJfkEGSmYRfnkrPO",
-                "$2a$12$WApznUOJfkEGSmYRfnkrPOr466oFDCaj4b6HY3EXGvfxm43seyhgC"));
+                "$2a$12$WApznUOJfkEGSmYRfnkrPOr466oFDCaj4b6HY3EXGvfxm43seyhgC", 12));
         testObjectsString.add(new TestObject<>("~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2b$06$FGWA8OlY6RtQhXBXuCJ8Wu",
-                "$2b$06$FGWA8OlY6RtQhXBXuCJ8WusVipRI15cWOgJK8MYpBHEkktMfbHRIG"));
+                "$2b$06$FGWA8OlY6RtQhXBXuCJ8WusVipRI15cWOgJK8MYpBHEkktMfbHRIG", 6));
         testObjectsString.add(new TestObject<>("~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2b$06$G6aYU7UhUEUDJBdTgq3CRe",
-                "$2b$06$G6aYU7UhUEUDJBdTgq3CRekiopCN4O4sNitFXrf5NUscsVZj3a2r6"));
+                "$2b$06$G6aYU7UhUEUDJBdTgq3CRekiopCN4O4sNitFXrf5NUscsVZj3a2r6", 6));
         testObjectsString.add(new TestObject<>("~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2y$06$sYDFHqOcXTjBgOsqC0WCKe",
-                "$2y$06$sYDFHqOcXTjBgOsqC0WCKeMd3T1UhHuWQSxncLGtXDLMrcE6vFDti"));
+                "$2y$06$sYDFHqOcXTjBgOsqC0WCKeMd3T1UhHuWQSxncLGtXDLMrcE6vFDti", 6));
         testObjectsString.add(new TestObject<>("~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2y$06$6Xm0gCw4g7ZNDCEp4yTise",
-                "$2y$06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq"));
+                "$2y$06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq", 6));
 
 
     }
@@ -241,9 +243,52 @@ public class BCryptFunctionTest
     {
         for (TestObject<String> test : testObjectsString)
         {
-            Hash hash = BCryptFunction.getInstance(10).hash(test.password, test.salt);
+            Hash hash = BCryptFunction.getInstance(test.rounds).hash(test.password, test.salt);
             Assert.assertEquals(hash.getResult(), test.expected);
+
+            int rounds = BCryptFunction.getInstanceFromHash(test.expected).getLogarithmicRounds();
+            Assert.assertEquals(test.rounds, rounds);
         }
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadFromHash1()
+    {
+        // GIVEN
+        String hash = "$2yS06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq";
+
+        // WHEN
+        BCryptFunction function = BCryptFunction.getInstanceFromHash(hash);
+
+        // THEN
+        Assert.assertEquals(6, function.getLogarithmicRounds());
+    }
+
+
+    @Test(expected = BadParametersException.class)
+    public void testBadFromHash2()
+    {
+        // GIVEN
+        String hash = "$a$06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq";
+
+        // WHEN
+        BCryptFunction function = BCryptFunction.getInstanceFromHash(hash);
+
+        // THEN
+        Assert.assertEquals(6, function.getLogarithmicRounds());
+    }
+
+    @Test
+    public void testFromHash()
+    {
+        // GIVEN
+        String hash = "$2$06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq";
+
+        // WHEN
+        BCryptFunction function = BCryptFunction.getInstanceFromHash(hash);
+
+        // THEN
+        Assert.assertEquals(6, function.getLogarithmicRounds());
     }
 
 
@@ -259,12 +304,36 @@ public class BCryptFunctionTest
             {
                 String plain = testObjectsString.get(j).password;
                 BCryptFunction function = BCryptFunction.getInstance(10);
-                String salt = BCryptFunction.generateSalt(i);
+                String salt = function.generateSalt();
                 Hash hashed1 = function.hash(plain, salt);
                 Hash hashed2 = function.hash(plain, hashed1.getResult());
                 Assert.assertEquals(hashed2.getResult(), hashed1.getResult());
             }
         }
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void generateBadSalt1()
+    {
+        BCryptFunction.generateSalt("S2", 10);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void generateBadSalt2()
+    {
+        BCryptFunction.generateSalt("$2D", 10);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void generateBadSalt3()
+    {
+        BCryptFunction.generateSalt("$2" + BCrypt.A.minor(), 3);
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void generateBadSalt4()
+    {
+        BCryptFunction.generateSalt("$2" + BCrypt.B.minor(), 32);
     }
 
 
@@ -274,9 +343,10 @@ public class BCryptFunctionTest
     @Test
     public void testCheckpw_success()
     {
-        BCryptFunction function = BCryptFunction.getInstance(10);
+
         for (TestObject<String> test : testObjectsString)
         {
+            BCryptFunction function = BCryptFunction.getInstance(test.rounds);
             Assert.assertTrue(function.check(test.password, test.expected));
         }
     }
@@ -418,7 +488,7 @@ public class BCryptFunctionTest
         String badSalt2 = "$2b06$ehKGYiS4wt2HAr7KQXS5z.";
 
         // WHEN
-        BCryptFunction.getInstance(10).hash(password, badSalt2);
+        BCryptFunction.getInstance(6).hash(password, badSalt2);
     }
 
     @Test(expected = BadParametersException.class)
@@ -429,7 +499,7 @@ public class BCryptFunctionTest
         String badSalt3 = "$2d$06$ehKGYiS4wt2HAr7KQXS5z.";
 
         // WHEN
-        BCryptFunction.getInstance(10).hash(password, badSalt3);
+        BCryptFunction.getInstance(6).hash(password, badSalt3);
     }
 
     @Test(expected = BadParametersException.class)
@@ -443,23 +513,24 @@ public class BCryptFunctionTest
         BCryptFunction.getInstance(10).hash(password, badSalt3);
     }
 
-    @Test(expected = BadParametersException.class)
-    public void genSaltFailsWithTooFewRounds()
-    {
-        BCryptFunction.generateSalt(3);
-    }
 
     @Test(expected = BadParametersException.class)
-    public void genSaltFailsWithTooManyRounds()
+    public void testBadSalt5()
     {
-        BCryptFunction.generateSalt(32);
+        // GIVEN
+        String password = "password";
+        String badSalt3 = "$2b$06%ehKGYiS4wt2HAr7KQXS5z.";
+
+        // WHEN
+        BCryptFunction.getInstance(10).cryptRaw(password.getBytes(), badSalt3.getBytes(), 6, false, 1);
     }
+
 
     @Test
     public void genSaltGeneratesCorrectSaltPrefix()
     {
-        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.generateSalt(4), "$2a$04$"));
-        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.generateSalt(31), "$2a$31$"));
+        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.getInstance(4).hash("").getResult(), "$2a$04$"));
+        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.getInstance(31).hash("").getResult(), "$2a$31$"));
     }
 
     @Test(expected = BadParametersException.class)
@@ -471,13 +542,13 @@ public class BCryptFunctionTest
     @Test(expected = BadParametersException.class)
     public void hashpwFailsWhenSaltSpecifiesTooFewRounds()
     {
-        BCryptFunction.getInstance(10).hash("password", "$2a$03$......................");
+        BCryptFunction.getInstance(3).hash("password", "$2a$03$......................");
     }
 
     @Test(expected = BadParametersException.class)
     public void hashpwFailsWhenSaltSpecifiesTooManyRounds()
     {
-        BCryptFunction.getInstance(10).hash("password", "$2a$32$......................");
+        BCryptFunction.getInstance(32).hash("password", "$2a$32$......................");
     }
 
     @Test(expected = BadParametersException.class)
@@ -489,7 +560,7 @@ public class BCryptFunctionTest
     @Test
     public void hashpwWorksWithOldRevision()
     {
-        Assert.assertEquals("$2$05$......................bvpG2UfzdyW/S0ny/4YyEZrmczoJfVm", BCryptFunction.getInstance(10).hash("password", "$2$05$......................").getResult());
+        Assert.assertEquals("$2$05$......................bvpG2UfzdyW/S0ny/4YyEZrmczoJfVm", BCryptFunction.getInstance(5).hash("password", "$2$05$......................").getResult());
     }
 
     @Test(expected = BadParametersException.class)
@@ -510,5 +581,20 @@ public class BCryptFunctionTest
         Assert.assertFalse(BCryptFunction.equalsNoEarlyReturn("test", "pass"));
     }
 
+    @Test
+    public void testAccessors()
+    {
+        // GIVEN
+        int logRounds = 7;
+        BCrypt type = BCrypt.Y;
+
+        // WHEN
+        BCryptFunction bcrypt = BCryptFunction.getInstance(type, logRounds);
+
+        // THEN
+        Assert.assertEquals(logRounds, bcrypt.getLogarithmicRounds());
+        Assert.assertEquals(type, bcrypt.getType());
+        Assert.assertEquals("BCryptFunction[y|7]", bcrypt.toString());
+    }
 
 }

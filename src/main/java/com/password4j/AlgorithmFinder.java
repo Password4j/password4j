@@ -26,7 +26,8 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Set;
+
 
 /**
  * This utility class finds algorithms with their configuration
@@ -143,7 +144,8 @@ public class AlgorithmFinder
      */
     public static PBKDF2Function getPBKDF2Instance()
     {
-        return getPBKDF2Instance(a -> (i -> l -> (PBKDF2Function.getInstance(a, i, l))));
+        Param params = internalGetProperties();
+        return PBKDF2Function.getInstance(params.algorithm, params.iterations, params.length);
     }
 
     /**
@@ -181,15 +183,16 @@ public class AlgorithmFinder
      */
     public static CompressedPBKDF2Function getCompressedPBKDF2Instance()
     {
-        return getPBKDF2Instance(a -> (i -> l -> (CompressedPBKDF2Function.getInstance(a, i, l))));
+        Param params = internalGetProperties();
+        return CompressedPBKDF2Function.getInstance(params.algorithm, params.iterations, params.length);
     }
 
-    private static <T extends PBKDF2Function> T getPBKDF2Instance(Function<String, Function<Integer, Function<Integer, T>>> f)
+    private static Param internalGetProperties()
     {
         String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", Hmac.SHA512.name(), "PBKDF2 algorithm is not defined");
         int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", 64_000, "PBKDF2 #iterations are not defined");
         int length = PropertyReader.readInt("hash.pbkdf2.length", Hmac.SHA512.bits(), "PBKDF2 key length is not defined");
-        return f.apply(algorithm).apply(iterations).apply(length);
+        return new Param(algorithm, iterations, length);
     }
 
     /**
@@ -206,6 +209,11 @@ public class AlgorithmFinder
      *     <th>Default</th>
      *   </tr>
      *   <tr>
+     *      *     <td>Logarithmic number of rounds</td>
+     *      *     <td>hash.bcrypt.minor</td>
+     *      *     <td>10</td>
+     *      *   </tr>
+     *   <tr>
      *     <td>Logarithmic number of rounds</td>
      *     <td>hash.bcrypt.rounds</td>
      *     <td>10</td>
@@ -217,8 +225,9 @@ public class AlgorithmFinder
      */
     public static BCryptFunction getBCryptInstance()
     {
+        char minor = PropertyReader.readChar("hash.bcrypt.minor", 'b', "BCrypt minor version is not defined");
         int rounds = PropertyReader.readInt("hash.bcrypt.rounds", 10, "BCrypt rounds are not defined");
-        return BCryptFunction.getInstance(rounds);
+        return BCryptFunction.getInstance(BCrypt.valueOf(minor), rounds);
     }
 
     /**
@@ -262,6 +271,21 @@ public class AlgorithmFinder
         return SCryptFunction.getInstance(workFactor, resources, parallelization);
     }
 
+    public static MessageDigestFunction getMessageDigestInstance()
+    {
+        String algorithm = PropertyReader.readString("hash.md.algorithm", "SHA-512", "Message Digest algorithm is not defined");
+        String saltOption = PropertyReader.readString("hash.md.salt.option", "APPEND", "Salt option is not defined");
+        try
+        {
+            return MessageDigestFunction.getInstance(algorithm, SaltOption.valueOf(saltOption.toUpperCase()));
+        }
+        catch (IllegalArgumentException iae)
+        {
+            LOG.warn("{} is not a valid option. Fallback to default.", saltOption);
+            return MessageDigestFunction.getInstance(algorithm);
+        }
+    }
+
     /**
      * Finds the list of supported PBKDF2 algorithms by
      * the environment's {@link Provider}s.
@@ -285,8 +309,27 @@ public class AlgorithmFinder
         return result;
     }
 
+    public static Set<String> getAllMessageDigests()
+    {
+        return Security.getAlgorithms("MessageDigest");
+    }
+
     private static boolean useStrongRandom()
     {
         return PropertyReader.readBoolean("global.random.strong", false);
+    }
+
+    private static class Param
+    {
+        String algorithm;
+        int iterations;
+        int length;
+
+        Param(String algorithm, int iterations, int length)
+        {
+            this.algorithm = algorithm;
+            this.iterations = iterations;
+            this.length = length;
+        }
     }
 }

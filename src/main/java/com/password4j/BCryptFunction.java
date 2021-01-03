@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentMap;
 public class BCryptFunction extends AbstractHashingFunction
 {
 
-    private static ConcurrentMap<Integer, BCryptFunction> instances = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, BCryptFunction> INSTANCES = new ConcurrentHashMap<>();
 
     private static final int BCRYPT_SALT_LEN = 16;
 
@@ -174,15 +174,18 @@ public class BCryptFunction extends AbstractHashingFunction
 
     private int logRounds;
 
+    private BCrypt type;
+
     private BCryptFunction()
     {
         //
     }
 
-    protected BCryptFunction(int logRounds)
+    protected BCryptFunction(BCrypt type, int logRounds)
     {
         this();
         this.logRounds = logRounds;
+        this.type = type;
     }
 
     /**
@@ -198,22 +201,49 @@ public class BCryptFunction extends AbstractHashingFunction
      */
     public static BCryptFunction getInstance(int logRounds)
     {
-        if (instances.containsKey(logRounds))
+        return getInstance(BCrypt.A, logRounds);
+    }
+
+    public static BCryptFunction getInstance(BCrypt type, int logRounds)
+    {
+        String uid = getUID(type, logRounds);
+        if (INSTANCES.containsKey(uid))
         {
-            return instances.get(logRounds);
+            return INSTANCES.get(uid);
         }
         else
         {
-            BCryptFunction function = new BCryptFunction(logRounds);
-            instances.put(logRounds, function);
+            BCryptFunction function = new BCryptFunction(type, logRounds);
+            INSTANCES.put(uid, function);
             return function;
         }
     }
 
+    public static BCryptFunction getInstanceFromHash(String hashed)
+    {
+        internalChecks(hashed);
+
+        if (hashed.charAt(2) == '$')
+        {
+            int rounds = Integer.parseInt(hashed.substring(3, 5));
+            return getInstance(rounds);
+        }
+        else
+        {
+            char minor = hashed.charAt(2);
+            if (!isValidMinor(minor) || hashed.charAt(3) != '$')
+                throw new BadParametersException("Invalid salt revision");
+            int rounds = Integer.parseInt(hashed.substring(4, 6));
+            return getInstance(BCrypt.valueOf(minor), rounds);
+        }
+    }
+
+
+
     @Override
     public Hash hash(CharSequence plainTextPassword)
     {
-        String salt = generateSalt(logRounds);
+        String salt = generateSalt();
         return hash(plainTextPassword, salt);
     }
 
@@ -224,9 +254,9 @@ public class BCryptFunction extends AbstractHashingFunction
     }
 
     @Override
-    public boolean check(CharSequence plainTexPassword, String hashed)
+    public boolean check(CharSequence plainTextPassword, String hashed)
     {
-        return checkPw(plainTexPassword, hashed);
+        return checkPw(plainTextPassword, hashed);
     }
 
     private Hash internalHash(CharSequence plainTextPassword, String salt)
@@ -247,10 +277,25 @@ public class BCryptFunction extends AbstractHashingFunction
         return this.logRounds == otherStrategy.logRounds;
     }
 
+    public int getLogarithmicRounds()
+    {
+        return logRounds;
+    }
+
+    public BCrypt getType()
+    {
+        return type;
+    }
+
     @Override
     public String toString()
     {
-        return getClass().getName() + '[' + this.logRounds + ']';
+        return getClass().getSimpleName() + '[' + getUID(type, logRounds) + ']';
+    }
+
+    protected static String getUID(BCrypt type, int logRounds)
+    {
+        return type.minor() + "|" + logRounds;
     }
 
     @Override
@@ -546,7 +591,7 @@ public class BCryptFunction extends AbstractHashingFunction
         diff &= 0xffff;
         diff += 0xffff;
         sign <<= 9;
-        sign &= ~diff & safety; /* action needed? */
+        sign &= ~diff & safety;
 
         pArray[0] ^= sign;
 
@@ -626,13 +671,13 @@ public class BCryptFunction extends AbstractHashingFunction
      *
      * @param password the password to hash
      * @param salt     the salt to hash with (perhaps generated
-     *                 using {@link BCryptFunction#generateSalt(int)})
+     *                 using {@link BCryptFunction#generateSalt()})
      * @return the hashed password
      * @since 0.1.0
      */
     protected String hashPw(CharSequence password, String salt)
     {
-        byte[] passwordb = Utilities.fromCharSequenceToBytes(password);
+        byte[] passwordb = CharSequenceUtils.fromCharSequenceToBytes(password);
 
         return hashPw(passwordb, salt);
     }
@@ -643,7 +688,6 @@ public class BCryptFunction extends AbstractHashingFunction
         byte[] saltb;
         byte[] hashed;
         char minor = (char) 0;
-        int rounds;
         int off;
         StringBuilder rs = new StringBuilder();
 
@@ -656,7 +700,7 @@ public class BCryptFunction extends AbstractHashingFunction
         else
         {
             minor = salt.charAt(2);
-            if ((minor != 'a' && minor != 'x' && minor != 'y' && minor != 'b') || salt.charAt(3) != '$')
+            if (!isValidMinor(minor) || salt.charAt(3) != '$')
                 throw new BadParametersException("Invalid salt revision");
             off = 4;
         }
@@ -669,27 +713,31 @@ public class BCryptFunction extends AbstractHashingFunction
         {
             throw new BadParametersException("Invalid salt");
         }
-        rounds = Integer.parseInt(salt.substring(off, off + 2));
 
         realSalt = salt.substring(off + 3, off + 25);
         saltb = decodeBase64(realSalt, BCRYPT_SALT_LEN);
 
-        if (minor >= 'a') // add null terminator
+        if (minor >= BCrypt.A.minor()) // add null terminator
             passwordb = Arrays.copyOf(passwordb, passwordb.length + 1);
 
-        hashed = cryptRaw(passwordb, saltb, rounds, minor == 'x', minor == 'a' ? 0x10000 : 0);
+        hashed = cryptRaw(passwordb, saltb, logRounds, minor == BCrypt.X.minor(), minor == BCrypt.A.minor() ? 0x10000 : 0);
 
         rs.append("$2");
-        if (minor >= 'a')
+        if (minor >= BCrypt.A.minor())
             rs.append(minor);
         rs.append('$');
-        if (rounds < 10)
+        if (logRounds < 10)
             rs.append('0');
-        rs.append(rounds);
+        rs.append(logRounds);
         rs.append('$');
         encodeBase64(saltb, saltb.length, rs);
         encodeBase64(hashed, BF_CRYPT_CIPHERTEXT.length * 4 - 1, rs);
         return rs.toString();
+    }
+
+    private static boolean isValidMinor(char minor)
+    {
+        return BCrypt.valueOf(minor) != null;
     }
 
     private static void internalChecks(String salt)
@@ -708,13 +756,22 @@ public class BCryptFunction extends AbstractHashingFunction
         }
     }
 
-
+    /**
+     * Generate a salt to be used with the {@link BCryptFunction#hash(CharSequence, String)} method
+     *
+     * @param logRounds the log2 of the number of rounds of
+     *                  hashing to apply - the work factor therefore increases as
+     *                  2^log_rounds.
+     * @param prefix BCrypt variant
+     * @return an encoded salt value
+     * @since 0.1.0
+     */
     protected static String generateSalt(String prefix, int logRounds)
     {
         StringBuilder rs = new StringBuilder();
         byte[] rnd = new byte[BCRYPT_SALT_LEN];
 
-        if (!prefix.startsWith("$2") || (prefix.charAt(2) != 'a' && prefix.charAt(2) != 'y' && prefix.charAt(2) != 'b'))
+        if (!prefix.startsWith("$2") || (prefix.charAt(2) != BCrypt.A.minor() && prefix.charAt(2) != BCrypt.Y.minor() && prefix.charAt(2) != BCrypt.B.minor()))
         {
             throw new BadParametersException("Invalid prefix");
         }
@@ -739,15 +796,12 @@ public class BCryptFunction extends AbstractHashingFunction
     /**
      * Generate a salt to be used with the {@link BCryptFunction#hash(CharSequence, String)} method
      *
-     * @param logRounds the log2 of the number of rounds of
-     *                  hashing to apply - the work factor therefore increases as
-     *                  2^log_rounds.
      * @return an encoded salt value
      * @since 0.1.0
      */
-    protected static String generateSalt(int logRounds)
+    protected String generateSalt()
     {
-        return generateSalt("$2a", logRounds);
+        return generateSalt("$2" + type.minor(), logRounds);
     }
 
     /**

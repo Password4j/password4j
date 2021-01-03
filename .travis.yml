@@ -4,14 +4,14 @@ dist: trusty
 
 jobs:
   include:
-    - name: OpenJDK 8
-      jdk: openjdk8
-    - name: OracleJDK 8
-      jdk: oraclejdk8
     - name: OpenJDK 11
       jdk: openjdk11
     - name: OracleJDK 11
       jdk: oraclejdk11
+    - name: OpenJDK 8
+      jdk: openjdk8
+    - name: OracleJDK 8
+      jdk: oraclejdk8
 
 cache:
   directories:

@@ -17,11 +17,12 @@
 
 package com.password4j;
 
+import java.nio.CharBuffer;
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.nio.CharBuffer;
-import java.util.Arrays;
 
 public class StringTest
 {
@@ -29,7 +30,7 @@ public class StringTest
     public void testConstructors()
     {
         // GIVEN
-        char[] password = new char[]{'a', 'b', 'c', 'd', 'e', 'f'};
+        char[] password = new char[] { 'a', 'b', 'c', 'd', 'e', 'f' };
 
         // WHEN
         SecureString ss = new SecureString(password);
@@ -38,8 +39,10 @@ public class StringTest
 
         // THEN
         Assert.assertEquals(sub1.length(), sub2.length());
-        Assert.assertEquals(Arrays.toString(new char[]{'b', 'c', 'd'}), Arrays.toString(Utilities.fromCharSequenceToChars(sub1)));
-        Assert.assertEquals(Arrays.toString(Utilities.fromCharSequenceToChars(sub1)), Arrays.toString(Utilities.fromCharSequenceToChars(sub2)));
+        Assert.assertEquals(Arrays.toString(new char[] { 'b', 'c', 'd' }),
+                Arrays.toString(CharSequenceUtils.fromCharSequenceToChars(sub1)));
+        Assert.assertEquals(Arrays.toString(CharSequenceUtils.fromCharSequenceToChars(sub1)),
+                Arrays.toString(CharSequenceUtils.fromCharSequenceToChars(sub2)));
 
     }
 
@@ -47,7 +50,7 @@ public class StringTest
     public void testClear()
     {
         // GIVEN
-        char[] password = new char[]{'a', 'b', 'c', 'd'};
+        char[] password = new char[] { 'a', 'b', 'c', 'd' };
 
         // WHEN
         SecureString ss = new SecureString(password);
@@ -55,13 +58,13 @@ public class StringTest
 
         // THEN
         char z = Character.MIN_VALUE;
-        Assert.assertEquals(Arrays.toString(new char[]{z, z, z, z}), Arrays.toString(Utilities.fromCharSequenceToChars(ss)));
+        Assert.assertEquals(Arrays.toString(new char[] { z, z, z, z }), Arrays.toString(CharSequenceUtils.fromCharSequenceToChars(ss)));
     }
 
     @Test(expected = NullPointerException.class)
     public void testNull()
     {
-       new SecureString(null);
+        new SecureString(null);
     }
 
     @Test(expected = NullPointerException.class)
@@ -73,19 +76,19 @@ public class StringTest
     @Test(expected = ArrayIndexOutOfBoundsException.class)
     public void testOut1()
     {
-        new SecureString(new char[]{'a', 'b', 'c', 'd'}, 0, 10);
+        new SecureString(new char[] { 'a', 'b', 'c', 'd' }, 0, 10);
     }
 
     @Test(expected = NegativeArraySizeException.class)
     public void testOut2()
     {
-        new SecureString(new char[]{'a', 'b', 'c', 'd'}, 0, -4);
+        new SecureString(new char[] { 'a', 'b', 'c', 'd' }, 0, -4);
     }
 
     @Test(expected = NegativeArraySizeException.class)
     public void testOut3()
     {
-        new SecureString(new char[]{'a', 'b', 'c', 'd'}, 3, 0);
+        new SecureString(new char[] { 'a', 'b', 'c', 'd' }, 3, 0);
     }
 
     @Test
@@ -93,7 +96,7 @@ public class StringTest
     {
         SecureString ss = new SecureString(new char[0]);
 
-        Assert.assertEquals("SecureString[]", ss.toString());
+        Assert.assertEquals("SecureString[****]", ss.toString());
         Assert.assertEquals(0, ss.length());
         try
         {
@@ -110,7 +113,7 @@ public class StringTest
     @Test
     public void testToString()
     {
-        SecureString ss = new SecureString(new char[]{'a', 'b', 'c', 'd'});
+        SecureString ss = new SecureString(new char[] { 'a', 'b', 'c', 'd' });
 
         Assert.assertEquals("SecureString[****]", ss.toString());
     }
@@ -119,8 +122,8 @@ public class StringTest
     public void erase()
     {
         // GIVEN
-        char[] password1 = new char[]{'a', 'b', 'c', 'd'};
-        char[] password2 = new char[]{'a', 'b', 'c', 'd'};
+        char[] password1 = new char[] { 'a', 'b', 'c', 'd' };
+        char[] password2 = new char[] { 'a', 'b', 'c', 'd' };
 
         // WHEN
         new SecureString(password1, true);
@@ -128,51 +131,60 @@ public class StringTest
 
         // THEN
         char z = Character.MIN_VALUE;
-        Assert.assertEquals(Arrays.toString(new char[]{z, z, z, z}), Arrays.toString(password1));
-        Assert.assertEquals(Arrays.toString(new char[]{'a', 'b', 'c', 'd'}), Arrays.toString(password2));
+        Assert.assertEquals(Arrays.toString(new char[] { z, z, z, z }), Arrays.toString(password1));
+        Assert.assertEquals(Arrays.toString(new char[] { 'a', 'b', 'c', 'd' }), Arrays.toString(password2));
     }
 
     @Test
     public void testEquality()
     {
-        char[] password = new char[]{'a', 'b', 'c', 'd'};
+        char[] password = new char[] { 'a', 'b', 'c', 'd' };
         String str = new String(password);
         SecureString ss = new SecureString(password);
+        SecureString ss2 = (SecureString) CharSequenceUtils.append(ss, "123");
 
-        Assert.assertTrue(ss.equals(str));
-        Assert.assertFalse(ss.equals(null));
-        Assert.assertTrue(ss.equals(CharBuffer.wrap(password)));
-        Assert.assertFalse(ss.equals("abc"));
-        Assert.assertFalse(ss.equals("cbad"));
-        Assert.assertTrue(ss.equals(ss));
+        Assert.assertTrue(((CharSequence) ss).equals(str) && ((CharSequence) ss).equals(CharBuffer.wrap(password)));
+        Assert.assertNotEquals(null, ss);
+        Assert.assertNotEquals("cbad", ss);
+        Assert.assertEquals(new SecureString(password), ss);
+        Assert.assertNotEquals(new SecureString(new char[] { 'b', 'b', 'b', 'b' }), ss);
+        Assert.assertEquals(ss, ss);
         Assert.assertEquals(Arrays.hashCode(password), ss.hashCode());
+
+        Assert.assertNotEquals(ss, 123);
+        Assert.assertNotEquals(ss2, ss);
     }
 
     @Test
     public void testUtilities()
     {
-        char[] c1 = Utilities.fromCharSequenceToChars(null);
-        char[] c2 = Utilities.fromCharSequenceToChars(new String(new char[0]));
-        byte[] b1 = Utilities.fromCharSequenceToBytes(null);
-        byte[] b2 = Utilities.fromCharSequenceToBytes(new String(new char[0]));
+        char[] c1 = CharSequenceUtils.fromCharSequenceToChars(null);
+        char[] c2 = CharSequenceUtils.fromCharSequenceToChars(new String(new char[0]));
+        byte[] b1 = CharSequenceUtils.fromCharSequenceToBytes(null);
+        byte[] b2 = CharSequenceUtils.fromCharSequenceToBytes(new String(new char[0]));
 
-        CharSequence cs1 = Utilities.append("a", null);
-        CharSequence cs2 = Utilities.append(null, "b");
+        CharSequence cs1 = CharSequenceUtils.append("a", null);
+        CharSequence cs2 = CharSequenceUtils.append(null, "b");
 
-        CharSequence a1 = Utilities.append(new SecureString(new char[]{'a', 'b', 'c'}), "def");
-        CharSequence a2 = Utilities.append(null, "def");
-        CharSequence a3 = Utilities.append(new SecureString(new char[0]), "def");
-        CharSequence a4 = Utilities.append("abc", null);
-        CharSequence a5 = Utilities.append("abc", new SecureString(new char[0]));
+        CharSequence a1 = CharSequenceUtils.append(new SecureString(new char[] { 'a', 'b', 'c' }), "def");
+        CharSequence a2 = CharSequenceUtils.append(null, "def");
+        CharSequence a3 = CharSequenceUtils.append(new SecureString(new char[0]), "def");
+        CharSequence a4 = CharSequenceUtils.append("abc", null);
+        CharSequence a5 = CharSequenceUtils.append("abc", new SecureString(new char[0]));
 
         Assert.assertEquals(Arrays.toString(c1), Arrays.toString(c2));
         Assert.assertEquals(Arrays.toString(b1), Arrays.toString(b2));
         Assert.assertEquals("a", cs1);
         Assert.assertEquals("b", cs2);
-        Assert.assertEquals(Arrays.toString(new char[]{'a', 'b', 'c', 'd', 'e', 'f'}), Arrays.toString(Utilities.fromCharSequenceToChars(a1)));
-        Assert.assertEquals(Arrays.toString(new char[]{'d', 'e', 'f'}), Arrays.toString(Utilities.fromCharSequenceToChars(a2)));
-        Assert.assertEquals(Arrays.toString(new char[]{'d', 'e', 'f'}), Arrays.toString(Utilities.fromCharSequenceToChars(a3)));
-        Assert.assertEquals(Arrays.toString(new char[]{'a', 'b', 'c'}), Arrays.toString(Utilities.fromCharSequenceToChars(a4)));
-        Assert.assertEquals(Arrays.toString(new char[]{'a', 'b', 'c'}), Arrays.toString(Utilities.fromCharSequenceToChars(a5)));
+        Assert.assertEquals(Arrays.toString(new char[] { 'a', 'b', 'c', 'd', 'e', 'f' }),
+                Arrays.toString(CharSequenceUtils.fromCharSequenceToChars(a1)));
+        Assert.assertEquals(Arrays.toString(new char[] { 'd', 'e', 'f' }),
+                Arrays.toString(CharSequenceUtils.fromCharSequenceToChars(a2)));
+        Assert.assertEquals(Arrays.toString(new char[] { 'd', 'e', 'f' }),
+                Arrays.toString(CharSequenceUtils.fromCharSequenceToChars(a3)));
+        Assert.assertEquals(Arrays.toString(new char[] { 'a', 'b', 'c' }),
+                Arrays.toString(CharSequenceUtils.fromCharSequenceToChars(a4)));
+        Assert.assertEquals(Arrays.toString(new char[] { 'a', 'b', 'c' }),
+                Arrays.toString(CharSequenceUtils.fromCharSequenceToChars(a5)));
     }
 }

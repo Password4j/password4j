@@ -19,10 +19,22 @@ public class PublicPasswordTest
                     PBKDF2Function.getInstance(Hmac.SHA1, 49999, 160)),
 
             new TestSuite("$2a$06$If6bvum7DFjUnE9p2uDeDu0YHzrHM6tf.iqN8.yx.jNN1ILEf7h0i", "bc", "$2a$06$If6bvum7DFjUnE9p2uDeDu", "a",
-                    BCryptFunction.getInstance(10)),
+                    BCryptFunction.getInstance(6)),
+
+            new TestSuite("$2a$09$PVRpK74XnUl/dsFfw6YSsOgwnJ1N3b5jKgbR/qdqerkuIYMa2u6eG", "Password", "$2a$09$PVRpK74XnUl/dsFfw6YSsO", "my",
+                    BCryptFunction.getInstance(9)),
+
+            new TestSuite("$2a$07$W3mOfB5auMDG3EitumH0S.ffmkA.NZIOZFaXb15tPWQyqq0hDXiEC", "Alice", "$2a$07$W3mOfB5auMDG3EitumH0S.", null,
+                    BCryptFunction.getInstance(7)),
+
+            new TestSuite("$2a$14$7rdjAp2vQxO0hCK9GvniqeKURflehmGaW5C2CLOONKZauODS7xOGW", "password4j", "$2a$14$7rdjAp2vQxO0hCK9Gvniqe", null,
+                    BCryptFunction.getInstance(14)),
 
             new TestSuite("$s0$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==", "word", "salt",
-                    "pass", SCryptFunction.getInstance(16384, 8, 1))
+                    "pass", SCryptFunction.getInstance(16384, 8, 1)),
+
+            new TestSuite("$s0$a0402$bm90UmFuZG9t$upriFfo7v+aAUqOKDpguh0duZlAHiKcQOLM0k/xFcBg7qfRcDfYLEZe/60+b+4NtA1M70LUI0IRY+3+ybuLMZg==", "known", "notRandom",
+                    "un", SCryptFunction.getInstance(1024, 4, 2))
     };
 
     @Test
@@ -39,6 +51,24 @@ public class PublicPasswordTest
             Assert.assertEquals(test.hashingFunction.toString(), test.hash,
                     Password.hash(securePassword).addSalt(test.salt).addPepper(test.pepper).with(test.hashingFunction)
                             .getResult());
+
+        }
+
+    }
+
+    @Test
+    public void testUpdate()
+    {
+
+        for (TestSuite test : PBKDF2_TEST)
+        {
+            Assert.assertEquals(test.hashingFunction.toString(), test.hash,
+                    Password.hash(test.password).addSalt(test.salt).addPepper(test.pepper).with(test.hashingFunction)
+                            .getResult());
+
+            HashUpdate update = Password.check(test.password, test.hash).addSalt(test.salt).addPepper(test.pepper).andUpdate().with(test.hashingFunction, test.hashingFunction);
+            Assert.assertTrue(test.hashingFunction.toString(), update.isVerified());
+            Assert.assertEquals(test.hashingFunction.toString(), Password.hash(test.password).addSalt(test.salt).addPepper(test.pepper).with(test.hashingFunction).getResult(), update.getHash().getResult());
 
         }
 
@@ -78,12 +108,6 @@ public class PublicPasswordTest
             hc.withBCrypt();
             hc.withPBKDF2();
 
-            CHB chb = Password.hash(password, CHB::new);
-            chb.foo();
-
-            CHC chc = Password.check(password, password, CHC::new);
-            chc.bar();
-
             Hmac.SHA256.code();
             Hmac.values();
             Hmac.SHA1.bits();
@@ -104,34 +128,6 @@ public class PublicPasswordTest
         catch (Exception e)
         {
             //
-        }
-    }
-
-    private class CHB extends HashBuilder<CHB>
-    {
-
-        public CHB(CharSequence plain)
-        {
-            super(plain);
-        }
-
-        public boolean foo()
-        {
-            return true;
-        }
-    }
-
-    private class CHC extends HashChecker<CHC>
-    {
-
-        public CHC(CharSequence plain, String hash)
-        {
-            super(plain, hash);
-        }
-
-        public boolean bar()
-        {
-            return true;
         }
     }
 

@@ -13,9 +13,9 @@ public enum Hmac
     SHA384(384, 4), //
     SHA512(512, 5);
 
-    private int bits;
+    private final int bits;
 
-    private int code;
+    private final int code;
 
     /**
      * @param bits length of the produced hash

@@ -17,10 +17,11 @@
 
 package com.password4j;
 
-import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.crypto.SecretKey;
 
 /**
  * Class containing the implementation of PBKDF2 function and its parameters.
@@ -59,7 +60,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CompressedPBKDF2Function extends PBKDF2Function
 {
 
-    private static Map<String, CompressedPBKDF2Function> instances = new ConcurrentHashMap<>();
+    private static final Map<String, CompressedPBKDF2Function> INSTANCES = new ConcurrentHashMap<>();
 
     private static final char DELIMITER = PropertyReader.readChar("hash.pbkdf2.delimiter", '$');
 
@@ -80,15 +81,15 @@ public class CompressedPBKDF2Function extends PBKDF2Function
      */
     public static CompressedPBKDF2Function getInstance(Hmac algorithm, int iterations, int length)
     {
-        String key = getUID(algorithm, iterations, length);
-        if (instances.containsKey(key))
+        String key = getUID(algorithm.name(), iterations, length);
+        if (INSTANCES.containsKey(key))
         {
-            return instances.get(key);
+            return INSTANCES.get(key);
         }
         else
         {
             CompressedPBKDF2Function function = new CompressedPBKDF2Function(algorithm, iterations, length);
-            instances.put(key, function);
+            INSTANCES.put(key, function);
             return function;
         }
     }
@@ -97,9 +98,10 @@ public class CompressedPBKDF2Function extends PBKDF2Function
      * Creates a singleton instance, depending on the provided
      * algorithm, number of iterations and key length.
      *
-     * @param algorithm  string veriong of hmac algorithm
+     * @param algorithm  string version of hmac algorithm. This must me mapped in {@link Hmac}.
      * @param iterations number of iterations
      * @param length     length of the derived key
+     * @throws IllegalArgumentException if {@code algorithm} is not mapped in {@link Hmac}.
      * @return a singleton instance
      * @since 0.1.0
      */
@@ -152,14 +154,14 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         String params = Long.toString((((long) getIterations()) << 32) | (getLength() & 0xffffffffL));
         String salt64 = Base64.getEncoder().encodeToString(salt.getBytes());
         String hash64 = super.getHash(key, salt);
-        return "$" + getAlgorithm().code() + "$" + params + "$" + salt64 + "$" + hash64;
+        return "$" + algorithm.code() + "$" + params + "$" + salt64 + "$" + hash64;
     }
 
     @Override
-    public boolean check(CharSequence plainTexPassword, String hashed)
+    public boolean check(CharSequence plainTextPassword, String hashed)
     {
         String salt = getSaltFromHash(hashed);
-        Hash internalHas = hash(plainTexPassword, salt);
+        Hash internalHas = hash(plainTextPassword, salt);
 
         return slowEquals(internalHas.getResult().getBytes(), hashed.getBytes());
     }

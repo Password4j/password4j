@@ -22,17 +22,16 @@ import org.apache.commons.lang3.StringUtils;
  * Builder class that helps to create a chain of parameters to be used
  * in the hashing process.
  *
- * @param <H> extends HashBuilder.
  * @author David Bertoldi
  * @since 1.0.0
  */
-public class HashBuilder<H extends HashBuilder<?>>
+public class HashBuilder
 {
     private CharSequence plainTextPassword;
 
     private String salt;
 
-    private String pepper;
+    private CharSequence pepper;
 
     @SuppressWarnings("unused")
     private HashBuilder()
@@ -44,7 +43,7 @@ public class HashBuilder<H extends HashBuilder<?>>
      * @param plainTextPassword the plain text password
      * @since 1.0.0
      */
-    public HashBuilder(CharSequence plainTextPassword)
+    protected HashBuilder(CharSequence plainTextPassword)
     {
         this.plainTextPassword = plainTextPassword;
     }
@@ -57,24 +56,26 @@ public class HashBuilder<H extends HashBuilder<?>>
      * @return this builder
      * @since 1.0.0
      */
-    public H addSalt(String salt)
+    public HashBuilder addSalt(String salt)
     {
         this.salt = salt;
-        return (H) this;
+        return this;
     }
 
     /**
      * Add a random cryptographic salt in the hashing process.
      * The salt is applied differently depending on the chosen algorithm.
+     * <p>
+     * Calling this method can be omitted for all the CHFs that require a salt.
      *
      * @return this builder
      * @see SaltGenerator#generate() for more information about the length of the product
      * @since 1.0.0
      */
-    public H addRandomSalt()
+    public HashBuilder addRandomSalt()
     {
         this.salt = new String(SaltGenerator.generate());
-        return (H) this;
+        return this;
     }
 
     /**
@@ -87,7 +88,7 @@ public class HashBuilder<H extends HashBuilder<?>>
      * @see SaltGenerator#generate() for more information about the length of the product
      * @since 1.0.0
      */
-    public H addRandomSalt(int length)
+    public HashBuilder addRandomSalt(int length)
     {
         if (length <= 0)
         {
@@ -97,7 +98,7 @@ public class HashBuilder<H extends HashBuilder<?>>
         {
             this.salt = new String(SaltGenerator.generate(length));
         }
-        return (H) this;
+        return this;
     }
 
     /**
@@ -107,10 +108,10 @@ public class HashBuilder<H extends HashBuilder<?>>
      * @return this builder
      * @see PepperGenerator#get()
      */
-    public H addPepper()
+    public HashBuilder addPepper()
     {
         this.pepper = PepperGenerator.get();
-        return (H) this;
+        return this;
     }
 
     /**
@@ -121,10 +122,10 @@ public class HashBuilder<H extends HashBuilder<?>>
      * @return this builder
      * @since 1.0.0
      */
-    public H addPepper(String pepper)
+    public HashBuilder addPepper(CharSequence pepper)
     {
         this.pepper = pepper;
-        return (H) this;
+        return this;
     }
 
     /**
@@ -142,7 +143,7 @@ public class HashBuilder<H extends HashBuilder<?>>
         CharSequence peppered = plainTextPassword;
         if (StringUtils.isNotEmpty(this.pepper))
         {
-            peppered = Utilities.append(this.pepper, peppered);
+            peppered = CharSequenceUtils.append(this.pepper, peppered);
         }
 
         Hash hash;
@@ -163,7 +164,7 @@ public class HashBuilder<H extends HashBuilder<?>>
      * Hashes the previously given plain text password
      * with {@link PBKDF2Function}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction)}
@@ -182,7 +183,7 @@ public class HashBuilder<H extends HashBuilder<?>>
      * Hashes the previously given plain text password
      * with {@link CompressedPBKDF2Function}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction)}
@@ -201,7 +202,7 @@ public class HashBuilder<H extends HashBuilder<?>>
      * Hashes the previously given plain text password
      * with {@link BCryptFunction}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction)}
@@ -220,7 +221,7 @@ public class HashBuilder<H extends HashBuilder<?>>
      * Hashes the previously given plain text password
      * with {@link SCryptFunction}.
      * <p>
-     * This method read the configurations in the `psw4j.properties` file. If no configuration is found,
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      * <p>
      * Finally calls {@link #with(HashingFunction)}
@@ -233,6 +234,25 @@ public class HashBuilder<H extends HashBuilder<?>>
     public Hash withSCrypt()
     {
         return with(AlgorithmFinder.getSCryptInstance());
+    }
+
+    /**
+     * Hashes the previously given plain text password
+     * with {@link MessageDigestFunction}.
+     * <p>
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
+     * then the default parameters are used.
+     * <p>
+     * Finally calls {@link #with(HashingFunction)}
+     *
+     * @return true if the hash was produced by the given plain text password; false otherwise.
+     * @see AlgorithmFinder#getPBKDF2Instance()
+     * @see #with(HashingFunction)
+     * @since 1.4.0
+     */
+    public Hash withMessageDigest()
+    {
+        return with(AlgorithmFinder.getMessageDigestInstance());
     }
 
 }

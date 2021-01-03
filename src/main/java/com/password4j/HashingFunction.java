@@ -84,14 +84,14 @@ public interface HashingFunction
      * recognise a valid salt) a {@link BadParametersException}
      * is thrown.
      *
-     * @param plainTexPassword the plaintext password
+     * @param plainTextPassword the plaintext password
      * @param hashed           the hash
      * @return true if the hash is generated from the plaintext; false otherwise
      * @throws UnsupportedOperationException if the CHF need a salt and it is not part of the hash
      * @throws BadParametersException        if the hash is not well-formed
      * @since 0.1.0
      */
-    boolean check(CharSequence plainTexPassword, String hashed);
+    boolean check(CharSequence plainTextPassword, String hashed);
 
     /**
      * Checks if the CHF generated the hash starting from

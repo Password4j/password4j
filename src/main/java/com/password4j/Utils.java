@@ -22,12 +22,12 @@ import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-class CharSequenceUtils
+class Utils
 {
 
     private static final char[] HEX_ALPHABET = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
-    private CharSequenceUtils()
+    private Utils()
     {
         //
     }
@@ -96,6 +96,82 @@ class CharSequenceUtils
         }
         return new String(output);
     }
+
+    static long littleEndianToLong(byte[] bs, int off)
+    {
+        int lo = littleEndianToInt(bs, off);
+        int hi = littleEndianToInt(bs, off + 4);
+        return ((hi & 0xffffffffL) << 32) | (lo & 0xffffffffL);
+    }
+
+    static void littleEndianToInt(byte[] bs, int bOff, int[] ns, int nOff, int count)
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            ns[nOff + i] = littleEndianToInt(bs, bOff);
+            bOff += 4;
+        }
+    }
+
+    static void littleEndianToInt(byte[] bs, int off, int[] ns)
+    {
+        for (int i = 0; i < ns.length; ++i)
+        {
+            ns[i] = littleEndianToInt(bs, off);
+            off += 4;
+        }
+    }
+
+    static int littleEndianToInt(byte[] bs, int off)
+    {
+        int n = bs[off] & 0xff;
+        n |= (bs[++off] & 0xff) << 8;
+        n |= (bs[++off] & 0xff) << 16;
+        n |= bs[++off] << 24;
+        return n;
+    }
+
+    static int[] littleEndianToInt(byte[] bs, int off, int count)
+    {
+        int[] ns = new int[count];
+        for (int i = 0; i < ns.length; ++i)
+        {
+            ns[i] = littleEndianToInt(bs, off);
+            off += 4;
+        }
+        return ns;
+    }
+
+    static byte[] longToLittleEndian(long n)
+    {
+        byte[] bs = new byte[8];
+        longToLittleEndian(n, bs, 0);
+        return bs;
+    }
+
+    static void longToLittleEndian(long n, byte[] bs, int off)
+    {
+        intToLittleEndian((int)(n & 0xffffffffL), bs, off);
+        intToLittleEndian((int)(n >>> 32), bs, off + 4);
+    }
+
+    static void intToLittleEndian(int n, byte[] bs, int off)
+    {
+        bs[  off] = (byte)(n       );
+        bs[++off] = (byte)(n >>>  8);
+        bs[++off] = (byte)(n >>> 16);
+        bs[++off] = (byte)(n >>> 24);
+    }
+
+    public static byte[] intToLittleEndianBytes(int a) {
+        byte[] result = new byte[4];
+        result[0] = (byte) (a & 0xFF);
+        result[1] = (byte) ((a >> 8) & 0xFF);
+        result[2] = (byte) ((a >> 16) & 0xFF);
+        result[3] = (byte) ((a >> 24) & 0xFF);
+        return result;
+    }
+
 
 
 }

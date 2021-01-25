@@ -120,7 +120,7 @@ public class SCryptFunction extends AbstractHashingFunction
         try
         {
             byte[] saltAsBytes = salt.getBytes(StandardCharsets.UTF_8);
-            byte[] derived = scrypt(CharSequenceUtils.fromCharSequenceToBytes(plainTextPassword), saltAsBytes, 64);
+            byte[] derived = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), saltAsBytes, 64);
             String params = Long.toString(log2(workFactor) << 16 | resources << 8 | parallelization, 16);
             String sb = "$s0$" + params + '$' + Base64.getEncoder().encodeToString(saltAsBytes) + '$' + Base64.getEncoder()
                     .encodeToString(derived);
@@ -143,7 +143,7 @@ public class SCryptFunction extends AbstractHashingFunction
             {
                 byte[] salt = Base64.getDecoder().decode(parts[3]);
                 byte[] derived0 = Base64.getDecoder().decode(parts[4]);
-                byte[] derived1 = scrypt(CharSequenceUtils.fromCharSequenceToBytes(plainTextPassword), salt, 64);
+                byte[] derived1 = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), salt, 64);
                 if (derived0.length != derived1.length)
                 {
                     return false;

@@ -143,7 +143,7 @@ public class HashBuilder
         CharSequence peppered = plainTextPassword;
         if (StringUtils.isNotEmpty(this.pepper))
         {
-            peppered = CharSequenceUtils.append(this.pepper, peppered);
+            peppered = Utils.append(this.pepper, peppered);
         }
 
         Hash hash;

@@ -384,7 +384,7 @@ public class PasswordTest
         PBKDF2Function strategy = CompressedPBKDF2Function.getInstanceFromHash(hashed);
 
         // THEN
-        Assert.assertTrue(strategy.check(CharSequenceUtils.append(PEPPER, SECURE_PASSWORD), hashed));
+        Assert.assertTrue(strategy.check(Utils.append(PEPPER, SECURE_PASSWORD), hashed));
         Assert.assertTrue(Password.check(SECURE_PASSWORD, hashed).addPepper(PEPPER).withCompressedPBKDF2());
     }
 
@@ -399,7 +399,7 @@ public class PasswordTest
         BCryptFunction strategy = AlgorithmFinder.getBCryptInstance();
 
         // THEN
-        Assert.assertTrue(strategy.check(CharSequenceUtils.append(PEPPER, SECURE_PASSWORD), hashed));
+        Assert.assertTrue(strategy.check(Utils.append(PEPPER, SECURE_PASSWORD), hashed));
         Assert.assertTrue(Password.check(SECURE_PASSWORD, hashed).addPepper(PEPPER).withBCrypt());
     }
 
@@ -414,7 +414,7 @@ public class PasswordTest
         SCryptFunction strategy = SCryptFunction.getInstanceFromHash(hashed);
 
         // THEN
-        Assert.assertTrue(strategy.check(CharSequenceUtils.append(PEPPER, SECURE_PASSWORD), hashed));
+        Assert.assertTrue(strategy.check(Utils.append(PEPPER, SECURE_PASSWORD), hashed));
         Assert.assertTrue(Password.check(SECURE_PASSWORD, hashed).addPepper(PEPPER).withSCrypt());
     }
 

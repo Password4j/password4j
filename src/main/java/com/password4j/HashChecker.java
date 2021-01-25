@@ -119,7 +119,7 @@ public class HashChecker
         CharSequence peppered = plainTextPassword;
         if (StringUtils.isNotEmpty(this.pepper))
         {
-            peppered = CharSequenceUtils.append(this.pepper, peppered);
+            peppered = Utils.append(this.pepper, peppered);
         }
 
         return hashingFunction.check(peppered, hashed, salt);

@@ -17,7 +17,7 @@ public class Argon2FunctionTest
     {
 
         Argon2Function function = new Argon2Function(Argon2.I, 3, 2, 1, 32);
-        function.initialize(Utils.fromCharSequenceToBytes("password"), "saltsalt".getBytes(CHARSET), null, null);
+        function.hash("password", "saltsalt");
 
 
 

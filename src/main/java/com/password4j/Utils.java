@@ -190,4 +190,42 @@ class Utils
         return result;
     }
 
+    public static byte[] longToLittleEndianBytes(long a) {
+        byte[] result = new byte[8];
+        result[0] = (byte) (a & 0xFF);
+        result[1] = (byte) ((a >> 8) & 0xFF);
+        result[2] = (byte) ((a >> 16) & 0xFF);
+        result[3] = (byte) ((a >> 24) & 0xFF);
+        result[4] = (byte) ((a >> 32) & 0xFF);
+        result[5] = (byte) ((a >> 40) & 0xFF);
+        result[6] = (byte) ((a >> 48) & 0xFF);
+        result[7] = (byte) ((a >> 56) & 0xFF);
+        return result;
+    }
+
+    public static long intToLong(int x){
+        byte[] intBytes = intToLittleEndianBytes(x);
+        byte[] bytes = new byte[8];
+        System.arraycopy(intBytes, 0, bytes, 0, 4);
+        return littleEndianBytesToLong(bytes);
+    }
+
+    public static void xor(long[] t, long[] b1, long[] b2) {
+        for (int i = 0; i < t.length; i++) {
+            t[i] = b1[i] ^ b2[i];
+        }
+    }
+
+    public static void xor(long[] t, long[] b1, long[] b2, long[] b3) {
+        for (int i = 0; i < t.length; i++) {
+            t[i] = b1[i] ^ b2[i] ^ b3[i];
+        }
+    }
+
+    public static void xor(long[] t, long[] other) {
+        for (int i = 0; i < t.length; i++) {
+            t[i] = t[i] ^ other[i];
+        }
+    }
+
 }

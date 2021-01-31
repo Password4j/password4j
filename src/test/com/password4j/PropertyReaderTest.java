@@ -129,7 +129,6 @@ public class PropertyReaderTest
     {
         // GIVEN
         String path = new File(".").getCanonicalPath() + "/src/test/my/custom/path/to/some.properties";
-        System.out.println(path);
         System.setProperty("psw4j.configuration", path);
 
         // WHEN
@@ -145,7 +144,6 @@ public class PropertyReaderTest
     {
         // GIVEN
         String path = new File(".").getCanonicalPath() + "/src/test/my/custom/path/to/some.properties";
-        System.out.println(path);
         System.setProperty("psw4j.configuration", path);
         Thread.currentThread().setContextClassLoader(null);
 

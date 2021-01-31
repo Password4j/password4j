@@ -172,6 +172,22 @@ class Utils
         return result;
     }
 
+    public static long[] fromBytesToLongs(byte[] input) {
+        long[] v = new long[128];
+        for (int i = 0; i < v.length; i++) {
+            byte[] slice = Arrays.copyOfRange(input, i * 8, (i + 1) * 8);
+            v[i] = littleEndianBytesToLong(slice);
+        }
+        return v;
+    }
 
+    public static long littleEndianBytesToLong(byte[] b) {
+        long result = 0;
+        for (int i = 7; i >= 0; i--) {
+            result <<= 8;
+            result |= (b[i] & 0xFF);
+        }
+        return result;
+    }
 
 }

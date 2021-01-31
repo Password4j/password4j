@@ -41,7 +41,7 @@ public class Blake2b
     private byte[] key = null;
 
 
-    private byte[] buffer;
+    private final byte[] buffer;
 
     private int bufferPos = 0;
 
@@ -86,21 +86,21 @@ public class Blake2b
     }
 
     /**
-     * Basic sized constructor - size in bits.
+     * Basic sized constructor - size in bytes.
      *
-     * @param digestSize size of the digest in bits
+     * @param digestSize size of the digest in bytes
      */
     Blake2b(int digestSize)
     {
-        if (digestSize < 8 || digestSize > 512 || digestSize % 8 != 0)
+        if (digestSize < 1 || digestSize > 64)
         {
             throw new IllegalArgumentException(
-                    "BLAKE2b digest bit length must be a multiple of 8 and not greater than 512");
+                    "BLAKE2b digest bytes length must be not greater than 64");
         }
 
         buffer = new byte[BLOCK_LENGTH_BYTES];
         keyLength = 0;
-        this.digestLength = digestSize / 8;
+        this.digestLength = digestSize;
         init();
     }
 
@@ -337,6 +337,7 @@ public class Blake2b
         bufferPos += offset + len - messagePos;
     }
 
+
     /**
      * close the digest, producing the final digest value. The doFinal
      * call leaves the digest reset.
@@ -378,6 +379,9 @@ public class Blake2b
 
         return digestLength;
     }
+
+
+
 
     /**
      * Reset the digest back to it's initial state.

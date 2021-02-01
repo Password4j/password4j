@@ -131,17 +131,6 @@ class Utils
         return n;
     }
 
-    static int[] littleEndianToInt(byte[] bs, int off, int count)
-    {
-        int[] ns = new int[count];
-        for (int i = 0; i < ns.length; ++i)
-        {
-            ns[i] = littleEndianToInt(bs, off);
-            off += 4;
-        }
-        return ns;
-    }
-
     static byte[] longToLittleEndian(long n)
     {
         byte[] bs = new byte[8];

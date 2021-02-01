@@ -57,7 +57,7 @@ public class Blake2b
 
     public Blake2b()
     {
-        this(512);
+        this(64);
     }
 
     public Blake2b(Blake2b digest)

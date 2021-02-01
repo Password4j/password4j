@@ -1,7 +1,24 @@
+/*
+ *  (C) Copyright 2020 Password4j (http://password4j.com/).
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
 package com.password4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -11,7 +28,7 @@ import java.util.concurrent.Future;
 
 public class Argon2Function extends AbstractHashingFunction
 {
-    private boolean CLEAR_MEMORY = true;
+    private static final boolean CLEAR_MEMORY = true;
 
     public static final int ARGON2_VERSION_10 = 0x10;
 
@@ -55,7 +72,7 @@ public class Argon2Function extends AbstractHashingFunction
 
     private Argon2 variant;
 
-    private int version;
+    private int version = DEFAULT_VERSION;
 
     private byte[] initialHash;
 
@@ -106,7 +123,7 @@ public class Argon2Function extends AbstractHashingFunction
         blake2b.update(Utils.intToLittleEndianBytes(outputLength));
         blake2b.update(Utils.intToLittleEndianBytes(memory));
         blake2b.update(Utils.intToLittleEndianBytes(iterations));
-        blake2b.update(Utils.intToLittleEndianBytes(DEFAULT_VERSION));
+        blake2b.update(Utils.intToLittleEndianBytes(version));
         blake2b.update(Utils.intToLittleEndianBytes(variant.ordinal()));
 
         updateWithLength(blake2b, plainTextPassword);
@@ -184,7 +201,6 @@ public class Argon2Function extends AbstractHashingFunction
 
             int lastLength = outputLength - 32 * r;
 
-            /* Vr+1 */
             outBuffer = simpleBlake2b(outBuffer, null, lastLength);
             System.arraycopy(outBuffer, 0, result, position, lastLength);
         }
@@ -200,7 +216,7 @@ public class Argon2Function extends AbstractHashingFunction
             blake2b.update(outlenBytes);
         blake2b.update(input);
 
-        byte[] buff = new byte[64];
+        byte[] buff = new byte[outputLength];
         blake2b.doFinal(buff, 0);
         return buff;
     }
@@ -307,7 +323,7 @@ public class Argon2Function extends AbstractHashingFunction
 
             long pseudoRandom = getPseudoRandom(i, addressBlock, inputBlock, zeroBlock, prevOffset, dataIndependentAddressing);
             int refLane = getRefLane(pass, lane, slice, pseudoRandom);
-            int refColumn = getRefColumn(pass, lane, slice, i, pseudoRandom, refLane == lane);
+            int refColumn = getRefColumn(pass, slice, i, pseudoRandom, refLane == lane);
 
             long[] prevBlock = blockMemory[prevOffset];
             long[] refBlock = blockMemory[((laneLength) * refLane + refColumn)];
@@ -377,11 +393,10 @@ public class Argon2Function extends AbstractHashingFunction
 
     private int getRefLane(int pass, int lane, int slice, long pseudoRandom)
     {
-        int refLane = (int) (((pseudoRandom >>> 32)) % parallelism);
+        int refLane = (int) ((pseudoRandom >>> 32) % parallelism);
 
-        if ((pass == 0) && (slice == 0))
+        if (pass == 0 && slice == 0)
         {
-            /* Can not reference other lanes yet */
             refLane = lane;
         }
         return refLane;
@@ -410,7 +425,7 @@ public class Argon2Function extends AbstractHashingFunction
         fillBlock(zeroBlock, addressBlock, addressBlock, false);
     }
 
-    private int getRefColumn(int pass, int lane, int slice, int index, long pseudoRandom, boolean sameLane)
+    private int getRefColumn(int pass, int slice, int index, long pseudoRandom, boolean sameLane)
     {
 
         int referenceAreaSize;
@@ -422,12 +437,10 @@ public class Argon2Function extends AbstractHashingFunction
 
             if (sameLane)
             {
-                /* The same lane => add current segment */
                 referenceAreaSize = slice * segmentLength + index - 1;
             }
             else
             {
-                /* pass == 0 && !sameLane => position.slice > 0*/
                 referenceAreaSize = slice * segmentLength + ((index == 0) ? (-1) : 0);
             }
 
@@ -454,56 +467,56 @@ public class Argon2Function extends AbstractHashingFunction
         return (int) (startPosition + relativePosition) % laneLength;
     }
 
-    static void fillBlock(long[] X, long[] Y, long[] currentBlock, boolean withXor)
+    static void fillBlock(long[] x, long[] y, long[] currentBlock, boolean withXor)
     {
 
-        long[] R = new long[ARGON2_QWORDS_IN_BLOCK];
-        long[] Z = new long[ARGON2_QWORDS_IN_BLOCK];
+        long[] r = new long[ARGON2_QWORDS_IN_BLOCK];
+        long[] z = new long[ARGON2_QWORDS_IN_BLOCK];
 
-        Utils.xor(R, X, Y);
-        System.arraycopy(R, 0, Z, 0, Z.length);
+        Utils.xor(r, x, y);
+        System.arraycopy(r, 0, z, 0, z.length);
 
         for (int i = 0; i < 8; i++)
         {
 
-            roundFunction(Z, 16 * i, 16 * i + 1, 16 * i + 2, 16 * i + 3, 16 * i + 4, 16 * i + 5, 16 * i + 6, 16 * i + 7,
+            roundFunction(z, 16 * i, 16 * i + 1, 16 * i + 2, 16 * i + 3, 16 * i + 4, 16 * i + 5, 16 * i + 6, 16 * i + 7,
                     16 * i + 8, 16 * i + 9, 16 * i + 10, 16 * i + 11, 16 * i + 12, 16 * i + 13, 16 * i + 14, 16 * i + 15);
         }
 
         for (int i = 0; i < 8; i++)
         {
 
-            roundFunction(Z, 2 * i, 2 * i + 1, 2 * i + 16, 2 * i + 17, 2 * i + 32, 2 * i + 33, 2 * i + 48, 2 * i + 49, 2 * i + 64,
+            roundFunction(z, 2 * i, 2 * i + 1, 2 * i + 16, 2 * i + 17, 2 * i + 32, 2 * i + 33, 2 * i + 48, 2 * i + 49, 2 * i + 64,
                     2 * i + 65, 2 * i + 80, 2 * i + 81, 2 * i + 96, 2 * i + 97, 2 * i + 112, 2 * i + 113);
 
         }
 
         if (withXor)
         {
-            Utils.xor(currentBlock, R, Z, currentBlock);
+            Utils.xor(currentBlock, r, z, currentBlock);
         }
         else
         {
-            Utils.xor(currentBlock, R, Z);
+            Utils.xor(currentBlock, r, z);
         }
     }
 
-    static void roundFunction(long[] block, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9,
+    private static void roundFunction(long[] block, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9,
             int v10, int v11, int v12, int v13, int v14, int v15)
     {
 
-        F(block, v0, v4, v8, v12);
-        F(block, v1, v5, v9, v13);
-        F(block, v2, v6, v10, v14);
-        F(block, v3, v7, v11, v15);
+        f(block, v0, v4, v8, v12);
+        f(block, v1, v5, v9, v13);
+        f(block, v2, v6, v10, v14);
+        f(block, v3, v7, v11, v15);
 
-        F(block, v0, v5, v10, v15);
-        F(block, v1, v6, v11, v12);
-        F(block, v2, v7, v8, v13);
-        F(block, v3, v4, v9, v14);
+        f(block, v0, v5, v10, v15);
+        f(block, v1, v6, v11, v12);
+        f(block, v2, v7, v8, v13);
+        f(block, v3, v4, v9, v14);
     }
 
-    private static void F(long[] block, int a, int b, int c, int d)
+    private static void f(long[] block, int a, int b, int c, int d)
     {
         fBlaMka(block, a, b);
         rotr64(block, d, a, 32);
@@ -542,7 +555,6 @@ public class Argon2Function extends AbstractHashingFunction
 
         long[] finalBlock = blockMemory[laneLength - 1];
 
-        /* XOR the last blocks */
         for (int i = 1; i < parallelism; i++)
         {
             int lastBlockInLane = i * laneLength + (laneLength - 1);
@@ -589,8 +601,14 @@ public class Argon2Function extends AbstractHashingFunction
         initialize(password, salt.getBytes(), null, null);
         fillMemoryBlocks();
         byte[] hash = ending();
-        System.out.println(Arrays.toString(hash));
-        return null;
+        return new Hash(this, encodeHash(hash, salt), salt);
+    }
+
+    private String encodeHash(byte[] hash, String salt)
+    {
+        return "$argon2" + variant.name().toLowerCase() + "$v=" + version + "$m=" + memory
+                + ",t="+ iterations + ",p=" + parallelism + "$" + Base64.getEncoder().withoutPadding().encodeToString(salt.getBytes()) +
+                "$" + Base64.getEncoder().withoutPadding().encodeToString(hash);
     }
 
     @Override
@@ -599,20 +617,6 @@ public class Argon2Function extends AbstractHashingFunction
         return false;
     }
 
-    protected byte[] getInitalHash()
-    {
-        return initialHash;
-    }
 
-    public long[][] getBlockMemory()
-    {
-        return blockMemory;
-    }
 
-    @Override
-    public String toString()
-    {
-        return "Argon2Function{" + "iterations=" + iterations + ",\n memory=" + memory + ",\n parallelism=" + parallelism + ",\n outputLength=" + outputLength + ",\n variant=" + variant
-                .ordinal() + ",\n initialHash=" + Arrays.toString(initialHash) + '}';
-    }
 }

@@ -186,6 +186,21 @@ public class PasswordTest
         Assert.assertEquals(Password.hash(PASSWORD).addPepper("newpepper").addSalt("newsalt").withMessageDigest().getResult(), update.getHash().getResult());
     }
 
+    @Test
+    public void testRawUpdate5()
+    {
+        // GIVEN
+        Hash hash = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withArgon2();
+
+        // WHEN
+        HashUpdate update = Password.check(PASSWORD, hash.getResult()).addPepper(PEPPER).addSalt(SALT)
+                .andUpdate().addNewSalt("newsalt").addNewPepper("newpepper").withArgon2();
+
+        // THEN
+        Assert.assertTrue(update.isVerified());
+        Assert.assertEquals(Password.hash(PASSWORD).addPepper("newpepper").addSalt("newsalt").withArgon2().getResult(), update.getHash().getResult());
+    }
+
 
 
     @Test
@@ -244,6 +259,25 @@ public class PasswordTest
         Assert.assertTrue(newCheck);
     }
 
+    @Test
+    public void testMigration4()
+    {
+        // GIVEN
+        Hash oldHash = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withMessageDigest();
+
+        // WHEN
+        HashUpdate update = Password.check(PASSWORD, oldHash.getResult()).addPepper(PEPPER).addSalt(SALT)
+                .andUpdate()
+                .with(AlgorithmFinder.getMessageDigestInstance(), AlgorithmFinder.getArgon2Instance());
+
+        boolean newCheck = Password.check(PASSWORD, update.getHash().getResult()).addPepper(PEPPER).withArgon2();
+
+
+        // THEN
+        Assert.assertTrue(update.isVerified());
+        Assert.assertTrue(newCheck);
+    }
+
 
     @Test
     public void testRandomSalt()
@@ -288,6 +322,9 @@ public class PasswordTest
         Hash hash2 = Password.hash(PASSWORD).withBCrypt();
         Hash hash3 = Password.hash(PASSWORD).withSCrypt();
         Hash hash4 = Password.hash(PASSWORD).withCompressedPBKDF2();
+        Hash hash5 = Password.hash(PASSWORD).withMessageDigest();
+        Hash hash6 = Password.hash(PASSWORD).withArgon2();
+
 
 
         // THEN
@@ -295,6 +332,8 @@ public class PasswordTest
         Assert.assertTrue(hash2.getHashingFunction() instanceof BCryptFunction);
         Assert.assertTrue(hash3.getHashingFunction() instanceof SCryptFunction);
         Assert.assertTrue(hash4.getHashingFunction() instanceof CompressedPBKDF2Function);
+        Assert.assertTrue(hash5.getHashingFunction() instanceof MessageDigestFunction);
+        Assert.assertTrue(hash6.getHashingFunction() instanceof Argon2Function);
     }
 
     @Test(expected = BadParametersException.class)
@@ -358,7 +397,7 @@ public class PasswordTest
     }
 
     @Test
-    public void testSecureNeverNull() throws ClassNotFoundException
+    public void testSecureNeverNull()
     {
         // GIVEN
         PropertyReader.properties.put("global.random.strong", "true");

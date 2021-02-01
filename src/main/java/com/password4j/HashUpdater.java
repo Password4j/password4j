@@ -331,4 +331,42 @@ public class HashUpdater
     {
         return with(AlgorithmFinder.getMessageDigestInstance(), newHashingFunction);
     }
+
+    /**
+     * Hashes the previously given plain text password
+     * with {@link Argon2Function}.
+     * <p>
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
+     * then the default parameters are used.
+     * <p>
+     * Finally calls {@link #with(HashingFunction, HashingFunction)}
+     *
+     * @return the result of the verification with the new hash
+     * @see AlgorithmFinder#getArgon2Instance() ()
+     * @see #with(HashingFunction, HashingFunction)
+     * @since 1.5.0
+     */
+    public HashUpdate withArgon2()
+    {
+        return withArgon2(AlgorithmFinder.getArgon2Instance());
+    }
+
+    /**
+     * Hashes the previously given plain text password
+     * with {@link Argon2Function}.
+     * <p>
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
+     * then the default parameters are used.
+     * <p>
+     * Finally calls {@link #with(HashingFunction, HashingFunction)}
+     *
+     * @return the result of the verification with the new hash
+     * @see AlgorithmFinder#getArgon2Instance() ()
+     * @see #with(HashingFunction, HashingFunction)
+     * @since 1.5.0
+     */
+    public HashUpdate withArgon2(HashingFunction newHashingFunction)
+    {
+        return with(Argon2Function.getInstanceFromHash(hashChecker.getHashed()), newHashingFunction);
+    }
 }

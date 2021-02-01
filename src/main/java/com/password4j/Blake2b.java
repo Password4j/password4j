@@ -66,12 +66,6 @@ class Blake2b
     private long t1 = 0L;
     private long f0 = 0L;
 
-
-    Blake2b()
-    {
-        this(64);
-    }
-
     /**
      * Basic sized constructor - size in bytes.
      *
@@ -150,20 +144,18 @@ class Blake2b
      */
     void update(byte[] message, int offset, int len)
     {
-        int remainingLength = 0; // left bytes of buffer
+        int remainingLength = 0;
 
         if (bufferPos != 0)
-        { // commenced, incomplete buffer
-
-            // complete the buffer:
+        {
             remainingLength = BLOCK_LENGTH_BYTES - bufferPos;
             if (remainingLength < len)
-            { // full buffer + at least 1 byte
+            {
                 System.arraycopy(message, offset, buffer, bufferPos,
                         remainingLength);
                 t0 += BLOCK_LENGTH_BYTES;
                 if (t0 == 0)
-                { // if message > 2^64
+                {
                     t1++;
                 }
                 compress(buffer, 0);
@@ -178,12 +170,10 @@ class Blake2b
             }
         }
 
-        // process blocks except last block (also if last block is full)
         int messagePos;
         int blockWiseLastPos = offset + len - BLOCK_LENGTH_BYTES;
         for (messagePos = offset + remainingLength; messagePos < blockWiseLastPos; messagePos += BLOCK_LENGTH_BYTES)
-        { // block wise 128 bytes
-            // without buffer:
+        {
             t0 += BLOCK_LENGTH_BYTES;
             if (t0 == 0)
             {

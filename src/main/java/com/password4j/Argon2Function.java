@@ -33,21 +33,11 @@ public class Argon2Function extends AbstractHashingFunction
 
     public static final int ARGON2_VERSION_13 = 0x13;
 
-    private static final int DEFAULT_OUTPUT_LENGTH = 32;
-
-    private static final int DEFAULT_MEMORY = 12;
-
-    private static final int DEFAULT_PARALLELISM = 1;
-
-    private static final Argon2 DEFAULT_VARIANT = Argon2.ID;
-
-    private static final int PRE_HASH_LENGTH = 64;
-
     private static final int ARGON2_SYNC_POINTS = 4;
 
-    public static final int ARGON2_PREHASH_DIGEST_LENGTH = 64;
+    public static final int ARGON2_INITIAL_DIGEST_LENGTH = 64;
 
-    private static final int ARGON2_PREHASH_SEED_LENGTH = 72;
+    private static final int ARGON2_INITIAL_SEED_LENGTH = 72;
 
     private static final int ARGON2_BLOCK_SIZE = 1024;
 
@@ -73,12 +63,36 @@ public class Argon2Function extends AbstractHashingFunction
 
     private final int laneLength;
 
-    public static Argon2Function getInstance(int memory, int iterations, int outputLength, int parallelism, Argon2 type)
+    /**
+     * Creates a singleton instance, depending on the provided
+     * logarithmic memory, number of iterations, parallelism, lenght og the output and type.
+     *
+     * @param memory       logarithmic memory
+     * @param iterations   number of iterations
+     * @param parallelism  level of parallelism
+     * @param outputLength length of the final hash
+     * @param type         argon2 type (i, d or id)
+     * @return a singleton instance
+     * @since 1.5.0
+     */
+    public static Argon2Function getInstance(int memory, int iterations, int parallelism, int outputLength, Argon2 type)
     {
-        return getInstance(memory, iterations, outputLength, parallelism, type, ARGON2_VERSION_13);
+        return getInstance(memory, iterations, parallelism, outputLength, type, ARGON2_VERSION_13);
     }
 
-
+    /**
+     * Creates a singleton instance, depending on the provided
+     * logarithmic memory, number of iterations, parallelism, lenght og the output, type and version.
+     *
+     * @param memory       logarithmic memory
+     * @param iterations   number of iterations
+     * @param parallelism  level of parallelism
+     * @param outputLength length of the final hash
+     * @param type         argon2 type (i, d or id)
+     * @param version      version of the algorithm (16 or 19)
+     * @return a singleton instance
+     * @since 1.5.0
+     */
     public static Argon2Function getInstance(int memory, int iterations, int parallelism, int outputLength, Argon2 type, int version)
     {
         String key = getUID(memory, iterations, parallelism, outputLength, type, version);
@@ -94,9 +108,17 @@ public class Argon2Function extends AbstractHashingFunction
         }
     }
 
-    public static Argon2Function getInstanceFromHash(String hash)
+    /**
+     * Reads the configuration contained in the given hash and
+     * builds a singleton instance based on these configurations.
+     *
+     * @param hashed an already hashed password
+     * @return a singleton instance based on the given hash
+     * @since 1.5.0
+     */
+    public static Argon2Function getInstanceFromHash(String hashed)
     {
-        Object[] params = decodeHash(hash);
+        Object[] params = decodeHash(hashed);
         Argon2 type = Argon2.valueOf(((String) params[0]).toUpperCase());
         int version = (int) params[1];
         int memory = (int) params[2];
@@ -145,14 +167,14 @@ public class Argon2Function extends AbstractHashingFunction
     {
         this.variant = variant;
         this.iterations = iterations;
-        this.memory = 1 << memory;
+        this.memory = memory;
         this.parallelism = parallelism;
         this.outputLength = outputLength;
         this.version = version;
 
         int memoryBlocks = this.memory;
 
-        if (memoryBlocks < 2 * ARGON2_SYNC_POINTS * parallelism)
+        if (this.memory < 2 * ARGON2_SYNC_POINTS * parallelism)
         {
             memoryBlocks = 2 * ARGON2_SYNC_POINTS * parallelism;
         }
@@ -169,9 +191,9 @@ public class Argon2Function extends AbstractHashingFunction
         }
     }
 
-    protected void initialize(byte[] plainTextPassword, byte[] salt, byte[] secret, byte[] additional, long[][] blockMemory)
+    private void initialize(byte[] plainTextPassword, byte[] salt, byte[] secret, byte[] additional, long[][] blockMemory)
     {
-        Blake2b blake2b = new Blake2b(ARGON2_PREHASH_DIGEST_LENGTH);
+        Blake2b blake2b = new Blake2b(ARGON2_INITIAL_DIGEST_LENGTH);
 
         blake2b.update(Utils.intToLittleEndianBytes(parallelism));
         blake2b.update(Utils.intToLittleEndianBytes(outputLength));
@@ -202,24 +224,24 @@ public class Argon2Function extends AbstractHashingFunction
 
             byte[] iBytes = Utils.intToLittleEndianBytes(i);
 
-            System.arraycopy(iBytes, 0, initialHashWithZeros, ARGON2_PREHASH_DIGEST_LENGTH + 4, 4);
-            System.arraycopy(iBytes, 0, initialHashWithOnes, ARGON2_PREHASH_DIGEST_LENGTH + 4, 4);
+            System.arraycopy(iBytes, 0, initialHashWithZeros, ARGON2_INITIAL_DIGEST_LENGTH + 4, 4);
+            System.arraycopy(iBytes, 0, initialHashWithOnes, ARGON2_INITIAL_DIGEST_LENGTH + 4, 4);
 
-            byte[] blockhashBytes = blake2bLong(initialHashWithZeros, ARGON2_BLOCK_SIZE);
-            blockMemory[i * laneLength] = Utils.fromBytesToLongs(blockhashBytes);
+            byte[] blockHashBytes = blake2bLong(initialHashWithZeros, ARGON2_BLOCK_SIZE);
+            blockMemory[i * laneLength] = Utils.fromBytesToLongs(blockHashBytes);
 
-            blockhashBytes = blake2bLong(initialHashWithOnes, ARGON2_BLOCK_SIZE);
-            blockMemory[i * laneLength + 1] = Utils.fromBytesToLongs(blockhashBytes);
+            blockHashBytes = blake2bLong(initialHashWithOnes, ARGON2_BLOCK_SIZE);
+            blockMemory[i * laneLength + 1] = Utils.fromBytesToLongs(blockHashBytes);
         }
 
     }
 
     private static byte[] getInitialHashLong(byte[] initialHash, byte[] appendix)
     {
-        byte[] initialHashLong = new byte[ARGON2_PREHASH_SEED_LENGTH];
+        byte[] initialHashLong = new byte[ARGON2_INITIAL_SEED_LENGTH];
 
-        System.arraycopy(initialHash, 0, initialHashLong, 0, ARGON2_PREHASH_DIGEST_LENGTH);
-        System.arraycopy(appendix, 0, initialHashLong, ARGON2_PREHASH_DIGEST_LENGTH, 4);
+        System.arraycopy(initialHash, 0, initialHashLong, 0, ARGON2_INITIAL_DIGEST_LENGTH);
+        System.arraycopy(appendix, 0, initialHashLong, ARGON2_INITIAL_DIGEST_LENGTH, 4);
 
         return initialHashLong;
     }
@@ -288,7 +310,7 @@ public class Argon2Function extends AbstractHashingFunction
         }
     }
 
-    public void fillMemoryBlocks(long[][] blockMemory)
+    private void fillMemoryBlocks(long[][] blockMemory)
     {
         if (parallelism == 1)
         {
@@ -521,7 +543,7 @@ public class Argon2Function extends AbstractHashingFunction
         return (int) (startPosition + relativePosition) % laneLength;
     }
 
-    static void fillBlock(long[] x, long[] y, long[] currentBlock, boolean withXor)
+    private static void fillBlock(long[] x, long[] y, long[] currentBlock, boolean withXor)
     {
 
         long[] r = new long[ARGON2_QWORDS_IN_BLOCK];
@@ -558,7 +580,6 @@ public class Argon2Function extends AbstractHashingFunction
     private static void roundFunction(long[] block, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9,
                                       int v10, int v11, int v12, int v13, int v14, int v15)
     {
-
         f(block, v0, v4, v8, v12);
         f(block, v1, v5, v9, v13);
         f(block, v2, v6, v10, v14);
@@ -667,7 +688,7 @@ public class Argon2Function extends AbstractHashingFunction
             result[0] = StringUtils.removeStart(parts[1], "argon2");
             String[] params = parts[3].split(",");
             result[1] = Integer.parseInt(StringUtils.removeStart(parts[2], "v="));
-            result[2] = Utils.log2(Integer.parseInt(StringUtils.removeStart(params[0], "m=")));
+            result[2] = Integer.parseInt(StringUtils.removeStart(params[0], "m="));
             result[3] = Integer.parseInt(StringUtils.removeStart(params[1], "t="));
             result[4] = Integer.parseInt(StringUtils.removeStart(params[2], "p="));
             result[5] = Base64.getDecoder().decode(parts[4]);

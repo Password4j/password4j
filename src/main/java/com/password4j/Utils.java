@@ -199,14 +199,7 @@ class Utils
         }
     }
 
-    /**
-     * Calculates the logarithm base 2 of a number that is already
-     * power of two
-     *
-     * @param number power of 2 positive number.
-     * @return the logarithm base 2
-     * @since 0.1.0
-     */
+
     static int log2(int number)
     {
         int log = 0;

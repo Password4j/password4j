@@ -61,4 +61,5 @@ public abstract class AbstractHashingFunction implements HashingFunction
             diff |= a[i] ^ b[i];
         return diff == 0;
     }
+
 }

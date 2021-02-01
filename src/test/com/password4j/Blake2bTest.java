@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -50,10 +49,12 @@ public class Blake2bTest
             new TestCase(null, 512/8, "786a02f742015903c6c6fd852552d272912f4740e15847618a86e217f71f5419d25e1031afee585313896444934eb04b903a685b1448b755d56f701afe9be2ce"),
             new TestCase(null, 384/8, "b32811423377f52d7862286ee1a72ee540524380fda1724a6f25d7978c6fd3244a6caf0498812673c5e05ef583825100"),
             new TestCase(null, 256/8, "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"),
-            new TestCase(null, 224/8, "836cc68931c2e4e3e838602eca1902591d216837bafddfe6f0c8cb07")
+            new TestCase(null, 224/8, "836cc68931c2e4e3e838602eca1902591d216837bafddfe6f0c8cb07"),
 
+            new TestCase("0", 384/8, "c62e79958b2e7796d4b6afaba57b3a929a5c38125f56703cae90a952a96a6ef2a2d42376fe7183222779e3790fc95a22"),
 
-            );
+            new TestCase("!$%^&*()_+@~{}", 512/8, "a7128f0b9a745d7073be967e2dc4ceb5e326a998ca45c451835c1c4eecd499dea1c1e04e15e890b2ac32675baea270785dd12d591646bc4df7c545b31041ed22")
+    );
 
 
     @Test
@@ -96,30 +97,10 @@ public class Blake2bTest
 
     }
 
+    
 
-    @Test
-    public void test1()
-    {
-        Blake2b instance = new Blake2b();
-        instance.update("IamUsingBlake2b###".getBytes());
 
-        byte[] out = new byte[64];
-        instance.doFinal(out, 0);
 
-        assertEquals("5fc5a199294099e98280dac6047523aa123ba29e6995618339c9590e4dca983dea2529ad85afbac5613c495b3fb50bf2d5919cb3f51f6a9dba78a33f9d278f6f", Utils.toHex(out));
-    }
-
-    @Test
-    public void testNull()
-    {
-        Blake2b instance = new Blake2b();
-        instance.update(null);
-
-        byte[] out = new byte[64];
-        instance.doFinal(out, 0);
-
-        assertEquals("786a02f742015903c6c6fd852552d272912f4740e15847618a86e217f71f5419d25e1031afee585313896444934eb04b903a685b1448b755d56f701afe9be2ce", Utils.toHex(out));
-    }
 
 
 }

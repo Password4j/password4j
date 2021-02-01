@@ -171,8 +171,18 @@ public class Argon2Function extends AbstractHashingFunction
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed, String salt, CharSequence pepper)
     {
-        Object[] params = decodeHash(hashed);
-        Hash internalHash = hash(plainTextPassword, new String((byte[]) params[5]), pepper);
+        String theSalt;
+        if(salt == null)
+        {
+            Object[] params = decodeHash(hashed);
+            theSalt = new String((byte[]) params[5]);
+        }
+        else
+        {
+            theSalt = salt;
+        }
+
+        Hash internalHash = hash(plainTextPassword, theSalt, pepper);
         return slowEquals(internalHash.getResult().getBytes(), hashed.getBytes());
     }
 

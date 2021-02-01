@@ -104,24 +104,6 @@ class Utils
         return ((hi & 0xffffffffL) << 32) | (lo & 0xffffffffL);
     }
 
-    static void littleEndianToInt(byte[] bs, int bOff, int[] ns, int nOff, int count)
-    {
-        for (int i = 0; i < count; ++i)
-        {
-            ns[nOff + i] = littleEndianToInt(bs, bOff);
-            bOff += 4;
-        }
-    }
-
-    static void littleEndianToInt(byte[] bs, int off, int[] ns)
-    {
-        for (int i = 0; i < ns.length; ++i)
-        {
-            ns[i] = littleEndianToInt(bs, off);
-            off += 4;
-        }
-    }
-
     static int littleEndianToInt(byte[] bs, int off)
     {
         int n = bs[off] & 0xff;
@@ -215,6 +197,40 @@ class Utils
         for (int i = 0; i < t.length; i++) {
             t[i] = t[i] ^ other[i];
         }
+    }
+
+    /**
+     * Calculates the logarithm base 2 of a number that is already
+     * power of two
+     *
+     * @param number power of 2 positive number.
+     * @return the logarithm base 2
+     * @since 0.1.0
+     */
+    static int log2(int number)
+    {
+        int log = 0;
+        if ((number & -65536) != 0)
+        {
+            number >>>= 16;
+            log = 16;
+        }
+        if (number >= 256)
+        {
+            number >>>= 8;
+            log += 8;
+        }
+        if (number >= 16)
+        {
+            number >>>= 4;
+            log += 4;
+        }
+        if (number >= 4)
+        {
+            number >>>= 2;
+            log += 2;
+        }
+        return log + (number >>> 1);
     }
 
 }

@@ -111,6 +111,21 @@ public class PasswordTest
     }
 
     @Test
+    public void testRawCheck5()
+    {
+        // GIVEN
+        Hash hash = Password.hash(PASSWORD).addSalt(SALT).withArgon2();
+        String hashed = hash.getResult();
+
+        // WHEN
+        Argon2Function strategy = Argon2Function.getInstanceFromHash(hashed);
+
+        // THEN
+        Assert.assertTrue(strategy.check(PASSWORD, hashed));
+        Assert.assertTrue(Password.check(PASSWORD, hashed).addSalt(SALT).withArgon2());
+    }
+
+    @Test
     public void testRawUpdate1()
     {
         // GIVEN
@@ -170,6 +185,8 @@ public class PasswordTest
         Assert.assertTrue(update.isVerified());
         Assert.assertEquals(Password.hash(PASSWORD).addPepper("newpepper").addSalt("newsalt").withMessageDigest().getResult(), update.getHash().getResult());
     }
+
+
 
     @Test
     public void testMigration1()

@@ -39,7 +39,7 @@ public class SCryptFunction extends AbstractHashingFunction
 
     private int parallelization; // p
 
-    private static ConcurrentMap<String, SCryptFunction> instances = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, SCryptFunction> INSTANCES = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unused")
     private SCryptFunction()
@@ -95,14 +95,14 @@ public class SCryptFunction extends AbstractHashingFunction
     public static SCryptFunction getInstance(int workFactor, int resources, int parallelization)
     {
         String key = getUID(resources, workFactor, parallelization);
-        if (instances.containsKey(key))
+        if (INSTANCES.containsKey(key))
         {
-            return instances.get(key);
+            return INSTANCES.get(key);
         }
         else
         {
             SCryptFunction function = new SCryptFunction(workFactor, resources, parallelization);
-            instances.put(key, function);
+            INSTANCES.put(key, function);
             return function;
         }
     }
@@ -121,7 +121,7 @@ public class SCryptFunction extends AbstractHashingFunction
         {
             byte[] saltAsBytes = salt.getBytes(StandardCharsets.UTF_8);
             byte[] derived = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), saltAsBytes, 64);
-            String params = Long.toString(log2(workFactor) << 16 | resources << 8 | parallelization, 16);
+            String params = Long.toString((long) Utils.log2(workFactor) << 16 | (long) resources << 8 | parallelization, 16);
             String sb = "$s0$" + params + '$' + Base64.getEncoder().encodeToString(saltAsBytes) + '$' + Base64.getEncoder()
                     .encodeToString(derived);
             return new Hash(this, sb, salt);
@@ -199,7 +199,7 @@ public class SCryptFunction extends AbstractHashingFunction
     }
 
     /**
-     * A more readable version of {@link #getRequiredMemory()},
+     * A more readable version of {@link #getRequiredBytes()},
      * changing the unit (B, KB, MB) so that the number has at most
      * 2 decimal places.
      *
@@ -251,39 +251,7 @@ public class SCryptFunction extends AbstractHashingFunction
         return workFactor + "|" + resources + "|" + parallelization;
     }
 
-    /**
-     * Calculates the logarithm base 2 of a number that is already
-     * power of two
-     *
-     * @param number power of 2 positive number.
-     * @return the logarithm base 2
-     * @since 0.1.0
-     */
-    private static int log2(int number)
-    {
-        int log = 0;
-        if ((number & -65536) != 0)
-        {
-            number >>>= 16;
-            log = 16;
-        }
-        if (number >= 256)
-        {
-            number >>>= 8;
-            log += 8;
-        }
-        if (number >= 16)
-        {
-            number >>>= 4;
-            log += 4;
-        }
-        if (number >= 4)
-        {
-            number >>>= 2;
-            log += 2;
-        }
-        return log + (number >>> 1);
-    }
+
 
     public byte[] scrypt(byte[] passwd, byte[] salt, int dkLen) throws GeneralSecurityException
     {

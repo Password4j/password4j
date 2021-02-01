@@ -28,7 +28,6 @@ class Blake2b
                     0x1f83d9abfb41bd6bL, 0x5be0cd19137e2179L
             };
 
-    // Message word permutations:
     private static final byte[][] SIGMA =
             {
                     {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
@@ -88,31 +87,19 @@ class Blake2b
     // initialize chainValue
     private void init()
     {
-
         chainValue = new long[8];
-
-        chainValue[0] = IV[0]
-                ^ (digestLength | ((long) keyLength << 8) | 0x1010000);
-
+        chainValue[0] = IV[0] ^ (digestLength | ((long) keyLength << 8) | 0x1010000);
         chainValue[1] = IV[1];
         chainValue[2] = IV[2];
-
-
         chainValue[3] = IV[3];
-
         chainValue[4] = IV[4];
         chainValue[5] = IV[5];
-
-
         chainValue[6] = IV[6];
         chainValue[7] = IV[7];
-
-
     }
 
     private void initializeInternalState()
     {
-        // initialize v:
         System.arraycopy(chainValue, 0, internalState, 0, chainValue.length);
         System.arraycopy(IV, 0, internalState, chainValue.length, 4);
         internalState[12] = t0 ^ IV[4];

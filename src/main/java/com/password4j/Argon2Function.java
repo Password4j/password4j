@@ -65,9 +65,9 @@ public class Argon2Function extends AbstractHashingFunction
 
     /**
      * Creates a singleton instance, depending on the provided
-     * logarithmic memory, number of iterations, parallelism, lenght og the output and type.
+     * memory (KiB), number of iterations, parallelism, length og the output and type.
      *
-     * @param memory       logarithmic memory
+     * @param memory       memory (KiB)
      * @param iterations   number of iterations
      * @param parallelism  level of parallelism
      * @param outputLength length of the final hash
@@ -138,25 +138,47 @@ public class Argon2Function extends AbstractHashingFunction
     @Override
     public Hash hash(CharSequence plainTextPassword, String salt)
     {
+        return hash(plainTextPassword, salt, null);
+    }
+
+    @Override
+    public Hash hash(CharSequence plainTextPassword, String salt, CharSequence pepper)
+    {
         byte[] password = Utils.fromCharSequenceToBytes(plainTextPassword);
         long[][] blockMemory = copyOf(initialBlockMemory);
-        initialize(password, salt.getBytes(), null, null, blockMemory);
+        String theSalt;
+        if(salt == null)
+        {
+            theSalt = new String(SaltGenerator.generate());
+        }
+        else
+        {
+            theSalt = salt;
+        }
+        initialize(password, theSalt.getBytes(), Utils.fromCharSequenceToBytes(pepper), null, blockMemory);
         fillMemoryBlocks(blockMemory);
         byte[] hash = ending(blockMemory);
-        return new Hash(this, encodeHash(hash, salt), salt);
+        return new Hash(this, encodeHash(hash, theSalt), theSalt);
     }
 
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed)
     {
         Object[] params = decodeHash(hashed);
-
-
-        byte[] salt = (byte[]) params[5];
-        Hash internalHash = hash(plainTextPassword, new String(salt));
-        return slowEquals(internalHash.getResult().getBytes(), hashed.getBytes());
-
+        return check(plainTextPassword, hashed, new String((byte[]) params[5]), null);
     }
+
+    @Override
+    public boolean check(CharSequence plainTextPassword, String hashed, String salt, CharSequence pepper)
+    {
+        Object[] params = decodeHash(hashed);
+        Hash internalHash = hash(plainTextPassword, new String((byte[]) params[5]), pepper);
+        return slowEquals(internalHash.getResult().getBytes(), hashed.getBytes());
+    }
+
+
+
+
 
     protected static String getUID(int memory, int iterations, int parallelism, int outputLength, Argon2 type, int version)
     {

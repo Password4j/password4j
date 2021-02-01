@@ -97,7 +97,26 @@ public class Blake2bTest
 
     }
 
-    
+    @Test(expected = BadParametersException.class)
+    public void badTest1()
+    {
+        // GIVEN
+
+        // WHEN
+        new Blake2b(0);
+    }
+
+
+    @Test(expected = BadParametersException.class)
+    public void badTest2()
+    {
+        // GIVEN
+
+        // WHEN
+        new Blake2b(65);
+    }
+
+
 
 
 

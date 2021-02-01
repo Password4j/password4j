@@ -45,7 +45,7 @@ class Blake2b
                     {14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3}
             };
 
-    private static final  int ROUNDS = 12;
+    private static final int ROUNDS = 12;
 
     private static final int BLOCK_LENGTH_BYTES = 128;
 
@@ -75,8 +75,7 @@ class Blake2b
     {
         if (digestSize < 1 || digestSize > 64)
         {
-            throw new IllegalArgumentException(
-                    "BLAKE2b digest bytes length must be not greater than 64");
+            throw new BadParametersException("BLAKE2b digest bytes length must be not greater than 64");
         }
 
         buffer = new byte[BLOCK_LENGTH_BYTES];
@@ -86,33 +85,29 @@ class Blake2b
     }
 
 
-
-
-
     // initialize chainValue
     private void init()
     {
-        if (chainValue == null)
-        {
-            chainValue = new long[8];
 
-            chainValue[0] = IV[0]
-                    ^ (digestLength | ((long) keyLength << 8) | 0x1010000);
+        chainValue = new long[8];
 
-            chainValue[1] = IV[1];
-            chainValue[2] = IV[2];
+        chainValue[0] = IV[0]
+                ^ (digestLength | ((long) keyLength << 8) | 0x1010000);
 
-
-            chainValue[3] = IV[3];
-
-            chainValue[4] = IV[4];
-            chainValue[5] = IV[5];
+        chainValue[1] = IV[1];
+        chainValue[2] = IV[2];
 
 
-            chainValue[6] = IV[6];
-            chainValue[7] = IV[7];
+        chainValue[3] = IV[3];
 
-        }
+        chainValue[4] = IV[4];
+        chainValue[5] = IV[5];
+
+
+        chainValue[6] = IV[6];
+        chainValue[7] = IV[7];
+
+
     }
 
     private void initializeInternalState()
@@ -160,7 +155,7 @@ class Blake2b
                 }
                 compress(buffer, 0);
                 bufferPos = 0;
-                Arrays.fill(buffer, (byte)0);// clear buffer
+                Arrays.fill(buffer, (byte) 0);// clear buffer
             }
             else
             {
@@ -207,7 +202,7 @@ class Blake2b
             t1++;
         }
         compress(buffer, 0);
-        Arrays.fill(buffer, (byte)0);// Holds eventually the key if input is null
+        Arrays.fill(buffer, (byte) 0);// Holds eventually the key if input is null
         Arrays.fill(internalState, 0L);
 
         for (int i = 0; i < chainValue.length && (i * 8 < digestLength); i++)
@@ -230,8 +225,6 @@ class Blake2b
     }
 
 
-
-
     /**
      * Reset the digest back to it's initial state.
      * The key, the salt and the personal string will
@@ -244,7 +237,7 @@ class Blake2b
         t0 = 0L;
         t1 = 0L;
         chainValue = null;
-        Arrays.fill(buffer, (byte)0);
+        Arrays.fill(buffer, (byte) 0);
         init();
     }
 

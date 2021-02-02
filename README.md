@@ -19,7 +19,10 @@ Algorithms can be configured **programmatically** or through a **property file**
 The configurations are mostly dependent on your environment. Password4j delivers a **tool that can create
 a set of optimal parameters** based on the system performance and the desired maximum computational time <sup>see [Performance section](#Performance)</sup>.
 
-![Hash and verify](https://i.imgur.com/zQMvGdG.png)
+![Hash](https://i.imgur.com/1Pduapf.png)
+![Verify](https://i.imgur.com/JgfNbQf.png)
+
+
 
 The library fully supports **[Argon2](https://en.wikipedia.org/wiki/Argon2)**, **[BCrypt](https://en.wikipedia.org/wiki/Bcrypt)**, **[SCrypt](https://en.wikipedia.org/wiki/Scrypt)** and **[PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)** 
 and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/Salt_%28cryptography%29)** and **[pepper](https://en.wikipedia.org/wiki/Pepper_%28cryptography%29)**.
@@ -35,7 +38,7 @@ Add the dependency of the latest version to your `pom.xml`:
 <dependency>
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
 </dependency>
 ```
 
@@ -47,14 +50,14 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.password4j:password4j:1.4.0'
+    implementation 'com.password4j:password4j:1.5.0'
 }
 ```
 
 ## ![Scala SBT](https://i.imgur.com/Nqv3mVd.png?1) Scala SBT 
 Add to the managed dependencies of your `build.sbt` the latest version:
 ```shell script
-libraryDependencies += "com.password4j" % "password4j" % "1.4.0"
+libraryDependencies += "com.password4j" % "password4j" % "1.5.0"
 ```
 
 # Usage

@@ -41,8 +41,8 @@ public class PublicPasswordTest
             new TestSuite("$argon2id$v=19$m=1024,t=3,p=12$MTExMTExMTE$0PUE8wVEaK0qdjms3b4pTZOs0+00S/+9j28WZ3gMUno", "first!", "11111111",
                     null, Argon2Function.getInstance(1024, 3, 12, 32, Argon2.ID)),
 
-            new TestSuite("$argon2id$v=19$m=1024,t=3,p=12$MTExMTExMTE$hKdynniJwT4OHUelELQckgvw2YLm2nF7dLdH0oU29Zk", "first!", "11111111",
-                    "secret", Argon2Function.getInstance(1024, 3, 12, 32, Argon2.ID))
+            new TestSuite("$argon2id$v=19$m=4096,t=20,p=4$NUdyNEV4Yzc3RG9QOQ$aY701D5E9/hCqO4HMVChlGuR2PPYntYLcr8RsxFi/Xo", "password", "5Gr4Exc77DoP9",
+                    "my custom pepper", Argon2Function.getInstance(4096, 20, 4, 32, Argon2.ID))
     };
 
     @Test

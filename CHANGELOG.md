@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.0](https://github.com/Password4j/password4j/releases/tag/1.5.0) - (2021-02-02)
+### Added
+* Argon2 support
+### Changed
+* Enums `BCrypt` and `Hmac` are moved from `com.password4j` to `com.password4j.types`
+### Fixed
+* Some typos along the code.
+
 ## [1.4.0](https://github.com/Password4j/password4j/releases/tag/1.4.0) - (2020-11-15)
 ### Added
  * CHFs like MD5, SHA-1, SHA-2 and SHA-3 in order to increase compatibility with legacy systems.

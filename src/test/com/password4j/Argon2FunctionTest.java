@@ -137,7 +137,7 @@ public class Argon2FunctionTest
     {
         for (TestCase test : CASES)
         {
-            Argon2Function f = Argon2Function.getInstance(test.memory, test.iterations, test.parallelism, test.outLength, test.type, test.version);
+            Argon2Function f = getFunction(test.memory, test.iterations, test.parallelism, test.outLength, test.type, test.version);
             assertEquals(test.expected, f.hash(test.plainTextPassword, test.salt).getResult());
         }
     }
@@ -151,7 +151,7 @@ public class Argon2FunctionTest
         List<Callable<Boolean>> tasks = new ArrayList<>();
         for (final TestCase test : CASES)
         {
-            Callable<Boolean> c = () -> test.expected.equals(Argon2Function.getInstance(test.memory, test.iterations, test.parallelism, test.outLength, test.type, test.version).hash(test.plainTextPassword, test.salt).getResult());
+            Callable<Boolean> c = () -> test.expected.equals(getFunction(test.memory, test.iterations, test.parallelism, test.outLength, test.type, test.version).hash(test.plainTextPassword, test.salt).getResult());
             tasks.add(c);
         }
         List<Future<Boolean>> results = executors.invokeAll(tasks);
@@ -162,6 +162,20 @@ public class Argon2FunctionTest
         }
 
     }
+
+    private Argon2Function getFunction(int memory, int iterations, int parallelism, int outLength, Argon2 type,int version)
+    {
+        if (version == Argon2Function.ARGON2_VERSION_13)
+        {
+            return Argon2Function.getInstance(memory, iterations, parallelism, outLength, type);
+        }
+        else
+        {
+            return Argon2Function.getInstance(memory, iterations, parallelism, outLength, type, version);
+        }
+    }
+
+
 
 
 }

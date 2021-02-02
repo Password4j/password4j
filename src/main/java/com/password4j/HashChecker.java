@@ -125,13 +125,7 @@ public class HashChecker
             return false;
         }
 
-        CharSequence peppered = plainTextPassword;
-        if (StringUtils.isNotEmpty(this.pepper))
-        {
-            peppered = Utils.append(this.pepper, peppered);
-        }
-
-        return hashingFunction.check(peppered, hashed, salt);
+        return hashingFunction.check(plainTextPassword, hashed, salt, pepper);
     }
 
     /**
@@ -226,7 +220,7 @@ public class HashChecker
      *
      * @return true if the hash was produced by the given plain text password; false otherwise.
      * @see AlgorithmFinder#getArgon2Instance() ()
-     * @since 1.0.0
+     * @since 1.5.0
      */
     public boolean withArgon2()
     {

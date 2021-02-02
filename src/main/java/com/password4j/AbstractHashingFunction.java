@@ -26,6 +26,24 @@ package com.password4j;
 public abstract class AbstractHashingFunction implements HashingFunction
 {
 
+    @Override
+    public Hash hash(CharSequence plainTextPassword, String salt, CharSequence pepper)
+    {
+        CharSequence peppered = Utils.append(pepper, plainTextPassword);
+        Hash result;
+        if(salt == null)
+        {
+            result = hash(peppered);
+        }
+        else
+        {
+            result = hash(peppered, salt);
+        }
+
+        result.setPepper(pepper);
+        return result;
+    }
+
     /**
      * Just calls {@link #check(CharSequence, String)} without salt
      * parameter.
@@ -37,6 +55,7 @@ public abstract class AbstractHashingFunction implements HashingFunction
      * @param hashed            the hash
      * @param salt              the salt used to produce the hash
      * @return true if the hash is generated from the plaintext; false otherwise
+     * @since 0.1.0
      */
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed, String salt)
@@ -44,6 +63,20 @@ public abstract class AbstractHashingFunction implements HashingFunction
         return check(plainTextPassword, hashed);
     }
 
+    /**
+     * Just calls {@link #check(CharSequence, String, String)}, with a prepended pepper.
+     *
+     * @param plainTextPassword the plaintext password
+     * @param hashed            the hash
+     * @param salt              the salt used to produce the hash
+     * @return true if the hash is generated from the plaintext; false otherwise
+     * @since 1.5.0
+     */
+    @Override
+    public boolean check(CharSequence plainTextPassword, String hashed, String salt, CharSequence pepper)
+    {
+        return check(Utils.append(pepper, plainTextPassword), hashed, salt);
+    }
 
     /**
      * Compares two byte arrays in length-constant time. This comparison method

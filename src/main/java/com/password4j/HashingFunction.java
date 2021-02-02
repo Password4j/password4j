@@ -71,6 +71,25 @@ public interface HashingFunction
     Hash hash(CharSequence plainTextPassword, String salt);
 
     /**
+     * Creates a {@link Hash} from a plaintext password and a salt.
+     * Depending on the implementation, the hash may contain
+     * the information about salt and pepper.
+     * <p>
+     * Some CHFs validate the format of the salt; if the validation
+     * is not passed a {@link BadParametersException} is thrown.
+     * The generation of the salt is completely
+     * responsibility of the caller.
+     *
+     * @param plainTextPassword the password to be hashed
+     * @param salt              the salt used in the hashing process
+     * @param pepper the pepper used int the hashing process
+     * @return a {@link Hash}
+     * @throws BadParametersException if the salt does not pass the validation of the CHF
+     * @since 1.5.0
+     */
+    Hash hash(CharSequence plainTextPassword, String salt, CharSequence pepper);
+
+    /**
      * Checks if the CHF generated the hash starting from
      * the plaintext password.
      * <p>
@@ -112,4 +131,25 @@ public interface HashingFunction
      * @since 0.2.1
      */
     boolean check(CharSequence plainTextPassword, String hashed, String salt);
+
+    /**
+     * Checks if the CHF generated the hash starting from
+     * the plaintext password and the salt.
+     * <p>
+     * This method must be used when the salt is not part
+     * of the hash.
+     * <p>
+     * If the format of the hash is not valid (e.g. the CHF cannot
+     * recognise a valid salt) a {@link BadParametersException}
+     * is thrown.
+     *
+     * @param plainTextPassword the plaintext password
+     * @param hashed            the hash
+     * @param salt              the salt used to produce the hash
+     * @param pepper the pepper used to produce the hash
+     * @return true if the hash is generated from the plaintext; false otherwise
+     * @throws BadParametersException if the hash is not well-formed
+     * @since 1.5.0
+     */
+    boolean check(CharSequence plainTextPassword, String hashed, String salt, CharSequence pepper);
 }

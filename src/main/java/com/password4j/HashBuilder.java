@@ -140,24 +140,7 @@ public class HashBuilder
      */
     public Hash with(HashingFunction hashingFunction)
     {
-        CharSequence peppered = plainTextPassword;
-        if (StringUtils.isNotEmpty(this.pepper))
-        {
-            peppered = Utils.append(this.pepper, peppered);
-        }
-
-        Hash hash;
-        if (StringUtils.isEmpty(this.salt))
-        {
-            hash = hashingFunction.hash(peppered);
-        }
-        else
-        {
-            hash = hashingFunction.hash(peppered, salt);
-        }
-
-        hash.setPepper(pepper);
-        return hash;
+        return hashingFunction.hash(plainTextPassword, salt, pepper);
     }
 
     /**

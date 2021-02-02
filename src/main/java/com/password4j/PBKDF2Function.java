@@ -16,6 +16,8 @@
  */
 package com.password4j;
 
+import com.password4j.types.Hmac;
+
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;

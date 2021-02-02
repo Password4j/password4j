@@ -17,11 +17,11 @@
 
 package com.password4j;
 
-import java.nio.CharBuffer;
-import java.util.Arrays;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.nio.CharBuffer;
+import java.util.Arrays;
 
 
 public class StringTest

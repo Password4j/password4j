@@ -1,6 +1,8 @@
 package org.example.project;
 
 import com.password4j.*;
+import com.password4j.types.Argon2;
+import com.password4j.types.Hmac;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,7 +36,13 @@ public class PublicPasswordTest
                     "pass", SCryptFunction.getInstance(16384, 8, 1)),
 
             new TestSuite("$s0$a0402$bm90UmFuZG9t$upriFfo7v+aAUqOKDpguh0duZlAHiKcQOLM0k/xFcBg7qfRcDfYLEZe/60+b+4NtA1M70LUI0IRY+3+ybuLMZg==", "known", "notRandom",
-                    "un", SCryptFunction.getInstance(1024, 4, 2))
+                    "un", SCryptFunction.getInstance(1024, 4, 2)),
+
+            new TestSuite("$argon2id$v=19$m=1024,t=3,p=12$MTExMTExMTE$0PUE8wVEaK0qdjms3b4pTZOs0+00S/+9j28WZ3gMUno", "first!", "11111111",
+                    null, Argon2Function.getInstance(1024, 3, 12, 32, Argon2.ID)),
+
+            new TestSuite("$argon2id$v=19$m=1024,t=3,p=12$MTExMTExMTE$hKdynniJwT4OHUelELQckgvw2YLm2nF7dLdH0oU29Zk", "first!", "11111111",
+                    "secret", Argon2Function.getInstance(1024, 3, 12, 32, Argon2.ID))
     };
 
     @Test
@@ -98,6 +106,7 @@ public class PublicPasswordTest
             hb.withSCrypt();
             hb.withBCrypt();
             hb.withPBKDF2();
+            hb.withArgon2();
 
             HashChecker hc = Password.check(password, password);
             hc.addPepper(pepper);
@@ -107,6 +116,7 @@ public class PublicPasswordTest
             hc.withSCrypt();
             hc.withBCrypt();
             hc.withPBKDF2();
+            hc.withArgon2();
 
             Hmac.SHA256.code();
             Hmac.values();
@@ -121,6 +131,9 @@ public class PublicPasswordTest
             BCryptFunction.getInstance(1);
             SCryptFunction.getInstance(2, 1, 1);
             SCryptFunction.getInstanceFromHash(password);
+
+            Argon2Function.getInstance(8, 1, 1, 32, Argon2.ID);
+            Argon2Function.getInstanceFromHash(password);
 
             SecureString s = new SecureString(new char[]{'a'});
             s.clear();

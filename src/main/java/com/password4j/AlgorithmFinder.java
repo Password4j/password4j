@@ -17,6 +17,9 @@
 package com.password4j;
 
 
+import com.password4j.types.Argon2;
+import com.password4j.types.BCrypt;
+import com.password4j.types.Hmac;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +29,6 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 

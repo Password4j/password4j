@@ -17,6 +17,10 @@
 
 package com.password4j;
 
+import com.password4j.types.Argon2;
+import com.password4j.types.BCrypt;
+import com.password4j.types.Hmac;
+
 import java.util.List;
 import java.util.Set;
 
@@ -106,6 +110,44 @@ public class SystemChecker
         } while (elapsed <= maxMilliseconds);
 
         return rounds - 1;
+    }
+
+
+    /**
+     * Finds the optimal number of iterations for PBKDF2.
+     * <p>
+     * To prevent timing attacks, a maximum interval of time (in milliseconds)
+     * is required to perform a single hash.
+     *
+     * @param maxMilliseconds max time to perform the hashing
+     * @param memory       logarithmic memory
+     * @param parallelism  level of parallelism
+     * @param outputLength length of the final hash
+     * @param type         argon2 type (i, d or id)
+     * @return number of iterations
+     * @see Argon2Function
+     * @since 1.5.0
+     */
+    public static int findIterationsForArgon2(long maxMilliseconds, int memory, int parallelism, int outputLength, Argon2 type)
+    {
+        warmUpArgon2();
+
+        long elapsed;
+        int iterations = 0;
+
+        do
+        {
+            iterations++;
+            long start = System.currentTimeMillis();
+
+            new Argon2Function(memory, iterations, parallelism, outputLength, type, 0x13).hash(TO_BE_HASHED);
+
+            long end = System.currentTimeMillis();
+            elapsed = end - start;
+
+        } while (elapsed <= maxMilliseconds);
+
+        return iterations;
     }
 
 
@@ -221,6 +263,15 @@ public class SystemChecker
         for (int i = 0; i < WARMUP_ROUNDS; i++)
         {
             BCryptFunction.getInstance(4).hash(TO_BE_HASHED);
+        }
+    }
+
+
+    private static void warmUpArgon2()
+    {
+        for (int i = 0; i < WARMUP_ROUNDS; i++)
+        {
+            Argon2Function.getInstance(8, 1, 1, 32, Argon2.ID).hash(TO_BE_HASHED);
         }
     }
 

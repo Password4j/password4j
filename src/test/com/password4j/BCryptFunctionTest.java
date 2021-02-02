@@ -16,6 +16,7 @@
  */
 package com.password4j;
 
+import com.password4j.types.BCrypt;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;

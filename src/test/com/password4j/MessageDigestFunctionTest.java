@@ -16,13 +16,14 @@
  */
 package com.password4j;
 
+import com.password4j.types.Hmac;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 
 public class MessageDigestFunctionTest

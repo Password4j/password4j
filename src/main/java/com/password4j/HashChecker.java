@@ -93,6 +93,15 @@ public class HashChecker
         return this;
     }
 
+    /**
+     * Creates a builder to update the hash.
+     * The actual  salt and pepper are taken from the original check request.
+     * <p>
+     * In order to declare a new salt or pepper use ,}
+     *
+     * @return the updater
+     * @since 1.3.0
+     */
     public HashUpdater andUpdate()
     {
         return new HashUpdater(this, new HashBuilder(plainTextPassword).addPepper(pepper).addSalt(salt));

@@ -1,5 +1,5 @@
 /*
- *  (C) Copyright 2020 Password4j (http://password4j.com/).
+ *  (C) Copyright 2021 Password4j (http://password4j.com/).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,10 +14,30 @@
  *  limitations under the License.
  *
  */
-package com.password4j;
 
-public enum Argon2
+package com.password4j.types;
+
+public enum BCrypt
 {
-    D, I, ID;
+    A,
+    B,
+    X,
+    Y;
 
+    public char minor()
+    {
+        return name().toLowerCase().charAt(0);
+    }
+
+    public static BCrypt valueOf(char minor)
+    {
+        for(BCrypt type : BCrypt.values())
+        {
+            if(type.minor() == minor)
+            {
+                return  type;
+            }
+        }
+        return null;
+    }
 }

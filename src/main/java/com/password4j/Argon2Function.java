@@ -16,6 +16,7 @@
  */
 package com.password4j;
 
+import com.password4j.types.Argon2;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -24,7 +25,13 @@ import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.*;
 
-
+/**
+ * Class containing the implementation of Argon2 function and its parameters.
+ *
+ * @author David Bertoldi
+ * @see <a href="https://en.wikipedia.org/wiki/Argon2">Argon2</a>
+ * @since 1.5.0
+ */
 public class Argon2Function extends AbstractHashingFunction
 {
     private static final ConcurrentMap<String, Argon2Function> INSTANCES = new ConcurrentHashMap<>();

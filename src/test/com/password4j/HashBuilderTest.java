@@ -1,9 +1,9 @@
 package com.password4j;
 
-import java.awt.event.KeyEvent;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.awt.event.KeyEvent;
 
 
 public class HashBuilderTest

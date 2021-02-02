@@ -8,10 +8,6 @@ jobs:
       jdk: openjdk11
     - name: OracleJDK 11
       jdk: oraclejdk11
-    - name: OpenJDK 8
-      jdk: openjdk8
-    - name: OracleJDK 8
-      jdk: oraclejdk8
 
 cache:
   directories:
@@ -19,8 +15,7 @@ cache:
 
 
 script:
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install
-  - if [ "$JAVA_HOME" = "/usr/local/lib/jvm/openjdk11" ]; then mvn sonar:sonar -Dsonar.projectKey=Password4j_password4j; fi
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=Password4j_password4j
 
 addons:
   sonarcloud:

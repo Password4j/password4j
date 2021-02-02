@@ -16,6 +16,8 @@
  */
 package com.password4j;
 
+import com.password4j.types.Hmac;
+
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -144,7 +146,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         {
             throw new IllegalArgumentException("Salt cannot be null");
         }
-        return internalHash(CharSequenceUtils.fromCharSequenceToChars(plainTextPassword), salt.getBytes(), algorithm, iterations, length);
+        return internalHash(Utils.fromCharSequenceToChars(plainTextPassword), salt.getBytes(), algorithm, iterations, length);
     }
 
     protected static SecretKey internalHash(char[] plain, byte[] salt, String algorithm, int iterations, int length)

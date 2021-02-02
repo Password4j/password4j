@@ -17,6 +17,9 @@
 package com.password4j;
 
 
+import com.password4j.types.Argon2;
+import com.password4j.types.BCrypt;
+import com.password4j.types.Hmac;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -284,6 +287,65 @@ public class AlgorithmFinder
             LOG.warn("{} is not a valid option. Fallback to default.", saltOption);
             return MessageDigestFunction.getInstance(algorithm);
         }
+    }
+
+    /**
+     * Creates a singleton instance of {@link Argon2Function}
+     * with the configuration set in the <i>psw4j.properties</i> file.
+     * <p>
+     * If no <i>psw4j.properties</i> is found in the classpath or no
+     * value is provided for a parameter, the
+     * default configuration is used.
+     * <table>
+     *   <tr>
+     *     <th>Parameter</th>
+     *     <th>Property</th>
+     *     <th>Default</th>
+     *   </tr>
+     *   <tr>
+     *     <td>Memory (log2)</td>
+     *     <td>hash.argon2.memory</td>
+     *     <td>12</td>
+     *   </tr>
+     *   <tr>
+     *     <td>Iterations</td>
+     *     <td>hash.argon2.iterations</td>
+     *     <td>20</td>
+     *   </tr>
+     *   <tr>
+     *     <td>Output Length</td>
+     *     <td>hash.argon2.length</td>
+     *     <td>32</td>
+     *   </tr>
+     *   <tr>
+     *     <td>Parallelism</td>
+     *     <td>hash.argon2.parallelism</td>
+     *     <td>2</td>
+     *   </tr>
+     *   <tr>
+     *     <td>Type</td>
+     *     <td>hash.argon2.type</td>
+     *     <td>id</td>
+     *   </tr>
+     *   <tr>
+     *     <td>Version</td>
+     *     <td>hash.argon2.version</td>
+     *     <td>19</td>
+     *   </tr>
+     * </table>
+     *
+     * @return a {@link SCryptFunction}
+     * @since 1.5.0
+     */
+    public static Argon2Function getArgon2Instance()
+    {
+        int memory = PropertyReader.readInt("hash.argon2.memory", 12, "Argon2 memory is not defined");
+        int iterations = PropertyReader.readInt("hash.argon2.iterations", 20, "Argon2 #iterations is not defined");
+        int outputLength = PropertyReader.readInt("hash.argon2.length", 32, "Argon2 output length is not defined");
+        int parallelism = PropertyReader.readInt("hash.argon2.parallelism", 2, "Argon2 parallelism is not defined");
+        String type = PropertyReader.readString("hash.argon2.type", "id", "Argon2 type is not defined");
+        int version = PropertyReader.readInt("hash.argon2.version", 19, "Argon2 version is not defined");
+        return Argon2Function.getInstance(memory, iterations, parallelism, outputLength,  Argon2.valueOf(type.toUpperCase()), version);
     }
 
     /**

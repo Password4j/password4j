@@ -19,9 +19,12 @@ Algorithms can be configured **programmatically** or through a **property file**
 The configurations are mostly dependent on your environment. Password4j delivers a **tool that can create
 a set of optimal parameters** based on the system performance and the desired maximum computational time <sup>see [Performance section](#Performance)</sup>.
 
-![Hash and verify](https://i.imgur.com/zQMvGdG.png)
+![Hash](https://i.imgur.com/1Pduapf.png)
+![Verify](https://i.imgur.com/JgfNbQf.png)
 
-The library fully supports **[BCrypt](https://en.wikipedia.org/wiki/Bcrypt)**, **[SCrypt](https://en.wikipedia.org/wiki/Scrypt)** and **[PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)** 
+
+
+The library fully supports **[Argon2](https://en.wikipedia.org/wiki/Argon2)**, **[BCrypt](https://en.wikipedia.org/wiki/Bcrypt)**, **[SCrypt](https://en.wikipedia.org/wiki/Scrypt)** and **[PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)** 
 and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/Salt_%28cryptography%29)** and **[pepper](https://en.wikipedia.org/wiki/Pepper_%28cryptography%29)**.
 
 
@@ -35,7 +38,7 @@ Add the dependency of the latest version to your `pom.xml`:
 <dependency>
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
 </dependency>
 ```
 
@@ -47,18 +50,18 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.password4j:password4j:1.4.0'
+    implementation 'com.password4j:password4j:1.5.0'
 }
 ```
 
 ## ![Scala SBT](https://i.imgur.com/Nqv3mVd.png?1) Scala SBT 
 Add to the managed dependencies of your `build.sbt` the latest version:
 ```shell script
-libraryDependencies += "com.password4j" % "password4j" % "1.4.0"
+libraryDependencies += "com.password4j" % "password4j" % "1.5.0"
 ```
 
 # Usage
-Password4j provides three main features.
+Password4j provides three main features: password hashing, hash checking and hash updating.
 
 ## Hash the password
 Here it is the easiest way to hash a password with a CHF (BCrypt in this case)
@@ -87,7 +90,7 @@ The same structure can be adopted for the other CHFs, not just for PBKDF2.
 
 
 ## Verify the hash
-With the same ease you can verify an hash
+With the same ease you can verify the hash:
 ```java
 boolean verified = Password.check(password, hash).withBCrypt();
 ```
@@ -104,14 +107,19 @@ boolean verification = Password.check(password, hash).addSalt(salt).withPBKDF2()
 // Verify with PBKDF2 and manually provided salt and pepper.
 boolean verification = Password.check(password, hash).addSalt(salt).addPepper(pepper).withPBKDF2();
 ```
- The same structure can be adopted for the other algorithms, not just for PBKDF2. Take in account that BCrypt and SCrypt store the salt
+ The same structure can be adopted for the other algorithms, not just for PBKDF2. Take in account that Argon2, BCrypt and SCrypt store the salt
  inside the hash, so the `addSalt()` method is not needed.
+```java
+// Verify with Argon2, reads the salt from the given hash.
+boolean verification = Password.check(password, hash).withArgon2();
+```
 
 
 ## Update the hash
 When a configuration is not considered anymore secure  you can
-refresh the hash like this:
+refresh the hash with a more modern algorithm like this:
 ```java
+// Reads the latest configurations in your psw4j.properties
 HashUpdate update = Password.check(password, hash).update().withBCrypt();
 
 if(update.isVerified())
@@ -149,7 +157,7 @@ if(update.isVerified())
 | PBKDF2                   | 1.0.0 | Depending on the Security Services your JVM provides |
 | BCrypt                   | 1.0.0 |                                                      |
 | SCrypt                   | 1.0.0 |                                                      |
-| Argon2                   | TBA   |                                                      |
+| Argon2                   | 1.5.0 |                                                      |
 
 | Cryptographic Hash Functions | Since | Notes                                                 |
 |------------------------------|-------|-------------------------------------------------------|
@@ -203,18 +211,19 @@ java -Dpsw4j.configuration=/my/path/to/some.properties ...
 
 Here's a basic configuration (please do not use it in production, but instead start a benchmark session in your target environment<sup>see [Performance section](#Performance)</sup>)
 ```properties
-### PBKDF2
-# with HMAC-SHA256
-hash.pbkdf2.algorithm=SHA256
-# 64000 iterations
-hash.pbkdf2.iterations=64000
-# derived key of 256bit 
-hash.pbkdf2.length=256
+### Argon2
+hash.argon2.memory=4096
+hash.argon2.iterations=20
+hash.argon2.length=128
+hash.argon2.parallelism=4
+hash.argon2.type=id
+
 
 ### BCrypt
 hash.bcrypt.minor=b
 # logarithmic cost (cost = 2^12)
 hash.bcrypt.rounds=12
+
 
 ### SCrypt
 # N
@@ -223,8 +232,19 @@ hash.scrypt.workfactor=16384
 hash.scrypt.resources=16
 # p
 hash.scrypt.parallelization=1
+hash.argon2.version=19
 
-### Legacy
+
+### PBKDF2
+# with HMAC-SHA256
+hash.pbkdf2.algorithm=SHA256
+# 64000 iterations
+hash.pbkdf2.iterations=64000
+# derived key of 256bit 
+hash.pbkdf2.length=256
+
+
+### Legacy MessageDisgest
 # algorithm
 hash.md.algorithm=SHA-512
 # append/prepend salt
@@ -243,7 +263,7 @@ Password.hash("password").addPepper().withSCrypt();
 Password.check("password", "hash").addPepper().withSCrypt();
 ```
 
-[SecureRandom](https://docs.oracle.com/javase/8/docs/api/java/security/SecureRandom.html) may be instantiated through `SecureRandom.getInstanceStrong()`
+[SecureRandom](https://docs.oracle.com/javase/8/docs/api/java/security/SecureRandom.html) may be instantiated and used through `SecureRandom.getInstanceStrong()` to generate salts and peppers.
 ```properties
 global.random.strong=true
 ```

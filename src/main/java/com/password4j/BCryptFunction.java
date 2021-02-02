@@ -16,6 +16,8 @@
  */
 package com.password4j;
 
+import com.password4j.types.BCrypt;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -677,7 +679,7 @@ public class BCryptFunction extends AbstractHashingFunction
      */
     protected String hashPw(CharSequence password, String salt)
     {
-        byte[] passwordb = CharSequenceUtils.fromCharSequenceToBytes(password);
+        byte[] passwordb = Utils.fromCharSequenceToBytes(password);
 
         return hashPw(passwordb, salt);
     }

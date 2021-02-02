@@ -22,11 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Properties;
 
 
 public class PropertyReaderTest
@@ -129,7 +125,6 @@ public class PropertyReaderTest
     {
         // GIVEN
         String path = new File(".").getCanonicalPath() + "/src/test/my/custom/path/to/some.properties";
-        System.out.println(path);
         System.setProperty("psw4j.configuration", path);
 
         // WHEN
@@ -145,7 +140,6 @@ public class PropertyReaderTest
     {
         // GIVEN
         String path = new File(".").getCanonicalPath() + "/src/test/my/custom/path/to/some.properties";
-        System.out.println(path);
         System.setProperty("psw4j.configuration", path);
         Thread.currentThread().setContextClassLoader(null);
 

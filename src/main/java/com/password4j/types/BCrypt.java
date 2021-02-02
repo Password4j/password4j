@@ -1,5 +1,5 @@
 /*
- *  (C) Copyright 2020 Password4j (http://password4j.com/).
+ *  (C) Copyright 2021 Password4j (http://password4j.com/).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
  */
 
-package com.password4j;
+package com.password4j.types;
 
 public enum BCrypt
 {

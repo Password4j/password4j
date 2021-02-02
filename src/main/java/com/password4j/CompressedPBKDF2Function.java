@@ -17,11 +17,12 @@
 
 package com.password4j;
 
+import com.password4j.types.Hmac;
+
+import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.crypto.SecretKey;
 
 /**
  * Class containing the implementation of PBKDF2 function and its parameters.

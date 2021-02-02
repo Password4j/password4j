@@ -140,24 +140,7 @@ public class HashBuilder
      */
     public Hash with(HashingFunction hashingFunction)
     {
-        CharSequence peppered = plainTextPassword;
-        if (StringUtils.isNotEmpty(this.pepper))
-        {
-            peppered = CharSequenceUtils.append(this.pepper, peppered);
-        }
-
-        Hash hash;
-        if (StringUtils.isEmpty(this.salt))
-        {
-            hash = hashingFunction.hash(peppered);
-        }
-        else
-        {
-            hash = hashingFunction.hash(peppered, salt);
-        }
-
-        hash.setPepper(pepper);
-        return hash;
+        return hashingFunction.hash(plainTextPassword, salt, pepper);
     }
 
     /**
@@ -253,6 +236,25 @@ public class HashBuilder
     public Hash withMessageDigest()
     {
         return with(AlgorithmFinder.getMessageDigestInstance());
+    }
+
+    /**
+     * Hashes the previously given plain text password
+     * with {@link Argon2Function}.
+     * <p>
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
+     * then the default parameters are used.
+     * <p>
+     * Finally calls {@link #with(HashingFunction)}
+     *
+     * @return true if the hash was produced by the given plain text password; false otherwise.
+     * @see AlgorithmFinder#getArgon2Instance()
+     * @see #with(HashingFunction)
+     * @since 1.5.0
+     */
+    public Hash withArgon2()
+    {
+        return with(AlgorithmFinder.getArgon2Instance());
     }
 
 }

@@ -103,8 +103,8 @@ public class MessageDigestFunction extends AbstractHashingFunction
             MessageDigest messageDigest = MessageDigest.getInstance(algorithm);
             CharSequence finalCharSequence = concatenateSalt(plainTextPassword, salt);
 
-            byte[] result = messageDigest.digest(CharSequenceUtils.fromCharSequenceToBytes(finalCharSequence));
-            return new Hash(this, CharSequenceUtils.toHex(result), salt);
+            byte[] result = messageDigest.digest(Utils.fromCharSequenceToBytes(finalCharSequence));
+            return new Hash(this, Utils.toHex(result), salt);
         }
         catch (NoSuchAlgorithmException nsae)
         {
@@ -131,9 +131,9 @@ public class MessageDigestFunction extends AbstractHashingFunction
     {
         if (saltOption == SaltOption.PREPEND)
         {
-            return CharSequenceUtils.append(salt, plainTextPassword);
+            return Utils.append(salt, plainTextPassword);
         }
-        return CharSequenceUtils.append(plainTextPassword, salt);
+        return Utils.append(plainTextPassword, salt);
     }
 
     private static String getUID(String algorithm, SaltOption saltOption)

@@ -17,10 +17,12 @@
 
 package com.password4j;
 
-import java.util.Set;
-
+import com.password4j.types.Argon2;
+import com.password4j.types.Hmac;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Set;
 
 public class SystemCheckTest
 {
@@ -31,7 +33,24 @@ public class SystemCheckTest
         // GIVEN
 
         // WHEN
-        int result = SystemChecker.findIterationsForPBKDF2(1, Hmac.SHA256, 256);
+        int result = SystemChecker.findIterationsForPBKDF2(10, Hmac.SHA256, 256);
+
+        // THEN
+        Assert.assertTrue(result > 0);
+    }
+
+
+    @Test
+    public void testArgon2Iterations()
+    {
+        // GIVEN
+        int memoryForEachHash = 4096;
+        int threadsPerHash = 2;
+        int outputLength = 128;
+        Argon2 type = Argon2.ID;
+
+        // WHEN
+        int result = SystemChecker.findIterationsForArgon2(50, memoryForEachHash, threadsPerHash, outputLength, type);
 
         // THEN
         Assert.assertTrue(result > 0);
@@ -44,7 +63,7 @@ public class SystemCheckTest
         // GIVEN
 
         // WHEN
-        int result = SystemChecker.findRoundsForBCrypt(1);
+        int result = SystemChecker.findRoundsForBCrypt(50);
 
         // THEN
         Assert.assertTrue(result > 0);

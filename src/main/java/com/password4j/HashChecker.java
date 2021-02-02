@@ -93,6 +93,15 @@ public class HashChecker
         return this;
     }
 
+    /**
+     * Creates a builder to update the hash.
+     * The actual  salt and pepper are taken from the original check request.
+     * <p>
+     * In order to declare a new salt or pepper use ,}
+     *
+     * @return the updater
+     * @since 1.3.0
+     */
     public HashUpdater andUpdate()
     {
         return new HashUpdater(this, new HashBuilder(plainTextPassword).addPepper(pepper).addSalt(salt));
@@ -116,13 +125,7 @@ public class HashChecker
             return false;
         }
 
-        CharSequence peppered = plainTextPassword;
-        if (StringUtils.isNotEmpty(this.pepper))
-        {
-            peppered = CharSequenceUtils.append(this.pepper, peppered);
-        }
-
-        return hashingFunction.check(peppered, hashed, salt);
+        return hashingFunction.check(plainTextPassword, hashed, salt, pepper);
     }
 
     /**
@@ -206,6 +209,23 @@ public class HashChecker
     public boolean withMessageDigest()
     {
         return with(AlgorithmFinder.getMessageDigestInstance());
+    }
+
+    /**
+     * Check if the previously given hash was produced from the given plain text password
+     * with {@link Argon2Function}.
+     * <p>
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
+     * then the default parameters are used.
+     *
+     * @return true if the hash was produced by the given plain text password; false otherwise.
+     * @see AlgorithmFinder#getArgon2Instance() ()
+     * @since 1.5.0
+     */
+    public boolean withArgon2()
+    {
+        Argon2Function argon2 = AlgorithmFinder.getArgon2Instance();
+        return with(argon2);
     }
 
 

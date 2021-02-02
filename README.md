@@ -183,7 +183,7 @@ You can erase the underlying `char[]` with `clear()` method.
 ```java
 SecureString secure = new SecureString(new char[]{...});
 
-Passowrd.hash(secure).withBCrypt();
+Password.hash(secure).withBCrypt();
 Password.check(secure, hash).withBCrypt();
 
 secure.clear();

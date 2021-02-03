@@ -168,15 +168,11 @@ if(update.isVerified())
 
 
 ## Security of Strings
-`String`s are immutable objects and they are stored in the String Pool, a location in the heap memory.
-Since you do not have control on the Garbage Collector, an attacker that has access to the memory could read the password
-just before you use it as input for Password4j. Even after this, the `String` may be still persisted in memory
-until the garbage collection occurs.
+`String`s are immutable objects and once stored in memory you cannot erase them until Garbage Collection. It is always [recommended](https://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html#PBEEx) to use `char[]` instead of `String` for storing passwords<sup>(where possible - If we're talking of a web application, most web containers will pass the password into the `HttpServletRequest` object in plaintext as `String`)</sup>.
 
-It is always recommended to use `char[]` instead of `String` <sup>(where possible - If we're talking of a web application, 
-most web containers will pass the password into the `HttpServletRequest` object in plaintext as `String`)</sup>.
+An attacker that is able to dump the memory could read the password before you use it as input for Password4j; even if it is read after its usage, it is not guaranteed when the garbage collection occurs: that means that the password may be stored in memory indefinitely and its value cannot be erased.
 
-For this reason Password4j provides a `SecureString` class that alleviates this problem. The provided
+For this reason Password4j provides a `SecureString` class that **alleviates** this problem. The provided
 `char[]` is wrapped around `SecureString` and it is never converted into a `String` during the process.
 
 You can erase the underlying `char[]` with `clear()` method.
@@ -198,6 +194,9 @@ SecureString secure = new SecureString(password, true);
 // At this point password = {\0, \0, \0, ...}
 ```
 The pepper can be expressed as `SecureString` as well.
+
+Using `SecureString` or `char[]` does not completely defend you from attacks: the Garbage Collector constantly copies objects from the _from space_ to the _to space_ and ereasing the original `char[]` does not erase its copies; moreover it is never guaranteed that `clear()` is applied before the garbage collection.
+For these reasons the usage of `SecureString` or `char[]` just reduces the window of opportunities for an attacker.
 
 # Configuration
 Password4j makes available a portable way to configure the library.

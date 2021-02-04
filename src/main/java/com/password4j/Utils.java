@@ -19,13 +19,15 @@ package com.password4j;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.*;
 import java.util.Arrays;
 
 class Utils
 {
 
-    private static final char[] HEX_ALPHABET = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+    private static final char[] HEX_ALPHABET = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+    static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     private Utils()
     {
@@ -34,18 +36,45 @@ class Utils
 
     static byte[] fromCharSequenceToBytes(CharSequence charSequence)
     {
-        if (charSequence == null || charSequence.length() == 0)
+        if (charSequence == null)
         {
             return new byte[0];
         }
-        ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(CharBuffer.wrap(charSequence));
-        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
-                byteBuffer.position(), byteBuffer.limit());
+        CharsetEncoder encoder = DEFAULT_CHARSET.newEncoder();
+        int length = charSequence.length();
+        int arraySize = scale(length, encoder.maxBytesPerChar());
+        byte[] result = new byte[arraySize];
+        if (length == 0)
+        {
+            return result;
+        }
+        else
+        {
+            char[] charArray;
+            if (charSequence instanceof String)
+            {
+                charArray = ((String) charSequence).toCharArray();
+            }
+            else
+            {
+                charArray = fromCharSequenceToChars(charSequence);
+            }
 
-        // clear sensitive data
-        Arrays.fill(byteBuffer.array(), (byte) 0);
-        return bytes;
+            charArray = Arrays.copyOfRange(charArray, 0, length);
+
+            encoder.onMalformedInput(CodingErrorAction.REPLACE).onUnmappableCharacter(CodingErrorAction.REPLACE).reset();
+
+            ByteBuffer byteBuffer = ByteBuffer.wrap(result);
+            CharBuffer charBuffer = CharBuffer.wrap(charArray, 0, length);
+
+            encoder.encode(charBuffer, byteBuffer, true);
+            encoder.flush(byteBuffer);
+
+            return Arrays.copyOf(result, byteBuffer.position());
+        }
+
     }
+
 
     static char[] fromCharSequenceToChars(CharSequence charSequence)
     {
@@ -58,6 +87,7 @@ class Utils
         {
             result[i] = charSequence.charAt(i);
         }
+
         return result;
     }
 
@@ -122,19 +152,20 @@ class Utils
 
     static void longToLittleEndian(long n, byte[] bs, int off)
     {
-        intToLittleEndian((int)(n & 0xffffffffL), bs, off);
-        intToLittleEndian((int)(n >>> 32), bs, off + 4);
+        intToLittleEndian((int) (n & 0xffffffffL), bs, off);
+        intToLittleEndian((int) (n >>> 32), bs, off + 4);
     }
 
     static void intToLittleEndian(int n, byte[] bs, int off)
     {
-        bs[  off] = (byte)(n       );
-        bs[++off] = (byte)(n >>>  8);
-        bs[++off] = (byte)(n >>> 16);
-        bs[++off] = (byte)(n >>> 24);
+        bs[off] = (byte) (n);
+        bs[++off] = (byte) (n >>> 8);
+        bs[++off] = (byte) (n >>> 16);
+        bs[++off] = (byte) (n >>> 24);
     }
 
-    public static byte[] intToLittleEndianBytes(int a) {
+    static byte[] intToLittleEndianBytes(int a)
+    {
         byte[] result = new byte[4];
         result[0] = (byte) (a & 0xFF);
         result[1] = (byte) ((a >> 8) & 0xFF);
@@ -143,25 +174,30 @@ class Utils
         return result;
     }
 
-    public static long[] fromBytesToLongs(byte[] input) {
+    static long[] fromBytesToLongs(byte[] input)
+    {
         long[] v = new long[128];
-        for (int i = 0; i < v.length; i++) {
+        for (int i = 0; i < v.length; i++)
+        {
             byte[] slice = Arrays.copyOfRange(input, i * 8, (i + 1) * 8);
             v[i] = littleEndianBytesToLong(slice);
         }
         return v;
     }
 
-    public static long littleEndianBytesToLong(byte[] b) {
+    static long littleEndianBytesToLong(byte[] b)
+    {
         long result = 0;
-        for (int i = 7; i >= 0; i--) {
+        for (int i = 7; i >= 0; i--)
+        {
             result <<= 8;
             result |= (b[i] & 0xFF);
         }
         return result;
     }
 
-    public static byte[] longToLittleEndianBytes(long a) {
+    static byte[] longToLittleEndianBytes(long a)
+    {
         byte[] result = new byte[8];
         result[0] = (byte) (a & 0xFF);
         result[1] = (byte) ((a >> 8) & 0xFF);
@@ -174,27 +210,34 @@ class Utils
         return result;
     }
 
-    public static long intToLong(int x){
+    static long intToLong(int x)
+    {
         byte[] intBytes = intToLittleEndianBytes(x);
         byte[] bytes = new byte[8];
         System.arraycopy(intBytes, 0, bytes, 0, 4);
         return littleEndianBytesToLong(bytes);
     }
 
-    public static void xor(long[] t, long[] b1, long[] b2) {
-        for (int i = 0; i < t.length; i++) {
+    static void xor(long[] t, long[] b1, long[] b2)
+    {
+        for (int i = 0; i < t.length; i++)
+        {
             t[i] = b1[i] ^ b2[i];
         }
     }
 
-    public static void xor(long[] t, long[] b1, long[] b2, long[] b3) {
-        for (int i = 0; i < t.length; i++) {
+    static void xor(long[] t, long[] b1, long[] b2, long[] b3)
+    {
+        for (int i = 0; i < t.length; i++)
+        {
             t[i] = b1[i] ^ b2[i] ^ b3[i];
         }
     }
 
-    public static void xor(long[] t, long[] other) {
-        for (int i = 0; i < t.length; i++) {
+    static void xor(long[] t, long[] other)
+    {
+        for (int i = 0; i < t.length; i++)
+        {
             t[i] = t[i] ^ other[i];
         }
     }
@@ -224,6 +267,11 @@ class Utils
             log += 2;
         }
         return log + (number >>> 1);
+    }
+
+    private static int scale(int initialLength, float bytesPerChar)
+    {
+        return (int) ((double) initialLength * (double) bytesPerChar);
     }
 
 }

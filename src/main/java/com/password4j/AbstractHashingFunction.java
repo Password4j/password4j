@@ -79,6 +79,20 @@ public abstract class AbstractHashingFunction implements HashingFunction
     }
 
     /**
+     * Compares two {@link CharSequence}s as byte arrays in length-constant time. This comparison method
+     * is used so that password hashes cannot be extracted from an on-line
+     * system using a timing attack and then attacked off-line.
+     *
+     * @param a the first CharSequence
+     * @param b the second CharSequence
+     * @return true if both {@link CharSequence}s are the same, false if not
+     */
+    protected static boolean slowEquals(CharSequence a, CharSequence b)
+    {
+        return slowEquals(Utils.fromCharSequenceToBytes(a), Utils.fromCharSequenceToBytes(b));
+    }
+
+    /**
      * Compares two byte arrays in length-constant time. This comparison method
      * is used so that password hashes cannot be extracted from an on-line
      * system using a timing attack and then attacked off-line.

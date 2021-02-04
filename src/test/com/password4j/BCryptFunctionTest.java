@@ -523,7 +523,7 @@ public class BCryptFunctionTest
         String badSalt3 = "$2b$06%ehKGYiS4wt2HAr7KQXS5z.";
 
         // WHEN
-        BCryptFunction.getInstance(10).cryptRaw(password.getBytes(), badSalt3.getBytes(), 6, false, 1);
+        BCryptFunction.getInstance(10).cryptRaw(password.getBytes(Utils.DEFAULT_CHARSET), badSalt3.getBytes(Utils.DEFAULT_CHARSET), 6, false, 1);
     }
 
 

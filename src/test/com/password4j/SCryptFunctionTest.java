@@ -119,6 +119,9 @@ public class SCryptFunctionTest
         boolean sameInst = scrypt.equals(SCryptFunction.getInstance(N, r, p));
         String toString = scrypt.toString();
         int hashCode = scrypt.hashCode();
+        boolean notSameInst1 = scrypt.equals(SCryptFunction.getInstance(r+1, N, p));
+        boolean notSameInst2 = scrypt.equals(SCryptFunction.getInstance(r, N+1+1, p));
+        boolean notSameInst3 = scrypt.equals(SCryptFunction.getInstance(r, N, p+1));
 
         // END
         Assert.assertFalse(eqNull);
@@ -127,6 +130,9 @@ public class SCryptFunctionTest
         Assert.assertTrue(sameInst);
         Assert.assertNotEquals(toString, new SCryptFunction(5, 4, 6).toString());
         Assert.assertNotEquals(hashCode, new SCryptFunction(5, 4, 6).hashCode());
+        Assert.assertFalse(notSameInst1);
+        Assert.assertFalse(notSameInst2);
+        Assert.assertFalse(notSameInst3);
     }
 
     @Test

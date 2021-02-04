@@ -117,14 +117,26 @@ public class MessageDigestFunction extends AbstractHashingFunction
     public boolean check(CharSequence plainTextPassword, String hashed)
     {
         Hash hash = internalHash(plainTextPassword, null);
-        return slowEquals(hash.getResult().getBytes(), hashed.getBytes());
+        return slowEquals(hash.getResult(), hashed);
     }
 
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed, String salt)
     {
         Hash hash = internalHash(plainTextPassword, salt);
-        return slowEquals(hash.getResult().getBytes(), hashed.getBytes());
+        return slowEquals(hash.getResult(), hashed);
+    }
+
+    /**
+     * The salt option describes if the Salt has been appended or prepended to
+     * the plain test password.
+     *
+     * @return how the salt is concatenated
+     * @since 1.6.1
+     */
+    public SaltOption getSaltOption()
+    {
+        return saltOption;
     }
 
     private CharSequence concatenateSalt(CharSequence plainTextPassword, CharSequence salt)

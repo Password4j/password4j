@@ -18,7 +18,6 @@ package com.password4j;
 
 import com.password4j.types.Hmac;
 
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
 import java.util.Objects;
@@ -156,7 +155,7 @@ public class SCryptFunction extends AbstractHashingFunction
     {
         try
         {
-            byte[] saltAsBytes = salt.getBytes(StandardCharsets.UTF_8);
+            byte[] saltAsBytes = Utils.fromCharSequenceToBytes(salt);
             byte[] derived = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), saltAsBytes, derivedKeyLength);
             String params = Long.toString((long) Utils.log2(workFactor) << 16 | (long) resources << 8 | parallelization, 16);
             String sb = "$s0$" + params + '$' + Base64.getEncoder().encodeToString(saltAsBytes) + '$' + Base64.getEncoder()

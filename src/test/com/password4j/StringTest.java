@@ -162,6 +162,7 @@ public class StringTest
         char[] c2 = Utils.fromCharSequenceToChars(new String(new char[0]));
         byte[] b1 = Utils.fromCharSequenceToBytes(null);
         byte[] b2 = Utils.fromCharSequenceToBytes(new String(new char[0]));
+        byte[] b3 = Utils.fromCharSequenceToBytes(new String(new char[]{(char)1}));
 
         CharSequence cs1 = Utils.append("a", null);
         CharSequence cs2 = Utils.append(null, "b");
@@ -174,6 +175,8 @@ public class StringTest
 
         Assert.assertEquals(Arrays.toString(c1), Arrays.toString(c2));
         Assert.assertEquals(Arrays.toString(b1), Arrays.toString(b2));
+        Assert.assertEquals(1, b3.length);
+        Assert.assertEquals(1, b3[0]);
         Assert.assertEquals("a", cs1);
         Assert.assertEquals("b", cs2);
         Assert.assertEquals(Arrays.toString(new char[] { 'a', 'b', 'c', 'd', 'e', 'f' }),

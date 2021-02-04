@@ -63,7 +63,7 @@ public class Blake2bTest
         for (TestCase test : CASES)
         {
             Blake2b instance = new Blake2b(test.length);
-            instance.update(test.message == null ? null : test.message.getBytes());
+            instance.update(test.message == null ? null : test.message.getBytes(Utils.DEFAULT_CHARSET));
             byte[] out = new byte[test.length];
             instance.doFinal(out, 0);
             assertEquals(test.expected, Utils.toHex(out));
@@ -81,7 +81,7 @@ public class Blake2bTest
         {
             Callable<Boolean> c = () -> {
                 Blake2b instance = new Blake2b(test.length);
-                instance.update(test.message == null ? null : test.message.getBytes());
+                instance.update(test.message == null ? null : test.message.getBytes(Utils.DEFAULT_CHARSET));
                 byte[] out = new byte[test.length];
                 instance.doFinal(out, 0);
                 return test.expected.equals(Utils.toHex(out));

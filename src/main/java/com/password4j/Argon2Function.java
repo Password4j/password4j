@@ -162,7 +162,7 @@ public class Argon2Function extends AbstractHashingFunction
         {
             theSalt = salt;
         }
-        initialize(password, theSalt.getBytes(), Utils.fromCharSequenceToBytes(pepper), null, blockMemory);
+        initialize(password, Utils.fromCharSequenceToBytes(theSalt), Utils.fromCharSequenceToBytes(pepper), null, blockMemory);
         fillMemoryBlocks(blockMemory);
         byte[] hash = ending(blockMemory);
         return new Hash(this, encodeHash(hash, theSalt), theSalt);
@@ -190,7 +190,7 @@ public class Argon2Function extends AbstractHashingFunction
         }
 
         Hash internalHash = hash(plainTextPassword, theSalt, pepper);
-        return slowEquals(internalHash.getResult().getBytes(), hashed.getBytes());
+        return slowEquals(internalHash.getResult(), hashed);
     }
 
 
@@ -713,7 +713,8 @@ public class Argon2Function extends AbstractHashingFunction
     private String encodeHash(byte[] hash, String salt)
     {
         return "$argon2" + variant.name().toLowerCase() + "$v=" + version + "$m=" + memory
-                + ",t=" + iterations + ",p=" + parallelism + "$" + Base64.getEncoder().withoutPadding().encodeToString(salt.getBytes()) +
+                + ",t=" + iterations + ",p=" + parallelism +
+                "$" + Base64.getEncoder().withoutPadding().encodeToString(Utils.fromCharSequenceToBytes(salt)) +
                 "$" + Base64.getEncoder().withoutPadding().encodeToString(hash);
     }
 
@@ -732,7 +733,6 @@ public class Argon2Function extends AbstractHashingFunction
             result[4] = Integer.parseInt(StringUtils.removeStart(params[2], "p="));
             result[5] = Base64.getDecoder().decode(parts[4]);
             result[6] = Base64.getDecoder().decode(parts[5]);
-
             return result;
         }
         else

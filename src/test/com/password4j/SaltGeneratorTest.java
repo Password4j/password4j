@@ -1,11 +1,23 @@
 package com.password4j;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.security.*;
+
+import static org.junit.Assert.*;
 
 
 public class SaltGeneratorTest
 {
+
+    @Before
+    public void init()
+    {
+        PropertyReader.properties.setProperty("global.random.strong", "false");
+        AlgorithmFinder.initialize();
+    }
 
     @Test
     public void testSaltLength()
@@ -41,7 +53,7 @@ public class SaltGeneratorTest
         // GIVEN
 
         // WHEN
-        byte[] salt = SaltGenerator.generate(-3);
+        SaltGenerator.generate(-3);
 
         // THEN
 
@@ -59,6 +71,73 @@ public class SaltGeneratorTest
         // THEN
         Assert.assertNotNull(salt);
         Assert.assertEquals(length, salt.length);
+    }
+
+    @Test
+    public void testStrongRandom()
+    {
+        // GIVEN
+
+        PropertyReader.properties.setProperty("global.random.strong", "true");
+
+        // WHEN
+        AlgorithmFinder.initialize();
+
+        // THEN
+
+        try
+        {
+            assertEquals(SecureRandom.getInstanceStrong().getAlgorithm(), AlgorithmFinder.getSecureRandom().getAlgorithm());
+
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            //
+        }
+
+    }
+
+    @Test
+    public void testStrongRandom2()
+    {
+        // GIVEN
+        PropertyReader.properties.setProperty("global.random.strong", "true");
+
+        // WHEN
+
+        String old = getSecurityProperty();
+        String strongAlg;
+        try
+        {
+            strongAlg =  SecureRandom.getInstanceStrong().getAlgorithm();
+        }
+        catch (Exception e)
+        {
+            return;
+        }
+
+        setSecurityProperty("not and algorithm");
+        AlgorithmFinder.initialize();
+
+        // THEN
+
+
+        assertNotEquals(strongAlg, AlgorithmFinder.getSecureRandom().getAlgorithm());
+        setSecurityProperty(old);
+
+    }
+
+    private String getSecurityProperty()
+    {
+        return AccessController.doPrivileged((PrivilegedAction<String>) () -> Security.getProperty("securerandom.strongAlgorithms"));
+    }
+
+    private void setSecurityProperty(String value)
+    {
+        AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+            Security.setProperty("securerandom.strongAlgorithms", value);
+            return null;
+        });
     }
 
 

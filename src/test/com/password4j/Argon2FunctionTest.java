@@ -165,6 +165,18 @@ public class Argon2FunctionTest
 
     }
 
+    @Test(expected = BadParametersException.class)
+    public void badHash()
+    {
+        // GIVEN
+        String invalidHash = "$argon2d$v=19Sm=1024,t=3,p=1$a1hYRFVFUUhMdzF5dk43$GvtgSr24rB/U/idt+1Xq2tn0DIav/H2W0BybTLZijZY";
+
+        // WHEN
+        Argon2Function.getInstanceFromHash(invalidHash);
+
+        // TEST
+    }
+
     private Argon2Function getFunction(int memory, int iterations, int parallelism, int outLength, Argon2 type,int version)
     {
         if (version == Argon2Function.ARGON2_VERSION_13)

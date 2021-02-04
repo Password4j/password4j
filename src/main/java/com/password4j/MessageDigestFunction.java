@@ -104,7 +104,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
             CharSequence finalCharSequence = concatenateSalt(plainTextPassword, salt);
 
             byte[] result = messageDigest.digest(Utils.fromCharSequenceToBytes(finalCharSequence));
-            return new Hash(this, Utils.toHex(result), salt);
+            return new Hash(this, Utils.toHex(result), result, salt);
         }
         catch (NoSuchAlgorithmException nsae)
         {

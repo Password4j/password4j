@@ -1,5 +1,7 @@
 package com.password4j;
 
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -19,14 +21,15 @@ public class HashTest
         HashingFunction function = new CompressedPBKDF2Function();
 
         // WHEN
-        Hash hash = new Hash(function, hashed, salt);
+        Hash hash = new Hash(function, hashed, hashed.getBytes(), salt);
         hash.setPepper(pepper);
-        Hash hash2 = new Hash(function, hashed, salt);
+        Hash hash2 = new Hash(function, hashed, hashed.getBytes(), salt);
 
         // THEN
         Assert.assertEquals(hashed, hash.getResult());
         Assert.assertEquals(salt, hash.getSalt());
         Assert.assertEquals(pepper, hash.getPepper());
+        Assert.assertEquals(Arrays.toString(hashed.getBytes()), Arrays.toString(hash.getBytes()));
         Assert.assertNull(hash2.getPepper());
     }
 
@@ -52,13 +55,13 @@ public class HashTest
         // WHEN
         boolean eq1 = hash.equals(null);
         boolean eq2 = hash.equals(new Object());
-        boolean eq3 = hash.equals(new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), hash.getResult(), hash.getSalt()));
-        boolean eq4 = hash.equals(new Hash(AlgorithmFinder.getPBKDF2Instance(), hash.getResult(), hash.getSalt()));
-        boolean eq5 = hash.equals(new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), "hash", hash.getSalt()));
-        boolean eq6 = hash.equals(new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), hash.getResult(), "salt"));
+        boolean eq3 = hash.equals(new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), hash.getResult(), hash.getBytes(), hash.getSalt()));
+        boolean eq4 = hash.equals(new Hash(AlgorithmFinder.getPBKDF2Instance(), hash.getResult(), hash.getBytes(), hash.getSalt()));
+        boolean eq5 = hash.equals(new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), "hash", hash.getBytes(), hash.getSalt()));
+        boolean eq6 = hash.equals(new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), hash.getResult(), hash.getBytes(), "salt"));
 
         hash.setPepper("pepper");
-        Hash testingHash = new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), hash.getResult(), hash.getSalt());
+        Hash testingHash = new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), hash.getResult(), hash.getBytes(), hash.getSalt());
         testingHash.setPepper(hash.getPepper());
         boolean eq7 = hash.equals(testingHash);
         hash.setPepper("reppep");

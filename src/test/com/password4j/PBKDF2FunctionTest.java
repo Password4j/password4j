@@ -21,6 +21,7 @@ import com.password4j.types.Hmac;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,15 +35,17 @@ public class PBKDF2FunctionTest
     public void testPBKDF2()
     {
         // GIVEN
-        HashingFunction strategy = CompressedPBKDF2Function.getInstance(Hmac.SHA256, 10_000, 256);
+        HashingFunction function = CompressedPBKDF2Function.getInstance(Hmac.SHA256, 10_000, 256);
         String password = "password";
         String salt = "abc";
 
         // WHEN
-        Hash hash = strategy.hash(password, salt);
+        Hash hash = function.hash(password, salt);
 
         // THEN
-        Assert.assertEquals("$3$42949672960256$YWJj$/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=", hash.getResult());
+        String result = "/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=";
+        Assert.assertEquals("$3$42949672960256$YWJj$" + result, hash.getResult());
+        Assert.assertArrayEquals(Base64.getDecoder().decode(result), hash.getBytes());
     }
 
     @Test
@@ -270,6 +273,7 @@ public class PBKDF2FunctionTest
             String expected = "$" + algorithm.code() + "$" + params + "$" + Base64.getEncoder().encodeToString(salt.getBytes(Utils.DEFAULT_CHARSET)) + "$" + notCompressedHash.getResult();
 
             Assert.assertEquals(expected, hash.getResult());
+            Assert.assertArrayEquals(hash.getBytes(), notCompressedHash.getBytes());
         }
     }
 

@@ -125,7 +125,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         try
         {
             SecretKey key = internalHash(plainTextPassword, salt, this.algorithmAsString, this.iterations, this.length);
-            return new Hash(this, getHash(key, salt), salt);
+            return new Hash(this, getHash(key, salt), key.getEncoded(), salt);
         }
         catch (NoSuchAlgorithmException nsae)
         {

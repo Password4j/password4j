@@ -16,7 +16,6 @@
  */
 package com.password4j;
 
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Builder class that helps to create a chain of parameters to be used

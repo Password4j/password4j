@@ -146,7 +146,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         {
             throw new IllegalArgumentException("Salt cannot be null");
         }
-        return internalHash(Utils.fromCharSequenceToChars(plainTextPassword), salt.getBytes(), algorithm, iterations, length);
+        return internalHash(Utils.fromCharSequenceToChars(plainTextPassword), Utils.fromCharSequenceToBytes(salt), algorithm, iterations, length);
     }
 
     protected static SecretKey internalHash(char[] plain, byte[] salt, String algorithm, int iterations, int length)
@@ -173,7 +173,7 @@ public class PBKDF2Function extends AbstractHashingFunction
     public boolean check(CharSequence plainTextPassword, String hashed, String salt)
     {
         Hash internalHash = hash(plainTextPassword, salt);
-        return slowEquals(internalHash.getResult().getBytes(), hashed.getBytes());
+        return slowEquals(internalHash.getResult(), hashed);
     }
 
     @Override

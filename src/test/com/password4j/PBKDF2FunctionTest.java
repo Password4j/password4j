@@ -16,6 +16,7 @@
  */
 package com.password4j;
 
+import com.password4j.types.BCrypt;
 import com.password4j.types.Hmac;
 import org.junit.Assert;
 import org.junit.Test;
@@ -266,10 +267,44 @@ public class PBKDF2FunctionTest
             Hash notCompressedHash = PBKDF2Function.getInstance(algorithm, 100 * i, algorithm.bits()).hash(password, salt);
 
             String params = Long.toString((((long) 100 * i) << 32) | (algorithm.bits() & 0xffffffffL));
-            String expected = "$" + algorithm.code() + "$" + params + "$" + Base64.getEncoder().encodeToString(salt.getBytes()) + "$" + notCompressedHash.getResult();
+            String expected = "$" + algorithm.code() + "$" + params + "$" + Base64.getEncoder().encodeToString(salt.getBytes(Utils.DEFAULT_CHARSET)) + "$" + notCompressedHash.getResult();
 
             Assert.assertEquals(expected, hash.getResult());
         }
+    }
+
+    @Test
+    public void testEquality()
+    {
+        // GIVEN
+        Hmac hmac = Hmac.SHA256;
+        int iterations = 2;
+        int length = 256;
+        PBKDF2Function pbkdf2Function = PBKDF2Function.getInstance(hmac, iterations, length);
+
+        // THEN
+        boolean eqNull = pbkdf2Function.equals(null);
+        boolean eqClass = pbkdf2Function.equals(new BCryptFunction(BCrypt.A,10));
+        boolean difInst = pbkdf2Function.equals(SCryptFunction.getInstance(5, 4, 6));
+        boolean sameInst = pbkdf2Function.equals(PBKDF2Function.getInstance(hmac, iterations, length));
+        boolean notSameInst1 = pbkdf2Function.equals(PBKDF2Function.getInstance(Hmac.SHA1, iterations, length));
+        boolean notSameInst2 = pbkdf2Function.equals(PBKDF2Function.getInstance(hmac, iterations+1, length));
+        boolean notSameInst3 = pbkdf2Function.equals(PBKDF2Function.getInstance(hmac, iterations, length*2));
+
+        String toString = pbkdf2Function.toString();
+        int hashCode = pbkdf2Function.hashCode();
+
+        // END
+        Assert.assertFalse(eqNull);
+        Assert.assertFalse(eqClass);
+        Assert.assertFalse(difInst);
+        Assert.assertTrue(sameInst);
+        Assert.assertNotEquals(toString, new SCryptFunction(5, 4, 6).toString());
+        Assert.assertNotEquals(hashCode, new SCryptFunction(5, 4, 6).hashCode());
+        Assert.assertFalse(notSameInst1);
+        Assert.assertFalse(notSameInst2);
+        Assert.assertFalse(notSameInst3);
+
     }
 
     @Test

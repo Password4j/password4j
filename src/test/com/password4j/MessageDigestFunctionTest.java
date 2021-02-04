@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
+
 
 public class MessageDigestFunctionTest
 {
@@ -42,7 +44,7 @@ public class MessageDigestFunctionTest
         Hash hash = strategy.hash(password, salt);
 
         // THEN
-        Assert.assertEquals("8223fe8dc0533c6ebbb717e7fda2833c", hash.getResult());
+        assertEquals("8223fe8dc0533c6ebbb717e7fda2833c", hash.getResult());
     }
 
 
@@ -57,7 +59,7 @@ public class MessageDigestFunctionTest
         Hash hash = strategy.hash(password);
 
         // THEN
-        Assert.assertEquals("5f4dcc3b5aa765d61d8327deb882cf99", hash.getResult());
+        assertEquals("5f4dcc3b5aa765d61d8327deb882cf99", hash.getResult());
     }
 
     @Test
@@ -111,6 +113,20 @@ public class MessageDigestFunctionTest
         strategy.hash(password, salt);
 
         // THEN
+    }
+
+    @Test
+    public void testMDWrongSaltOption()
+    {
+        // GIVEN
+
+        PropertyReader.properties.setProperty("hash.md.salt.option", "1234");
+
+        // WHEN
+        MessageDigestFunction function = AlgorithmFinder.getMessageDigestInstance();
+
+        // THEN
+        assertEquals(SaltOption.APPEND, function.getSaltOption());
     }
 
 
@@ -172,8 +188,8 @@ public class MessageDigestFunctionTest
 
             // THEN
             Assert.assertNotNull(alg);
-            Assert.assertEquals(enumAlg.code(), alg.code());
-            Assert.assertEquals(enumAlg.bits(), alg.bits());
+            assertEquals(enumAlg.code(), alg.code());
+            assertEquals(enumAlg.bits(), alg.bits());
         }
         Assert.assertNull(algNull);
 
@@ -230,8 +246,8 @@ public class MessageDigestFunctionTest
 
 
         // THEN
-        Assert.assertEquals(4, map.size());
-        Assert.assertEquals(strategy1, strategy2);
+        assertEquals(4, map.size());
+        assertEquals(strategy1, strategy2);
     }
 
     @Test
@@ -249,9 +265,9 @@ public class MessageDigestFunctionTest
             Hash notCompressedHash = PBKDF2Function.getInstance(algorithm, 100 * i, algorithm.bits()).hash(password, salt);
 
             String params = Long.toString((((long) 100 * i) << 32) | (algorithm.bits() & 0xffffffffL));
-            String expected = "$" + algorithm.code() + "$" + params + "$" + Base64.getEncoder().encodeToString(salt.getBytes()) + "$" + notCompressedHash.getResult();
+            String expected = "$" + algorithm.code() + "$" + params + "$" + Base64.getEncoder().encodeToString(salt.getBytes(Utils.DEFAULT_CHARSET)) + "$" + notCompressedHash.getResult();
 
-            Assert.assertEquals(expected, hash.getResult());
+            assertEquals(expected, hash.getResult());
         }
     }
 
@@ -268,11 +284,11 @@ public class MessageDigestFunctionTest
         CompressedPBKDF2Function compressed = CompressedPBKDF2Function.getInstance(hmac, iterations, length);
 
         // THEN
-        Assert.assertEquals(hmac.name(), pbkdf2.getAlgorithm());
-        Assert.assertEquals(iterations, pbkdf2.getIterations());
-        Assert.assertEquals(length, pbkdf2.getLength());
-        Assert.assertEquals("PBKDF2Function[SHA384|5|7]", pbkdf2.toString());
-        Assert.assertEquals("CompressedPBKDF2Function[SHA384|5|7]", compressed.toString());
+        assertEquals(hmac.name(), pbkdf2.getAlgorithm());
+        assertEquals(iterations, pbkdf2.getIterations());
+        assertEquals(length, pbkdf2.getLength());
+        assertEquals("PBKDF2Function[SHA384|5|7]", pbkdf2.toString());
+        assertEquals("CompressedPBKDF2Function[SHA384|5|7]", compressed.toString());
     }
 
 }

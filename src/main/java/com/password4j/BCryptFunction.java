@@ -822,7 +822,7 @@ public class BCryptFunction extends AbstractHashingFunction
 
     static boolean equalsNoEarlyReturn(String a, String b)
     {
-        return MessageDigest.isEqual(a.getBytes(StandardCharsets.UTF_8), b.getBytes(StandardCharsets.UTF_8));
+        return MessageDigest.isEqual(Utils.fromCharSequenceToBytes(a), Utils.fromCharSequenceToBytes(b));
     }
 
 }

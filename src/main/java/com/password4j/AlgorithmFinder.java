@@ -57,32 +57,11 @@ public class AlgorithmFinder
      * @see #getSecureRandom()
      * @since 0.1.0
      */
-    private static final SecureRandom SR_SOURCE;
+    private static SecureRandom secureRandom;
 
     static
     {
-        SecureRandom sr;
-        if (useStrongRandom())
-        {
-            try
-            {
-                sr = SecureRandom.getInstanceStrong();
-            }
-            catch (NoSuchAlgorithmException nsae)
-            {
-                /* Even if there's no strong instance, execution
-                 * must continue with a less strong SecureRandom instance */
-                LOG.warn("No source of strong randomness found for this environment.");
-                sr = new SecureRandom();
-            }
-
-        }
-        else
-        {
-            sr = new SecureRandom();
-        }
-        SR_SOURCE = sr;
-
+        initialize();
     }
 
     private AlgorithmFinder()
@@ -109,7 +88,7 @@ public class AlgorithmFinder
      */
     public static SecureRandom getSecureRandom()
     {
-        return SR_SOURCE;
+        return secureRandom;
     }
 
     /**
@@ -379,6 +358,31 @@ public class AlgorithmFinder
     private static boolean useStrongRandom()
     {
         return PropertyReader.readBoolean("global.random.strong", false);
+    }
+
+    static void initialize()
+    {
+        SecureRandom sr;
+        if (useStrongRandom())
+        {
+            try
+            {
+                sr = SecureRandom.getInstanceStrong();
+            }
+            catch (NoSuchAlgorithmException nsae)
+            {
+                /* Even if there's no strong instance, execution
+                 * must continue with a less strong SecureRandom instance */
+                LOG.warn("No source of strong randomness found for this environment.");
+                sr = new SecureRandom();
+            }
+
+        }
+        else
+        {
+            sr = new SecureRandom();
+        }
+        secureRandom = sr;
     }
 
     private static class Param

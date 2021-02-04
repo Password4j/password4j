@@ -153,7 +153,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
     protected String getHash(SecretKey key, String salt)
     {
         String params = Long.toString((((long) getIterations()) << 32) | (getLength() & 0xffffffffL));
-        String salt64 = Base64.getEncoder().encodeToString(salt.getBytes());
+        String salt64 = Base64.getEncoder().encodeToString(Utils.fromCharSequenceToBytes(salt));
         String hash64 = super.getHash(key, salt);
         return "$" + algorithm.code() + "$" + params + "$" + salt64 + "$" + hash64;
     }
@@ -164,7 +164,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         String salt = getSaltFromHash(hashed);
         Hash internalHas = hash(plainTextPassword, salt);
 
-        return slowEquals(internalHas.getResult().getBytes(), hashed.getBytes());
+        return slowEquals(internalHas.getResult(), hashed);
     }
 
     @Override
@@ -172,7 +172,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
     {
         String realSalt = getSaltFromHash(hashed);
         Hash internalHas = hash(plainTextPassword, realSalt);
-        return slowEquals(internalHas.getResult().getBytes(), hashed.getBytes());
+        return slowEquals(internalHas.getResult(), hashed);
     }
 
     private String getSaltFromHash(String hashed)
@@ -180,7 +180,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         String[] parts = getParts(hashed);
         if (parts.length == 5)
         {
-            return new String(Base64.getDecoder().decode(parts[3].getBytes()));
+            return new String(Base64.getDecoder().decode(Utils.fromCharSequenceToBytes(parts[3])));
         }
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }

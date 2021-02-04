@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class SCryptFunction extends AbstractHashingFunction
 {
+    private static final int DERIVED_KEY_LENGTH = 64;
 
     private int workFactor; // N
 
@@ -122,7 +123,7 @@ public class SCryptFunction extends AbstractHashingFunction
         try
         {
             byte[] saltAsBytes = salt.getBytes(StandardCharsets.UTF_8);
-            byte[] derived = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), saltAsBytes, 64);
+            byte[] derived = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), saltAsBytes, DERIVED_KEY_LENGTH);
             String params = Long.toString((long) Utils.log2(workFactor) << 16 | (long) resources << 8 | parallelization, 16);
             String sb = "$s0$" + params + '$' + Base64.getEncoder().encodeToString(saltAsBytes) + '$' + Base64.getEncoder()
                     .encodeToString(derived);
@@ -145,22 +146,12 @@ public class SCryptFunction extends AbstractHashingFunction
             {
                 byte[] salt = Base64.getDecoder().decode(parts[3]);
                 byte[] derived0 = Base64.getDecoder().decode(parts[4]);
-                byte[] derived1 = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), salt, 64);
-                if (derived0.length != derived1.length)
-                {
-                    return false;
-                }
-                else
-                {
-                    int result = 0;
 
-                    for (int i = 0; i < derived0.length; ++i)
-                    {
-                        result |= derived0[i] ^ derived1[i];
-                    }
+                // Calculate the derived key using the key length from the input hash, whose key length may be different
+                // than this implementation's default DERIVED_KEY_LENGTH.
+                byte[] derived1 = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), salt, derived0.length);
 
-                    return result == 0;
-                }
+                return slowEquals(derived0, derived1);
             }
             else
             {

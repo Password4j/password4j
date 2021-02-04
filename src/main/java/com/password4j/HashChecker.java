@@ -158,7 +158,7 @@ public class HashChecker
      */
     public boolean withCompressedPBKDF2()
     {
-        PBKDF2Function pbkdf2 = AlgorithmFinder.getCompressedPBKDF2Instance();
+        PBKDF2Function pbkdf2 = CompressedPBKDF2Function.getInstanceFromHash(hashed);
         return with(pbkdf2);
     }
 
@@ -175,7 +175,7 @@ public class HashChecker
      */
     public boolean withSCrypt()
     {
-        SCryptFunction scrypt = AlgorithmFinder.getSCryptInstance();
+        SCryptFunction scrypt = SCryptFunction.getInstanceFromHash(hashed);
         return with(scrypt);
     }
 
@@ -192,7 +192,7 @@ public class HashChecker
      */
     public boolean withBCrypt()
     {
-        return with(AlgorithmFinder.getBCryptInstance());
+        return with(BCryptFunction.getInstanceFromHash(hashed));
     }
 
     /**
@@ -224,7 +224,7 @@ public class HashChecker
      */
     public boolean withArgon2()
     {
-        Argon2Function argon2 = AlgorithmFinder.getArgon2Instance();
+        Argon2Function argon2 = Argon2Function.getInstanceFromHash(hashed);
         return with(argon2);
     }
 

@@ -707,8 +707,8 @@ public class PasswordTest
     @Test
     public void testBCryptNonStandardParams()
     {
-        Assert.assertTrue(Password.check("s$cret12",
-            "$2b$16$.1FczuSNl2iXHmLojhwBZO9vCfA5HIqrONkefhvn2qLQpth3r7Jwe").withBCrypt());
+        final String testHash = "$2b$16$.1FczuSNl2iXHmLojhwBZO9vCfA5HIqrONkefhvn2qLQpth3r7Jwe";
+        Assert.assertTrue(Password.check("s$cret12", testHash).with(BCryptFunction.getInstanceFromHash(testHash)));
     }
 
     @Test
@@ -717,8 +717,8 @@ public class PasswordTest
         /*
          * This password hash was generated using com.lambdaworks:scrypt, which has a derived key length (dkLen) of 32 bytes.
          */
-        Assert.assertTrue(Password.check("Hello world!",
-            "$s0$e0801$fl+gNAicpGG4gLMkUTCvLw==$N5wE1IKsr4LPBoetJVW6jLzEH4kTVXuKGafvAA8Z+88=").withSCrypt());
+        final String testHash = "$s0$e0801$fl+gNAicpGG4gLMkUTCvLw==$N5wE1IKsr4LPBoetJVW6jLzEH4kTVXuKGafvAA8Z+88=";
+        Assert.assertTrue(Password.check("Hello world!", testHash).with(SCryptFunction.getInstanceFromHash(testHash)));
     }
 
     @Test
@@ -727,7 +727,7 @@ public class PasswordTest
         /*
          * This password hash comes from the Argon2 C reference implementation (https://github.com/P-H-C/phc-winner-argon2).
          */
-        Assert.assertTrue(Password.check("password",
-            "$argon2i$v=19$m=65536,t=2,p=4$c29tZXNhbHQ$RdescudvJCsgt3ub+b+dWRWJTmaaJObG").withArgon2());
+        final String testHash = "$argon2i$v=19$m=65536,t=2,p=4$c29tZXNhbHQ$RdescudvJCsgt3ub+b+dWRWJTmaaJObG";
+        Assert.assertTrue(Password.check("password", testHash).with(Argon2Function.getInstanceFromHash(testHash)));
     }
 }

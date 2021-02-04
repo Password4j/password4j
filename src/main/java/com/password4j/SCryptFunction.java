@@ -34,13 +34,15 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class SCryptFunction extends AbstractHashingFunction
 {
-    private static final int DERIVED_KEY_LENGTH = 64;
+    public static final int DERIVED_KEY_LENGTH = 64;
 
     private int workFactor; // N
 
     private int resources; // r
 
     private int parallelization; // p
+
+    private int derivedKeyLength; // dkLen
 
     private static final ConcurrentMap<String, SCryptFunction> INSTANCES = new ConcurrentHashMap<>();
 
@@ -60,6 +62,21 @@ public class SCryptFunction extends AbstractHashingFunction
         this.resources = resources;
         this.workFactor = workFactor;
         this.parallelization = parallelization;
+        this.derivedKeyLength = DERIVED_KEY_LENGTH;
+    }
+
+    /**
+     * @param workFactor       (N)
+     * @param resources        (r)
+     * @param parallelization  (p)
+     * @param derivedKeyLength (dkLen)
+     */
+    protected SCryptFunction(int workFactor, int resources, int parallelization, int derivedKeyLength)
+    {
+        this.resources = resources;
+        this.workFactor = workFactor;
+        this.parallelization = parallelization;
+        this.derivedKeyLength = derivedKeyLength;
     }
 
     /**
@@ -79,8 +96,9 @@ public class SCryptFunction extends AbstractHashingFunction
             int workFactor = (int) Math.pow(2.0D, (double) (params >> 16 & 65535L));
             int resources = (int) params >> 8 & 255;
             int parallelization = (int) params & 255;
+            int derivedKeyLength = Base64.getDecoder().decode(parts[4]).length;
 
-            return SCryptFunction.getInstance(workFactor, resources, parallelization);
+            return SCryptFunction.getInstance(workFactor, resources, parallelization, derivedKeyLength);
         }
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }
@@ -97,14 +115,30 @@ public class SCryptFunction extends AbstractHashingFunction
      */
     public static SCryptFunction getInstance(int workFactor, int resources, int parallelization)
     {
-        String key = getUID(resources, workFactor, parallelization);
+        return getInstance(workFactor, resources, parallelization, DERIVED_KEY_LENGTH);
+    }
+
+    /**
+     * Creates a singleton instance, depending on the provided
+     * N, r and p parameters.
+     *
+     * @param workFactor       work factor (N)
+     * @param resources        resources (r)
+     * @param parallelization  parallelization (p)
+     * @param derivedKeyLength derived key length (dkLen)
+     * @return a singleton instance
+     * @since 0.3.0
+     */
+    public static SCryptFunction getInstance(int workFactor, int resources, int parallelization, int derivedKeyLength)
+    {
+        String key = getUID(resources, workFactor, parallelization, derivedKeyLength);
         if (INSTANCES.containsKey(key))
         {
             return INSTANCES.get(key);
         }
         else
         {
-            SCryptFunction function = new SCryptFunction(workFactor, resources, parallelization);
+            SCryptFunction function = new SCryptFunction(workFactor, resources, parallelization, derivedKeyLength);
             INSTANCES.put(key, function);
             return function;
         }
@@ -123,7 +157,7 @@ public class SCryptFunction extends AbstractHashingFunction
         try
         {
             byte[] saltAsBytes = salt.getBytes(StandardCharsets.UTF_8);
-            byte[] derived = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), saltAsBytes, DERIVED_KEY_LENGTH);
+            byte[] derived = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), saltAsBytes, derivedKeyLength);
             String params = Long.toString((long) Utils.log2(workFactor) << 16 | (long) resources << 8 | parallelization, 16);
             String sb = "$s0$" + params + '$' + Base64.getEncoder().encodeToString(saltAsBytes) + '$' + Base64.getEncoder()
                     .encodeToString(derived);
@@ -146,11 +180,7 @@ public class SCryptFunction extends AbstractHashingFunction
             {
                 byte[] salt = Base64.getDecoder().decode(parts[3]);
                 byte[] derived0 = Base64.getDecoder().decode(parts[4]);
-
-                // Calculate the derived key using the key length from the input hash, whose key length may be different
-                // than this implementation's default DERIVED_KEY_LENGTH.
-                byte[] derived1 = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), salt, derived0.length);
-
+                byte[] derived1 = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), salt, derivedKeyLength);
                 return slowEquals(derived0, derived1);
             }
             else
@@ -189,6 +219,11 @@ public class SCryptFunction extends AbstractHashingFunction
     public int getParallelization()
     {
         return parallelization;
+    }
+
+    public int getDerivedKeyLength()
+    {
+        return derivedKeyLength;
     }
 
     /**
@@ -230,7 +265,7 @@ public class SCryptFunction extends AbstractHashingFunction
     @Override
     public String toString()
     {
-        return getClass().getSimpleName() + '[' + getUID(this.resources, this.workFactor, this.parallelization) + ']';
+        return getClass().getSimpleName() + '[' + getUID(this.resources, this.workFactor, this.parallelization, this.derivedKeyLength) + ']';
     }
 
     @Override
@@ -239,9 +274,9 @@ public class SCryptFunction extends AbstractHashingFunction
         return Objects.hash(resources, workFactor, parallelization);
     }
 
-    protected static String getUID(int resources, int workFactor, int parallelization)
+    protected static String getUID(int resources, int workFactor, int parallelization, int derivedKeyLength)
     {
-        return workFactor + "|" + resources + "|" + parallelization;
+        return workFactor + "|" + resources + "|" + parallelization + "|" + derivedKeyLength;
     }
 
 

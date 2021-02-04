@@ -201,15 +201,17 @@ public class SCryptFunctionTest
         int workFactor = 3;
         int resources = 5;
         int parallelization = 7;
+        int derivedKeyLength = 32;
 
         // WHEN
-        SCryptFunction scrypt = SCryptFunction.getInstance(workFactor, resources,parallelization);
+        SCryptFunction scrypt = SCryptFunction.getInstance(workFactor, resources, parallelization, derivedKeyLength);
 
         // THEN
         Assert.assertEquals(workFactor, scrypt.getWorkFactor());
         Assert.assertEquals(resources, scrypt.getResources());
         Assert.assertEquals(parallelization, scrypt.getParallelization());
-        Assert.assertEquals("SCryptFunction[3|5|7]", scrypt.toString());
+        Assert.assertEquals(derivedKeyLength, scrypt.getDerivedKeyLength());
+        Assert.assertEquals("SCryptFunction[3|5|7|32]", scrypt.toString());
     }
 
 }

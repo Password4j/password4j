@@ -114,6 +114,12 @@ boolean verification = Password.check(password, hash).addSalt(salt).addPepper(pe
 boolean verification = Password.check(password, hash).withArgon2();
 ```
 
+Some algorithms encode into the hash the parameters that were used to compute that hash, notably BCrypt, SCrypt, and Argon2.
+When checking a hash, you can use the parameters from the hash rather than Password4j's configured defaults.
+```java
+// Verify with Argon2, reads the salt and parameters from the given hash.
+boolean verification = Password.check(password, hash)..with(Argon2Function.getInstanceFromHash(hash)));
+```
 
 ## Update the hash
 When a configuration is not considered anymore secure  you can

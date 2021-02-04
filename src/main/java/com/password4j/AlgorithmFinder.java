@@ -240,6 +240,11 @@ public class AlgorithmFinder
      *     <td>hash.scrypt.parallelization</td>
      *     <td>1</td>
      *   </tr>
+     *   <tr>
+     *     <td>Derived Key Length (dkLen)</td>
+     *     <td>hash.scrypt.derivedKeyLength</td>
+     *     <td>64</td>
+     *   </tr>
      * </table>
      *
      * @return a {@link SCryptFunction}
@@ -250,7 +255,8 @@ public class AlgorithmFinder
         int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", 32_768, "SCrypt work factor (N) is not defined");
         int resources = PropertyReader.readInt("hash.scrypt.resources", 8, "SCrypt resources (r) is not defined");
         int parallelization = PropertyReader.readInt("hash.scrypt.parallelization", 1, "SCrypt parallelization (p) is not defined");
-        return SCryptFunction.getInstance(workFactor, resources, parallelization);
+        int derivedKeyLength = PropertyReader.readInt("hash.scrypt.derivedKeyLength", SCryptFunction.DERIVED_KEY_LENGTH, "SCrypt derivedKeyLength (dkLen) is not defined");
+        return SCryptFunction.getInstance(workFactor, resources, parallelization, derivedKeyLength);
     }
 
     public static MessageDigestFunction getMessageDigestInstance()

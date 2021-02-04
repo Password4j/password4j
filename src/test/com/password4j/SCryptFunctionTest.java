@@ -1,7 +1,6 @@
 package com.password4j;
 
 import com.password4j.types.BCrypt;
-import com.password4j.types.Hmac;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;

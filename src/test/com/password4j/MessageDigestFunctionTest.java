@@ -17,7 +17,6 @@
 package com.password4j;
 
 import com.password4j.types.Hmac;
-import com.sun.javafx.scene.traversal.Algorithm;
 import org.junit.Assert;
 import org.junit.Test;
 

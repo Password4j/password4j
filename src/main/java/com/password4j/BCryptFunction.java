@@ -18,7 +18,6 @@ package com.password4j;
 
 import com.password4j.types.BCrypt;
 
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;

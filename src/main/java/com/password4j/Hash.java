@@ -18,6 +18,7 @@ package com.password4j;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 
@@ -244,6 +245,7 @@ public class Hash
     private boolean hasSameValues(Hash otherHash)
     {
         return StringUtils.equals(this.result, otherHash.result) //
+                && Arrays.equals(this.bytes, otherHash.bytes) //
                 && StringUtils.equals(this.salt, otherHash.salt) //
                 && StringUtils.equals(this.pepper, otherHash.pepper) //
                 && this.hashingFunction.equals(otherHash.hashingFunction);

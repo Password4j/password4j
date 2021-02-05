@@ -126,7 +126,7 @@ public class SCryptFunction extends AbstractHashingFunction
      * @param parallelization  parallelization (p)
      * @param derivedKeyLength derived key length (dkLen)
      * @return a singleton instance
-     * @since 0.3.0
+     * @since 1.5.1
      */
     public static SCryptFunction getInstance(int workFactor, int resources, int parallelization, int derivedKeyLength)
     {
@@ -160,7 +160,7 @@ public class SCryptFunction extends AbstractHashingFunction
             String params = Long.toString((long) Utils.log2(workFactor) << 16 | (long) resources << 8 | parallelization, 16);
             String sb = "$s0$" + params + '$' + Base64.getEncoder().encodeToString(saltAsBytes) + '$' + Base64.getEncoder()
                     .encodeToString(derived);
-            return new Hash(this, sb, salt);
+            return new Hash(this, sb, derived, salt);
         }
         catch (IllegalArgumentException | GeneralSecurityException e)
         {

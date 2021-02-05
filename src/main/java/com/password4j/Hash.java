@@ -18,6 +18,7 @@ package com.password4j;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 
@@ -70,6 +71,12 @@ public class Hash
     private String result;
 
     /**
+     * Represents the computed output of a cryptographic hashing function.
+     * It never contains salt and other configurations.
+     */
+    private byte[] bytes;
+
+    /**
      * Represents the salt: random data that is used as an additional input
      * to a cryptographic hashing function.
      */
@@ -92,7 +99,7 @@ public class Hash
      * It is meant to not be used if not internally.
      * The other constructor must be used instead.
      *
-     * @see Hash#Hash(HashingFunction, String, String)
+     * @see Hash#Hash(HashingFunction, String, byte[], String)
      * @since 0.1.0
      */
     @SuppressWarnings("unused")
@@ -112,14 +119,16 @@ public class Hash
      * @param hashingFunction the cryptographic algorithm used to produce the hash.
      * @param result          the result of the computation of the hash.
      *                        Notice that the format varies depending on the algorithm.
+     * @param bytes           the hash without additional information.
      * @param salt            the salt used for the computation.
      * @since 0.1.0
      */
-    public Hash(HashingFunction hashingFunction, String result, String salt)
+    public Hash(HashingFunction hashingFunction, String result, byte[] bytes, String salt)
     {
         this.hashingFunction = hashingFunction;
         this.salt = salt;
         this.result = result;
+        this.bytes = bytes;
     }
 
     /**
@@ -131,6 +140,18 @@ public class Hash
     public String getResult()
     {
         return result;
+    }
+
+    /**
+     * Retrieves the hash as byte array and without the parameters
+     * encoded in the final hash.
+     *
+     * @return the hash.
+     * @since 1.5.1
+     */
+    public byte[] getBytes()
+    {
+        return bytes;
     }
 
     /**
@@ -224,6 +245,7 @@ public class Hash
     private boolean hasSameValues(Hash otherHash)
     {
         return StringUtils.equals(this.result, otherHash.result) //
+                && Arrays.equals(this.bytes, otherHash.bytes) //
                 && StringUtils.equals(this.salt, otherHash.salt) //
                 && StringUtils.equals(this.pepper, otherHash.pepper) //
                 && this.hashingFunction.equals(otherHash.hashingFunction);

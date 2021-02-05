@@ -16,11 +16,15 @@
  */
 package com.password4j;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
 import com.password4j.types.BCrypt;
 import com.password4j.types.Hmac;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,15 +38,17 @@ public class PBKDF2FunctionTest
     public void testPBKDF2()
     {
         // GIVEN
-        HashingFunction strategy = CompressedPBKDF2Function.getInstance(Hmac.SHA256, 10_000, 256);
+        HashingFunction function = CompressedPBKDF2Function.getInstance(Hmac.SHA256, 10_000, 256);
         String password = "password";
         String salt = "abc";
 
         // WHEN
-        Hash hash = strategy.hash(password, salt);
+        Hash hash = function.hash(password, salt);
 
         // THEN
-        Assert.assertEquals("$3$42949672960256$YWJj$/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=", hash.getResult());
+        String result = "/WTQfTTc8Hg8GlplP0LthpgdElUG+I3MyuvK8MI4MnQ=";
+        assertEquals("$3$42949672960256$YWJj$" + result, hash.getResult());
+        assertArrayEquals(Base64.getDecoder().decode(result), hash.getBytes());
     }
 
     @Test
@@ -190,8 +196,8 @@ public class PBKDF2FunctionTest
 
             // THEN
             Assert.assertNotNull(alg);
-            Assert.assertEquals(enumAlg.code(), alg.code());
-            Assert.assertEquals(enumAlg.bits(), alg.bits());
+            assertEquals(enumAlg.code(), alg.code());
+            assertEquals(enumAlg.bits(), alg.bits());
         }
         Assert.assertNull(algNull);
 
@@ -248,8 +254,8 @@ public class PBKDF2FunctionTest
 
 
         // THEN
-        Assert.assertEquals(4, map.size());
-        Assert.assertEquals(strategy1, strategy2);
+        assertEquals(4, map.size());
+        assertEquals(strategy1, strategy2);
     }
 
     @Test
@@ -258,7 +264,7 @@ public class PBKDF2FunctionTest
         Hmac algorithm = Hmac.SHA512;
 
 
-        for (int i = 1; i <= 100; i++)
+        for (int i = 1; i <= 100; i+=10)
         {
             String password = PepperGenerator.generate(12);
             String salt = PepperGenerator.generate(i);
@@ -269,7 +275,10 @@ public class PBKDF2FunctionTest
             String params = Long.toString((((long) 100 * i) << 32) | (algorithm.bits() & 0xffffffffL));
             String expected = "$" + algorithm.code() + "$" + params + "$" + Base64.getEncoder().encodeToString(salt.getBytes(Utils.DEFAULT_CHARSET)) + "$" + notCompressedHash.getResult();
 
-            Assert.assertEquals(expected, hash.getResult());
+            assertEquals(expected, hash.getResult());
+            assertArrayEquals(hash.getBytes(), notCompressedHash.getBytes());
+            String hash64 = hash.getResult().split("\\$")[4];
+            assertArrayEquals(Base64.getDecoder().decode(hash64), hash.getBytes());
         }
     }
 
@@ -320,11 +329,11 @@ public class PBKDF2FunctionTest
         CompressedPBKDF2Function compressed = CompressedPBKDF2Function.getInstance(hmac, iterations, length);
 
         // THEN
-        Assert.assertEquals(hmac.name(), pbkdf2.getAlgorithm());
-        Assert.assertEquals(iterations, pbkdf2.getIterations());
-        Assert.assertEquals(length, pbkdf2.getLength());
-        Assert.assertEquals("PBKDF2Function[SHA384|5|7]", pbkdf2.toString());
-        Assert.assertEquals("CompressedPBKDF2Function[SHA384|5|7]", compressed.toString());
+        assertEquals(hmac.name(), pbkdf2.getAlgorithm());
+        assertEquals(iterations, pbkdf2.getIterations());
+        assertEquals(length, pbkdf2.getLength());
+        assertEquals("PBKDF2Function[SHA384|5|7]", pbkdf2.toString());
+        assertEquals("CompressedPBKDF2Function[SHA384|5|7]", compressed.toString());
     }
 
 }

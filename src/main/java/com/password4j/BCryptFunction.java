@@ -263,8 +263,8 @@ public class BCryptFunction extends AbstractHashingFunction
 
     private Hash internalHash(CharSequence plainTextPassword, String salt)
     {
-        String hash = hashPw(plainTextPassword, salt);
-        return new Hash(this, hash, salt);
+        byte[] passwordb = Utils.fromCharSequenceToBytes(plainTextPassword);
+        return hash(passwordb, salt);
     }
 
     @Override
@@ -668,23 +668,8 @@ public class BCryptFunction extends AbstractHashingFunction
         return ret;
     }
 
-    /**
-     * Hash a password using the OpenBSD bcrypt scheme
-     *
-     * @param password the password to hash
-     * @param salt     the salt to hash with (perhaps generated
-     *                 using {@link BCryptFunction#generateSalt()})
-     * @return the hashed password
-     * @since 0.1.0
-     */
-    protected String hashPw(CharSequence password, String salt)
-    {
-        byte[] passwordb = Utils.fromCharSequenceToBytes(password);
 
-        return hashPw(passwordb, salt);
-    }
-
-    protected String hashPw(byte[] passwordb, String salt)
+    protected Hash hash(byte[] passwordb, String salt)
     {
         String realSalt;
         byte[] saltb;
@@ -734,7 +719,9 @@ public class BCryptFunction extends AbstractHashingFunction
         rs.append('$');
         encodeBase64(saltb, saltb.length, rs);
         encodeBase64(hashed, BF_CRYPT_CIPHERTEXT.length * 4 - 1, rs);
-        return rs.toString();
+        String result = rs.toString();
+
+        return new Hash(this, result, hashed, salt);
     }
 
     private static boolean isValidMinor(char minor)
@@ -817,7 +804,7 @@ public class BCryptFunction extends AbstractHashingFunction
      */
     protected boolean checkPw(CharSequence plaintext, String hashed)
     {
-        return equalsNoEarlyReturn(hashed, hashPw(plaintext, hashed));
+        return equalsNoEarlyReturn(hashed, hash(plaintext, hashed).getResult());
     }
 
     static boolean equalsNoEarlyReturn(String a, String b)

@@ -124,17 +124,19 @@ public class SCryptFunctionTest
         boolean eqClass = scrypt.equals(new BCryptFunction(BCrypt.A, 10));
         boolean difInst = scrypt.equals(SCryptFunction.getInstance(5, 4, 6));
         boolean sameInst = scrypt.equals(SCryptFunction.getInstance(N, r, p));
+        boolean sameInst2 = scrypt.equals(new SCryptFunction(N, r, p));
         String toString = scrypt.toString();
         int hashCode = scrypt.hashCode();
-        boolean notSameInst1 = scrypt.equals(SCryptFunction.getInstance(r + 1, N, p));
-        boolean notSameInst2 = scrypt.equals(SCryptFunction.getInstance(r, N + 1 + 1, p));
-        boolean notSameInst3 = scrypt.equals(SCryptFunction.getInstance(r, N, p + 1));
+        boolean notSameInst1 = scrypt.equals(new SCryptFunction(N + 1, r, p));
+        boolean notSameInst2 = scrypt.equals(new SCryptFunction(N, r + 1 + 1, p));
+        boolean notSameInst3 = scrypt.equals(new SCryptFunction(N, r, p + 1));
 
         // END
         Assert.assertFalse(eqNull);
         Assert.assertFalse(eqClass);
         Assert.assertFalse(difInst);
         Assert.assertTrue(sameInst);
+        Assert.assertTrue(sameInst2);
         Assert.assertNotEquals(toString, new SCryptFunction(5, 4, 6).toString());
         Assert.assertNotEquals(hashCode, new SCryptFunction(5, 4, 6).hashCode());
         Assert.assertFalse(notSameInst1);
@@ -185,6 +187,34 @@ public class SCryptFunctionTest
     public void testBadParameters3()
     {
         // GIVEN
+        int k = 16777215;
+
+        // WHEN
+        SCryptFunction.getInstance(2, 2 << 20, 16777215).hash("password");
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadParameters4()
+    {
+        // GIVEN
+
+        // WHEN
+        SCryptFunction.getInstance(1, 4, 3).hash("password");
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadParameters5()
+    {
+        // GIVEN
+
+        // WHEN
+        SCryptFunction.getInstance(50, 4, 3).hash("password");
+    }
+
+    @Test(expected = BadParametersException.class)
+    public void testBadParameters6()
+    {
+        // GIVEN
         int p = 5;
 
         // WHEN
@@ -192,7 +222,7 @@ public class SCryptFunctionTest
     }
 
     @Test(expected = BadParametersException.class)
-    public void testBadParameters4()
+    public void testBadParameters7()
     {
         // GIVEN
 
@@ -217,7 +247,7 @@ public class SCryptFunctionTest
         Assert.assertEquals(resources, scrypt.getResources());
         Assert.assertEquals(parallelization, scrypt.getParallelization());
         Assert.assertEquals(derivedKeyLength, scrypt.getDerivedKeyLength());
-        Assert.assertEquals("SCryptFunction[3|5|7|32]", scrypt.toString());
+        Assert.assertEquals("SCryptFunction(N=3, r=5, p=7, l=32)", scrypt.toString());
     }
 
 }

@@ -267,16 +267,15 @@ public class BCryptFunction extends AbstractHashingFunction
         return hash(passwordb, salt);
     }
 
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (obj == null || !this.getClass().equals(obj.getClass()))
-        {
-            return false;
-        }
 
-        BCryptFunction otherStrategy = (BCryptFunction) obj;
-        return this.logRounds == otherStrategy.logRounds;
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (!(o instanceof BCryptFunction)) return false;
+        BCryptFunction that = (BCryptFunction) o;
+        return logRounds == that.logRounds && type == that.type;
     }
 
     public int getLogarithmicRounds()
@@ -292,12 +291,17 @@ public class BCryptFunction extends AbstractHashingFunction
     @Override
     public String toString()
     {
-        return getClass().getSimpleName() + '[' + getUID(type, logRounds) + ']';
+        return getClass().getSimpleName() + '(' + toString(type, logRounds) + ')';
     }
 
     protected static String getUID(BCrypt type, int logRounds)
     {
         return type.minor() + "|" + logRounds;
+    }
+
+    protected static String toString(BCrypt type, int logRounds)
+    {
+        return "t=" + type.minor() + ", r=" + logRounds;
     }
 
     @Override

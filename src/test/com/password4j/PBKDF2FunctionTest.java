@@ -332,8 +332,8 @@ public class PBKDF2FunctionTest
         assertEquals(hmac.name(), pbkdf2.getAlgorithm());
         assertEquals(iterations, pbkdf2.getIterations());
         assertEquals(length, pbkdf2.getLength());
-        assertEquals("PBKDF2Function[SHA384|5|7]", pbkdf2.toString());
-        assertEquals("CompressedPBKDF2Function[SHA384|5|7]", compressed.toString());
+        assertEquals("PBKDF2Function(a=SHA384, i=5, l=7)", pbkdf2.toString());
+        assertEquals("CompressedPBKDF2Function(a=SHA384, i=5, l=7)", compressed.toString());
     }
 
 }

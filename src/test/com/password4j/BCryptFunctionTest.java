@@ -116,19 +116,26 @@ public class BCryptFunctionTest
     {
         // GIVEN
         int rounds = 8;
-        BCryptFunction bcrypt = new BCryptFunction(BCrypt.A,rounds);
+        BCryptFunction bcrypt = BCryptFunction.getInstance(BCrypt.A,rounds);
 
         // THEN
         boolean eqNull = bcrypt.equals(null);
-        boolean eqClass = bcrypt.equals(new BCryptFunction(BCrypt.A,10));
+        boolean eqClass = bcrypt.equals(new MessageDigestFunction("MD5", SaltOption.APPEND));
         boolean difInst = bcrypt.equals(new BCryptFunction(BCrypt.A,10));
-        boolean sameInst = bcrypt.equals(new BCryptFunction(BCrypt.A,rounds));
+        boolean sameInst = bcrypt.equals(new BCryptFunction(BCrypt.A, rounds));
+        boolean sameInst2 = bcrypt.equals(BCryptFunction.getInstance(BCrypt.A, rounds));
+        boolean notSameInst1 = bcrypt.equals(new BCryptFunction(BCrypt.B, rounds));
+        boolean notSameInst2 = bcrypt.equals(new BCryptFunction(BCrypt.A, rounds+1));
 
         // END
         Assert.assertFalse(eqNull);
         Assert.assertFalse(eqClass);
         Assert.assertFalse(difInst);
         Assert.assertTrue(sameInst);
+        Assert.assertTrue(sameInst2);
+        Assert.assertFalse(notSameInst1);
+        Assert.assertFalse(notSameInst2);
+
     }
 
     private static class TestObject<T>
@@ -600,7 +607,7 @@ public class BCryptFunctionTest
         // THEN
         Assert.assertEquals(logRounds, bcrypt.getLogarithmicRounds());
         Assert.assertEquals(type, bcrypt.getType());
-        Assert.assertEquals("BCryptFunction[y|7]", bcrypt.toString());
+        Assert.assertEquals("BCryptFunction(t=y, r=7)", bcrypt.toString());
     }
 
 }

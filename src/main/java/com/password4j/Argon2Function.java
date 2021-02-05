@@ -196,7 +196,7 @@ public class Argon2Function extends AbstractHashingFunction
 
     protected static String getUID(int memory, int iterations, int parallelism, int outputLength, Argon2 type, int version)
     {
-        return memory + "|" + iterations + "|" + outputLength + "|" + parallelism + "|" + type.ordinal() + "|" + version;
+        return memory + "|" + iterations + "|" + parallelism + "|" + outputLength + "|" + type.ordinal() + "|" + version;
     }
 
     Argon2Function(int memory, int iterations, int parallelism, int outputLength, Argon2 variant, int version)
@@ -762,6 +762,11 @@ public class Argon2Function extends AbstractHashingFunction
     @Override
     public String toString()
     {
-        return getClass().getSimpleName() + '[' + getUID(memory, iterations, parallelism, outputLength, variant, version) + ']';
+        return getClass().getSimpleName() + '[' + toString(memory, iterations, parallelism, outputLength, variant, version) + ']';
+    }
+
+    protected static String toString(int memory, int iterations, int parallelism, int outputLength, Argon2 type, int version)
+    {
+        return "m=" + memory + ", i=" + iterations + ", l=" + outputLength + ", p=" + parallelism + ", t=" + type.ordinal() + ", v=" + version;
     }
 }

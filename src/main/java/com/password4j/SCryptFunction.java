@@ -264,7 +264,12 @@ public class SCryptFunction extends AbstractHashingFunction
     @Override
     public String toString()
     {
-        return getClass().getSimpleName() + '[' + getUID(this.resources, this.workFactor, this.parallelization, this.derivedKeyLength) + ']';
+        return getClass().getSimpleName() + '(' + toString(this.resources, this.workFactor, this.parallelization, this.derivedKeyLength) + ')';
+    }
+
+    protected static String toString(int resources, int workFactor, int parallelization, int derivedKeyLength)
+    {
+        return "N=" + workFactor + ", r=" + resources + ", p=" + parallelization + ", l=" + derivedKeyLength;
     }
 
     @Override

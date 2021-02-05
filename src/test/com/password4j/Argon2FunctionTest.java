@@ -17,6 +17,8 @@
 package com.password4j;
 
 import com.password4j.types.Argon2;
+import com.password4j.types.BCrypt;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -187,6 +189,48 @@ public class Argon2FunctionTest
         {
             return Argon2Function.getInstance(memory, iterations, parallelism, outLength, type, version);
         }
+    }
+
+
+    @Test
+    public void testEquality()
+    {
+        // GIVEN
+        int m = 1;
+        int i = 2;
+        int p = 3;
+        int l = 4;
+        Argon2 t = Argon2.D;
+        int v = 0x13;
+        Argon2Function argon2 = Argon2Function.getInstance(m, i, p, l, t, v);
+
+        // THEN
+        boolean eqNull = argon2.equals(null);
+        boolean eqClass = argon2.equals(new BCryptFunction(BCrypt.A, 10));
+        boolean sameInst = argon2.equals(Argon2Function.getInstance(m, i, p, l, t, v));
+        boolean sameInst2 = argon2.equals(new Argon2Function(m, i, p, l, t, v));
+        String toString = argon2.toString();
+        int hashCode = argon2.hashCode();
+        boolean notSameInst1 = argon2.equals(new Argon2Function(m+1, i, p, l, t, v));
+        boolean notSameInst2 = argon2.equals(new Argon2Function(m, i+1, p, l, t, v));
+        boolean notSameInst3 = argon2.equals(new Argon2Function(m, i, p+1, l, t, v));
+        boolean notSameInst4 = argon2.equals(new Argon2Function(m, i, p, l+1, t, v));
+        boolean notSameInst5 = argon2.equals(new Argon2Function(m, i, p, l, Argon2.ID, v));
+        boolean notSameInst6 = argon2.equals(new Argon2Function(m, i, p, l, t, v+1));
+
+        // END
+        Assert.assertFalse(eqNull);
+        Assert.assertFalse(eqClass);
+        Assert.assertTrue(sameInst);
+        Assert.assertTrue(sameInst2);
+        Assert.assertNotEquals(toString, new Argon2Function(m, i+1, p, l, t, v).toString());
+        Assert.assertNotEquals(hashCode, new Argon2Function(m, i, p, l, t, v+1).hashCode());
+        Assert.assertFalse(notSameInst1);
+        Assert.assertFalse(notSameInst2);
+        Assert.assertFalse(notSameInst3);
+        Assert.assertFalse(notSameInst4);
+        Assert.assertFalse(notSameInst5);
+        Assert.assertFalse(notSameInst6);
     }
 
 

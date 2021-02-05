@@ -41,7 +41,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
     private final SaltOption saltOption;
 
 
-    private MessageDigestFunction(String algorithm, SaltOption saltOption)
+    MessageDigestFunction(String algorithm, SaltOption saltOption)
     {
         this.algorithm = algorithm;
         this.saltOption = saltOption;
@@ -129,15 +129,26 @@ public class MessageDigestFunction extends AbstractHashingFunction
     }
 
     /**
-     * The salt option describes if the Salt has been appended or prepended to
-     * the plain test password.
+     * The salt option describes if the Salt is appended or prepended to
+     * the plain text password.
      *
      * @return how the salt is concatenated
-     * @since 1.6.1
+     * @since 1.5.1
      */
     public SaltOption getSaltOption()
     {
         return saltOption;
+    }
+
+    /**
+     * The algorithm in use by this instance.
+     *
+     * @return the algorithm in use
+     * @since 1.5.1
+     */
+    public String getAlgorithm()
+    {
+        return algorithm;
     }
 
     private CharSequence concatenateSalt(CharSequence plainTextPassword, CharSequence salt)
@@ -149,7 +160,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
         return Utils.append(plainTextPassword, salt);
     }
 
-    private static String getUID(String algorithm, SaltOption saltOption)
+    protected static String getUID(String algorithm, SaltOption saltOption)
     {
         return algorithm + "|" + saltOption.name();
     }
@@ -157,7 +168,12 @@ public class MessageDigestFunction extends AbstractHashingFunction
     @Override
     public String toString()
     {
-        return getClass().getSimpleName() + '[' + getUID(this.algorithm, this.saltOption) + ']';
+        return getClass().getSimpleName() + '(' + toString(this.algorithm, this.saltOption) + ')';
+    }
+
+    protected static String toString(String algorithm, SaltOption saltOption)
+    {
+        return "a=" + algorithm + ", o=" + saltOption.name();
     }
 
     @Override

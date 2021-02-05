@@ -16,6 +16,8 @@
  */
 package com.password4j;
 
+import com.password4j.types.Argon2;
+import com.password4j.types.BCrypt;
 import com.password4j.types.Hmac;
 import org.junit.Assert;
 import org.junit.Test;
@@ -275,20 +277,45 @@ public class MessageDigestFunctionTest
     public void testAccessors()
     {
         // GIVEN
-        Hmac hmac = Hmac.SHA384;
-        int iterations = 5;
-        int length = 7;
+
 
         // WHEN
-        PBKDF2Function pbkdf2 = PBKDF2Function.getInstance(hmac, iterations, length);
-        CompressedPBKDF2Function compressed = CompressedPBKDF2Function.getInstance(hmac, iterations, length);
+        MessageDigestFunction function = MessageDigestFunction.getInstance("MD5", SaltOption.APPEND);
 
         // THEN
-        assertEquals(hmac.name(), pbkdf2.getAlgorithm());
-        assertEquals(iterations, pbkdf2.getIterations());
-        assertEquals(length, pbkdf2.getLength());
-        assertEquals("PBKDF2Function[SHA384|5|7]", pbkdf2.toString());
-        assertEquals("CompressedPBKDF2Function[SHA384|5|7]", compressed.toString());
+        assertEquals("MD5", function.getAlgorithm());
+        assertEquals(SaltOption.APPEND, function.getSaltOption());
+        assertEquals("MessageDigestFunction(a=MD5, o=APPEND)", function.toString());
+    }
+
+    @Test
+    public void testEquality()
+    {
+        // GIVEN
+        String a = "MD5";
+        SaltOption o = SaltOption.APPEND;
+        MessageDigestFunction function = MessageDigestFunction.getInstance(a, o);
+
+        // THEN
+        boolean eqNull = function.equals(null);
+        boolean eqClass = function.equals(new BCryptFunction(BCrypt.A, 10));
+        boolean sameInst = function.equals(MessageDigestFunction.getInstance(a, o));
+        boolean sameInst2 = function.equals(new MessageDigestFunction(a, o));
+        String toString = function.toString();
+        int hashCode = function.hashCode();
+        boolean notSameInst1 = function.equals(new MessageDigestFunction("SHA1", o));
+        boolean notSameInst2 = function.equals(new MessageDigestFunction(a, SaltOption.PREPEND));
+
+
+        // END
+        Assert.assertFalse(eqNull);
+        Assert.assertFalse(eqClass);
+        Assert.assertTrue(sameInst);
+        Assert.assertTrue(sameInst2);
+        Assert.assertNotEquals(toString, new MessageDigestFunction("SHA1", o).toString());
+        Assert.assertNotEquals(hashCode, new MessageDigestFunction(a, SaltOption.PREPEND).hashCode());
+        Assert.assertFalse(notSameInst1);
+        Assert.assertFalse(notSameInst2);
     }
 
 }

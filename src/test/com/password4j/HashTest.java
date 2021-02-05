@@ -59,13 +59,15 @@ public class HashTest
         boolean eq4 = hash.equals(new Hash(AlgorithmFinder.getPBKDF2Instance(), hash.getResult(), hash.getBytes(), hash.getSalt()));
         boolean eq5 = hash.equals(new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), "hash", hash.getBytes(), hash.getSalt()));
         boolean eq6 = hash.equals(new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), hash.getResult(), hash.getBytes(), "salt"));
+        boolean eq7 = hash.equals(new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), hash.getResult(), new byte[]{1,2,3,4}, hash.getSalt()));
+
 
         hash.setPepper("pepper");
         Hash testingHash = new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), hash.getResult(), hash.getBytes(), hash.getSalt());
         testingHash.setPepper(hash.getPepper());
-        boolean eq7 = hash.equals(testingHash);
-        hash.setPepper("reppep");
         boolean eq8 = hash.equals(testingHash);
+        hash.setPepper("reppep");
+        boolean eq9 = hash.equals(testingHash);
 
         // THEN
         Assert.assertFalse(eq1);
@@ -74,8 +76,9 @@ public class HashTest
         Assert.assertFalse(eq4);
         Assert.assertFalse(eq5);
         Assert.assertFalse(eq6);
-        Assert.assertTrue(eq7);
-        Assert.assertFalse(eq8);
+        Assert.assertFalse(eq7);
+        Assert.assertTrue(eq8);
+        Assert.assertFalse(eq9);
     }
 
     @Test

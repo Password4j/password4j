@@ -20,6 +20,7 @@ import com.password4j.types.BCrypt;
 
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -302,7 +303,7 @@ public class BCryptFunction extends AbstractHashingFunction
     @Override
     public int hashCode()
     {
-        return toString().hashCode();
+        return Objects.hash(logRounds, type);
     }
 
     /**

@@ -19,10 +19,7 @@ package com.password4j;
 import com.password4j.types.Argon2;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -742,5 +739,29 @@ public class Argon2Function extends AbstractHashingFunction
 
     }
 
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (!(o instanceof Argon2Function)) return false;
+        Argon2Function other = (Argon2Function) o;
+        return iterations == other.iterations //
+                && memory == other.memory //
+                && parallelism == other.parallelism //
+                && outputLength == other.outputLength //
+                && version == other.version //
+                && variant == other.variant;
+    }
 
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(iterations, memory, parallelism, outputLength, variant, version);
+    }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName() + '[' + getUID(memory, iterations, parallelism, outputLength, variant, version) + ']';
+    }
 }

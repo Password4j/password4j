@@ -25,6 +25,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -224,7 +225,7 @@ public class PBKDF2Function extends AbstractHashingFunction
     @Override
     public int hashCode()
     {
-        return toString().hashCode();
+        return Objects.hash(algorithmAsString, iterations, length);
     }
 
     protected static String getUID(String algorithm, int iterations, int length)

@@ -56,6 +56,8 @@ public class HashTest
         boolean eq4 = hash.equals(new Hash(AlgorithmFinder.getPBKDF2Instance(), hash.getResult(), hash.getSalt()));
         boolean eq5 = hash.equals(new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), "hash", hash.getSalt()));
         boolean eq6 = hash.equals(new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), hash.getResult(), "salt"));
+        boolean eq7 = hash.equals(new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), hash.getResult(), hash.getSalt()));
+
 
         hash.setPepper("pepper");
         Hash testingHash = new Hash(AlgorithmFinder.getCompressedPBKDF2Instance(), hash.getResult(), hash.getSalt());

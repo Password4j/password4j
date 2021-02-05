@@ -19,6 +19,7 @@ package com.password4j;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -50,7 +51,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
      * Creates a singleton instance, depending on the provided
      * algorithm, number of iterations and key length.
      *
-     * @param algorithm  message digest algorithm
+     * @param algorithm message digest algorithm
      * @return a singleton instance
      * @since 1.4.0
      */
@@ -108,7 +109,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
         }
         catch (NoSuchAlgorithmException nsae)
         {
-            throw new UnsupportedOperationException("`" +  algorithm + "` is not supported by your system.", nsae);
+            throw new UnsupportedOperationException("`" + algorithm + "` is not supported by your system.", nsae);
         }
     }
 
@@ -151,5 +152,27 @@ public class MessageDigestFunction extends AbstractHashingFunction
     private static String getUID(String algorithm, SaltOption saltOption)
     {
         return algorithm + "|" + saltOption.name();
+    }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName() + '[' + getUID(this.algorithm, this.saltOption) + ']';
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (!(o instanceof MessageDigestFunction)) return false;
+        MessageDigestFunction other = (MessageDigestFunction) o;
+        return algorithm.equals(other.algorithm) //
+                && saltOption == other.saltOption;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(algorithm, saltOption);
     }
 }

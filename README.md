@@ -237,8 +237,8 @@ hash.scrypt.workfactor=16384
 hash.scrypt.resources=16
 # p
 hash.scrypt.parallelization=1
-hash.argon2.version=19
-
+# length
+hash.scrypt.derivedKeyLength=64
 
 ### PBKDF2
 # with HMAC-SHA256

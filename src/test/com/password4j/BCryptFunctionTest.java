@@ -24,6 +24,8 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static org.junit.Assert.assertArrayEquals;
+
 
 public class BCryptFunctionTest
 {
@@ -236,19 +238,22 @@ public class BCryptFunctionTest
 
     }
 
-    /**
-     * Test method for 'BCrypt.hashpw(String, String)'
-     */
+
     @Test
     public void testHashpw()
     {
         for (TestObject<String> test : testObjectsString)
         {
             Hash hash = BCryptFunction.getInstance(test.rounds).hash(test.password, test.salt);
-            Assert.assertEquals(hash.getResult(), test.expected);
+            String result = hash.getResult();
+            Assert.assertEquals(test.expected, result);
 
             int rounds = BCryptFunction.getInstanceFromHash(test.expected).getLogarithmicRounds();
-            Assert.assertEquals(test.rounds, rounds);
+            Assert.assertEquals(rounds, test.rounds);
+
+            byte[] bytes = BCryptFunction.decodeBase64(result.split("\\$")[3], 23);
+            byte[] expectedBytes = BCryptFunction.decodeBase64(test.expected.split("\\$")[3], 23);
+            assertArrayEquals(expectedBytes, bytes);
         }
     }
 

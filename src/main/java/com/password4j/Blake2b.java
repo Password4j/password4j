@@ -244,15 +244,15 @@ class Blake2b
 
             // G apply to columns of internalState:m[blake2b_sigma[round][2 *
             // blockPos]] /+1
-            G(m[SIGMA[round][0]], m[SIGMA[round][1]], 0, 4, 8, 12);
-            G(m[SIGMA[round][2]], m[SIGMA[round][3]], 1, 5, 9, 13);
-            G(m[SIGMA[round][4]], m[SIGMA[round][5]], 2, 6, 10, 14);
-            G(m[SIGMA[round][6]], m[SIGMA[round][7]], 3, 7, 11, 15);
+            functionG(m[SIGMA[round][0]], m[SIGMA[round][1]], 0, 4, 8, 12);
+            functionG(m[SIGMA[round][2]], m[SIGMA[round][3]], 1, 5, 9, 13);
+            functionG(m[SIGMA[round][4]], m[SIGMA[round][5]], 2, 6, 10, 14);
+            functionG(m[SIGMA[round][6]], m[SIGMA[round][7]], 3, 7, 11, 15);
             // G apply to diagonals of internalState:
-            G(m[SIGMA[round][8]], m[SIGMA[round][9]], 0, 5, 10, 15);
-            G(m[SIGMA[round][10]], m[SIGMA[round][11]], 1, 6, 11, 12);
-            G(m[SIGMA[round][12]], m[SIGMA[round][13]], 2, 7, 8, 13);
-            G(m[SIGMA[round][14]], m[SIGMA[round][15]], 3, 4, 9, 14);
+            functionG(m[SIGMA[round][8]], m[SIGMA[round][9]], 0, 5, 10, 15);
+            functionG(m[SIGMA[round][10]], m[SIGMA[round][11]], 1, 6, 11, 12);
+            functionG(m[SIGMA[round][12]], m[SIGMA[round][13]], 2, 7, 8, 13);
+            functionG(m[SIGMA[round][14]], m[SIGMA[round][15]], 3, 4, 9, 14);
         }
 
         // update chain values:
@@ -262,7 +262,7 @@ class Blake2b
         }
     }
 
-    private void G(long m1, long m2, int posA, int posB, int posC, int posD)
+    private void functionG(long m1, long m2, int posA, int posB, int posC, int posD)
     {
 
         internalState[posA] = internalState[posA] + internalState[posB] + m1;

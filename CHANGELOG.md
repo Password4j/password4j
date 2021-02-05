@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.1](https://github.com/Password4j/password4j/releases/tag/1.5.1) - (2021-02-05)
+### Added
+* `Hash` stores the byte array containing the calculated hash without algorithm's parameters and salt ([#26](../../issues/26))
+### Changed
+* Scrypt accepts dynamic key length ([#24](../../issues/24))
+### Fixed
+* Improved `toString()` methods' readability.
+
 ## [1.5.0](https://github.com/Password4j/password4j/releases/tag/1.5.0) - (2021-02-02)
 ### Added
 * Argon2 support

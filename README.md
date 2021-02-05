@@ -38,7 +38,7 @@ Add the dependency of the latest version to your `pom.xml`:
 <dependency>
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.1</version>
 </dependency>
 ```
 
@@ -50,14 +50,14 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.password4j:password4j:1.5.0'
+    implementation 'com.password4j:password4j:1.5.1'
 }
 ```
 
 ## ![Scala SBT](https://i.imgur.com/Nqv3mVd.png?1) Scala SBT 
 Add to the managed dependencies of your `build.sbt` the latest version:
 ```shell script
-libraryDependencies += "com.password4j" % "password4j" % "1.5.0"
+libraryDependencies += "com.password4j" % "password4j" % "1.5.1"
 ```
 
 # Usage
@@ -315,20 +315,27 @@ System.out.println("N: " + N + ", r: " + r);
 
 
 # Contributing
+![GitHub issues](https://img.shields.io/github/issues/Password4j/password4j?color=success)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/Password4j/password4j)
+
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 # Versioning
+![SemVer 2.0.0](https://img.shields.io/badge/SemVer-2.0.0-orange)
+
 We use [SemVer](http://semver.org/) for versioning. 
 
 For the versions available, see the [releases on this repository](https://github.com/Password4j/password4j/releases). 
 
 # Authors
+![GitHub contributors](https://img.shields.io/github/contributors/Password4j/password4j)
 
-* **David Bertoldi** - *Initial work* - [firaja](https://github.com/firaja)
+* **David Bertoldi** - *Main Maintainer* - [firaja](https://github.com/firaja)
 
 See also the list of [contributors](https://github.com/Password4j/password4j/contributors) who participated in this project.
 
 # License
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 This project is licensed under the Apache License 2.0 License - see the [LICENSE](LICENSE) file for details
 

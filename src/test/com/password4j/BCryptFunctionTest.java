@@ -271,10 +271,8 @@ public class BCryptFunctionTest
         String hash = "$2yS06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq";
 
         // WHEN
-        BCryptFunction function = BCryptFunction.getInstanceFromHash(hash);
+        BCryptFunction.getInstanceFromHash(hash);
 
-        // THEN
-        Assert.assertEquals(6, function.getLogarithmicRounds());
     }
 
 
@@ -285,10 +283,7 @@ public class BCryptFunctionTest
         String hash = "$a$06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq";
 
         // WHEN
-        BCryptFunction function = BCryptFunction.getInstanceFromHash(hash);
-
-        // THEN
-        Assert.assertEquals(6, function.getLogarithmicRounds());
+        BCryptFunction.getInstanceFromHash(hash);
     }
 
     @Test

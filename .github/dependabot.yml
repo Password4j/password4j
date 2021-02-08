@@ -10,5 +10,7 @@ updates:
     schedule:
       interval: "daily"
     labels:
-      - ":gear: dependencies"
+      - "priority: low"
+      - "type: enhancement"
+      - "status: confirmed" 
       

@@ -191,6 +191,59 @@ public class Argon2Function extends AbstractHashingFunction
     }
 
 
+    /**
+     * @return the memory in bytes
+     * @since 1.5.2
+     */
+    public int getMemory()
+    {
+        return memory;
+    }
+
+    /**
+     * @return the number of iterations
+     * @since 1.5.2
+     */
+    public int getIterations()
+    {
+        return iterations;
+    }
+
+    /**
+     * @return the degree of parallelism
+     * @since 1.5.2
+     */
+    public int getParallelism()
+    {
+        return parallelism;
+    }
+
+    /**
+     * @return the length of the produced hash
+     * @since 1.5.2
+     */
+    public int getOutputLength()
+    {
+        return outputLength;
+    }
+
+    /**
+     * @return the Argon2 variant (i, d, id)
+     * @since 1.5.2
+     */
+    public Argon2 getVariant()
+    {
+        return variant;
+    }
+
+    /**
+     * @return the version of the algorithm
+     * @since 1.5.2
+     */
+    public int getVersion()
+    {
+        return version;
+    }
 
 
 

@@ -10,8 +10,7 @@
 
     <name>Password4j</name>
     <description>
-        Password4j is a Java utility package for hashing and checking
-        passwords with different Crypto Hashing Functions (CHF).
+        Password4j is a user-friendly cryptographic library that supports Argon2, Bcrypt, Scrypt, PBKDF2 and various cryptographic hash functions.
     </description>
     <url>https://password4j.com/</url>
 

@@ -147,24 +147,30 @@ public class SCryptFunction extends AbstractHashingFunction
     public Hash hash(CharSequence plainTextPassword)
     {
         byte[] salt = SaltGenerator.generate();
-        return hash(plainTextPassword, new String(salt));
+        return internalHash(plainTextPassword, salt);
     }
 
     @Override
     public Hash hash(CharSequence plainTextPassword, String salt)
     {
+        byte[] saltAsBytes = Utils.fromCharSequenceToBytes(salt);
+        return internalHash(plainTextPassword, saltAsBytes);
+    }
+
+    private Hash internalHash(CharSequence plainTextPassword, byte[] salt)
+    {
+        String stringedSalt = new String(salt, Utils.DEFAULT_CHARSET);
         try
         {
-            byte[] saltAsBytes = Utils.fromCharSequenceToBytes(salt);
-            byte[] derived = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), saltAsBytes, derivedKeyLength);
+            byte[] derived = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), salt, derivedKeyLength);
             String params = Long.toString((long) Utils.log2(workFactor) << 16 | (long) resources << 8 | parallelization, 16);
-            String sb = "$s0$" + params + '$' + Base64.getEncoder().encodeToString(saltAsBytes) + '$' + Base64.getEncoder()
+            String sb = "$s0$" + params + '$' + Base64.getEncoder().encodeToString(salt) + '$' + Base64.getEncoder()
                     .encodeToString(derived);
-            return new Hash(this, sb, derived, salt);
+            return new Hash(this, sb, derived, stringedSalt);
         }
         catch (IllegalArgumentException | GeneralSecurityException e)
         {
-            String message = "Invalid specification with salt=" + salt + ", N=" + workFactor + ", r=" + resources + " and p=" + parallelization;
+            String message = "Invalid specification with salt=" + stringedSalt + ", N=" + workFactor + ", r=" + resources + " and p=" + parallelization;
             throw new BadParametersException(message, e);
         }
     }

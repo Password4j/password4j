@@ -233,6 +233,31 @@ public class Argon2FunctionTest
         Assert.assertFalse(notSameInst6);
     }
 
+    @Test
+    public void testAccessors()
+    {
+        // GIVEN
+        int memory = 3;
+        int iterations = 5;
+        int parallelism = 7;
+        int outputLength = 11;
+        Argon2 variant = Argon2.D;
+        int version = 13;
+
+        // WHEN
+        Argon2Function argon2Function = Argon2Function.getInstance(memory, iterations, parallelism, outputLength, variant, version);
+
+        // THEN
+        Assert.assertEquals(memory, argon2Function.getMemory());
+        Assert.assertEquals(iterations, argon2Function.getIterations());
+        Assert.assertEquals(parallelism, argon2Function.getParallelism());
+        Assert.assertEquals(outputLength, argon2Function.getOutputLength());
+        Assert.assertEquals(variant, argon2Function.getVariant());
+        Assert.assertEquals(version, argon2Function.getVersion());
+
+        Assert.assertEquals("Argon2Function[m=3, i=5, p=7, l=11, t=D, v=13]", argon2Function.toString());
+    }
+
 
 
 

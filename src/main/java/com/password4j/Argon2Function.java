@@ -136,7 +136,7 @@ public class Argon2Function extends AbstractHashingFunction
     public Hash hash(CharSequence plainTextPassword)
     {
         byte[] salt = SaltGenerator.generate();
-        return hash(plainTextPassword, new String(salt));
+        return internalHash(plainTextPassword, salt, null);
     }
 
     @Override
@@ -148,18 +148,20 @@ public class Argon2Function extends AbstractHashingFunction
     @Override
     public Hash hash(CharSequence plainTextPassword, String salt, CharSequence pepper)
     {
+        return internalHash(plainTextPassword, Utils.fromCharSequenceToBytes(salt), pepper);
+    }
+
+    private Hash internalHash(CharSequence plainTextPassword, byte[] salt, CharSequence pepper)
+    {
         byte[] password = Utils.fromCharSequenceToBytes(plainTextPassword);
         long[][] blockMemory = copyOf(initialBlockMemory);
-        String theSalt;
+
         if(salt == null)
         {
-            theSalt = new String(SaltGenerator.generate());
+            salt = SaltGenerator.generate();
         }
-        else
-        {
-            theSalt = salt;
-        }
-        initialize(password, Utils.fromCharSequenceToBytes(theSalt), Utils.fromCharSequenceToBytes(pepper), null, blockMemory);
+        String theSalt = new String(salt, Utils.DEFAULT_CHARSET);
+        initialize(password, salt, Utils.fromCharSequenceToBytes(pepper), null, blockMemory);
         fillMemoryBlocks(blockMemory);
         byte[] hash = ending(blockMemory);
         return new Hash(this, encodeHash(hash, theSalt), hash, theSalt);
@@ -820,6 +822,6 @@ public class Argon2Function extends AbstractHashingFunction
 
     protected static String toString(int memory, int iterations, int parallelism, int outputLength, Argon2 type, int version)
     {
-        return "m=" + memory + ", i=" + iterations + ", l=" + outputLength + ", p=" + parallelism + ", t=" + type.ordinal() + ", v=" + version;
+        return "m=" + memory + ", i=" + iterations + ", p=" + parallelism + ", l=" + outputLength +  ", t=" + type.name() + ", v=" + version;
     }
 }

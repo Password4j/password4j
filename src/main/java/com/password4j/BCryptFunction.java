@@ -263,8 +263,8 @@ public class BCryptFunction extends AbstractHashingFunction
 
     private Hash internalHash(CharSequence plainTextPassword, String salt)
     {
-        byte[] passwordb = Utils.fromCharSequenceToBytes(plainTextPassword);
-        return hash(passwordb, salt);
+        byte[] passwordAsBytes = Utils.fromCharSequenceToBytes(plainTextPassword);
+        return hash(passwordAsBytes, salt);
     }
 
 

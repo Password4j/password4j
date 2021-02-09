@@ -150,11 +150,11 @@ public class CompressedPBKDF2Function extends PBKDF2Function
 
 
     @Override
-    protected String getHash(SecretKey key, String salt)
+    protected String getHash(byte[] encodedKey, String salt)
     {
         String params = Long.toString((((long) getIterations()) << 32) | (getLength() & 0xffffffffL));
         String salt64 = Base64.getEncoder().encodeToString(Utils.fromCharSequenceToBytes(salt));
-        String hash64 = super.getHash(key, salt);
+        String hash64 = super.getHash(encodedKey, salt);
         return "$" + algorithm.code() + "$" + params + "$" + salt64 + "$" + hash64;
     }
 

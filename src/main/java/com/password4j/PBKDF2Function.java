@@ -126,7 +126,8 @@ public class PBKDF2Function extends AbstractHashingFunction
         try
         {
             SecretKey key = internalHash(plainTextPassword, salt, this.algorithmAsString, this.iterations, this.length);
-            return new Hash(this, getHash(key, salt), key.getEncoded(), salt);
+            byte[] encodedKey = key.getEncoded();
+            return new Hash(this, getHash(encodedKey, salt), encodedKey, salt);
         }
         catch (NoSuchAlgorithmException nsae)
         {
@@ -143,7 +144,7 @@ public class PBKDF2Function extends AbstractHashingFunction
     protected static SecretKey internalHash(CharSequence plainTextPassword, String salt, String algorithm, int iterations, int length)
             throws NoSuchAlgorithmException, InvalidKeySpecException
     {
-        if(salt == null)
+        if (salt == null)
         {
             throw new IllegalArgumentException("Salt cannot be null");
         }
@@ -158,16 +159,17 @@ public class PBKDF2Function extends AbstractHashingFunction
         return secretKeyFactory.generateSecret(spec);
     }
 
+
     /**
      * Overridable PBKDF2 generator
      *
-     * @param key secret key
-     * @param salt cryptographic salt
+     * @param encodedKey secret encodedKey
+     * @param salt       cryptographic salt
      * @return the PBKDF2 hash string
      */
-    protected String getHash(SecretKey key, String salt)
+    protected String getHash(byte[] encodedKey, String salt)
     {
-        return Base64.getEncoder().encodeToString(key.getEncoded());
+        return Base64.getEncoder().encodeToString(encodedKey);
     }
 
     @Override

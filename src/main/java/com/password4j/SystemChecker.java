@@ -81,109 +81,165 @@ public class SystemChecker
     }
 
     /**
-     * Finds the optimal logarithmic cost of BCrypt.
+     * Finds the optimal configuration for BCrypt.
      * <p>
      * To prevent timing attacks, a maximum interval of time (in milliseconds)
      * is required to perform a single hash.
+     * <p>
+     * This function returns a prototype {@link BCryptFunction} and the real
+     * elapsed time.
+     * If the hash cannot be performed under the specified time, the elapsed time is set to -1
+     * and prototype null.
      *
      * @param maxMilliseconds max time to perform the hashing
-     * @return the logarithmic cost
+     * @return a benchmark result for bcrypt
      * @see BCryptFunction
      * @since 1.0.0
      */
-    public static int findRoundsForBCrypt(long maxMilliseconds)
+    public static BenchmarkResult<BCryptFunction> benchmarkBcrypt(long maxMilliseconds)
     {
-        warmUpBCrypt();
+        warmUpBcrypt();
 
-        long elapsed;
-        int rounds = 3;
-        do
+        long finalElapsed = -1;
+        BCryptFunction prototype = null;
+        int rounds = 4;
+
+        while(true)
         {
-            rounds++;
+            BCryptFunction tmp = new BCryptFunction(BCrypt.A, rounds);
             long start = System.currentTimeMillis();
 
-            new BCryptFunction(BCrypt.A, rounds).hash(TO_BE_HASHED);
+            tmp.hash(TO_BE_HASHED);
 
             long end = System.currentTimeMillis();
-            elapsed = end - start;
+            long elapsed = end - start;
 
-        } while (elapsed <= maxMilliseconds);
+            if(elapsed > maxMilliseconds)
+            {
+                break;
+            }
+            else
+            {
+                finalElapsed = elapsed;
+                prototype = tmp;
+                rounds++;
+            }
+        }
 
-        return rounds - 1;
+        return new BenchmarkResult<>(prototype, finalElapsed);
     }
 
 
     /**
-     * Finds the optimal number of iterations for PBKDF2.
+     * Finds the optimal configuration for Argon2.
      * <p>
      * To prevent timing attacks, a maximum interval of time (in milliseconds)
      * is required to perform a single hash.
+     * <p>
+     * This function returns a prototype {@link Argon2Function} and the real
+     * elapsed time.
+     * If the hash cannot be performed under the specified time, the elapsed time is set to -1
+     * and prototype null.
      *
      * @param maxMilliseconds max time to perform the hashing
      * @param memory       logarithmic memory
      * @param parallelism  level of parallelism
      * @param outputLength length of the final hash
      * @param type         argon2 type (i, d or id)
-     * @return number of iterations
+     * @return a benchmark result for bcrypt
      * @see Argon2Function
      * @since 1.5.0
      */
-    public static int findIterationsForArgon2(long maxMilliseconds, int memory, int parallelism, int outputLength, Argon2 type)
+    public static BenchmarkResult<Argon2Function> benchmarkForArgon2(long maxMilliseconds, int memory, int parallelism, int outputLength, Argon2 type)
     {
         warmUpArgon2();
 
-        long elapsed;
-        int iterations = 0;
+        long finalElapsed = -1;
+        Argon2Function prototype = null;
+        int iterations = 1;
 
-        do
+        while(true)
         {
-            iterations++;
+            Argon2Function tmp = new Argon2Function(memory, iterations, parallelism, outputLength, type, Argon2Function.ARGON2_VERSION_13);
+
             long start = System.currentTimeMillis();
 
-            new Argon2Function(memory, iterations, parallelism, outputLength, type, 0x13).hash(TO_BE_HASHED);
+            tmp.hash(TO_BE_HASHED);
 
             long end = System.currentTimeMillis();
-            elapsed = end - start;
+            long elapsed = end - start;
 
-        } while (elapsed <= maxMilliseconds);
+            if(elapsed > maxMilliseconds)
+            {
+                break;
+            }
+            else
+            {
+                finalElapsed = elapsed;
+                prototype = tmp;
+                iterations++;
+            }
+        }
 
-        return iterations;
+        if(finalElapsed == -1 && memory <= 4)
+        {
+            return benchmarkForArgon2(maxMilliseconds, memory / 2, parallelism, outputLength, type);
+        }
+
+        return new BenchmarkResult<>(prototype, finalElapsed);
+
     }
 
 
     /**
-     * Finds the optimal number of iterations for PBKDF2.
+     * Finds the optimal configuration for PBKDF2.
      * <p>
      * To prevent timing attacks, a maximum interval of time (in milliseconds)
      * is required to perform a single hash.
+     * <p>
+     * This function returns a prototype {@link PBKDF2Function} and the real
+     * elapsed time.
+     * If the hash cannot be performed under the specified time, the elapsed time is set to -1
+     * and prototype null.
      *
      * @param maxMilliseconds max time to perform the hashing
      * @param algorithm       the chosen variant
      * @param length          it is recommended to use {@link Hmac#bits()}
-     * @return number of iterations
+     * @return a benchmark result for bcrypt
      * @see PBKDF2Function
      * @since 1.0.0
      */
-    public static int findIterationsForPBKDF2(long maxMilliseconds, Hmac algorithm, int length)
+    public static BenchmarkResult<PBKDF2Function> benchmarkPBKDF2(long maxMilliseconds, Hmac algorithm, int length)
     {
         warmUpPBKDF2(algorithm, length);
 
-        long elapsed;
-        int iterations = 1;
-        do
+        long finalElapsed = -1;
+        int iterations = 150;
+        PBKDF2Function prototype = null;
+
+        while(true)
         {
-            iterations += 150;
+            PBKDF2Function tmp = new PBKDF2Function(algorithm, iterations, length);
             long start = System.currentTimeMillis();
 
-            new PBKDF2Function(algorithm, iterations, length).hash(TO_BE_HASHED, SALT);
+            tmp.hash(TO_BE_HASHED);
 
             long end = System.currentTimeMillis();
-            elapsed = end - start;
+            long elapsed = end - start;
 
-        } while (elapsed <= maxMilliseconds);
+            if(elapsed > maxMilliseconds)
+            {
+                break;
+            }
+            else
+            {
+                finalElapsed = elapsed;
+                prototype = tmp;
+                iterations += 150;
+            }
+        }
 
-
-        return iterations - 100;
+        return new BenchmarkResult<>(prototype, finalElapsed);
     }
 
     /**
@@ -198,29 +254,40 @@ public class SystemChecker
      * @return the optimal work factor (N)
      * @since 1.0.0
      */
-    public static int findWorkFactorForSCrypt(long maxMilliseconds, int resources, int parallelization)
+    public static BenchmarkResult<SCryptFunction> findWorkFactorForSCrypt(long maxMilliseconds, int resources, int parallelization)
     {
-
         int workFactor = 2;
-        warmUpSCrypt(workFactor, resources, parallelization);
+        warmUpSCrypt(workFactor, 1, parallelization);
 
-        long elapsed;
-        do
+        long finalElapsed = -1;
+        SCryptFunction prototype = null;
+
+        while(true)
         {
-            workFactor *= 2;
+            SCryptFunction tmp = new SCryptFunction(workFactor, resources, parallelization);
             long start = System.currentTimeMillis();
 
-            new SCryptFunction(workFactor, resources, parallelization).hash(TO_BE_HASHED, SALT);
+            tmp.hash(TO_BE_HASHED);
 
             long end = System.currentTimeMillis();
-            elapsed = end - start;
+            long elapsed = end - start;
 
+            if(elapsed > maxMilliseconds)
+            {
+                break;
+            }
+            else
+            {
+                finalElapsed = elapsed;
+                prototype = tmp;
+                workFactor *= 2;
+            }
+        }
 
-        } while (elapsed <= maxMilliseconds);
-
-
-        return workFactor / 2;
+        return new BenchmarkResult<>(prototype, finalElapsed);
     }
+
+
 
     /**
      * Finds the optimal resources (r) for SCrypt.
@@ -234,31 +301,41 @@ public class SystemChecker
      * @return the optimal resources (r)
      * @since 1.0.0
      */
-    public static int findResourcesForSCrypt(long maxMilliseconds, int workFactor, int parallelization)
+    public static BenchmarkResult<SCryptFunction> findResourcesForSCrypt(long maxMilliseconds, int workFactor, int parallelization)
     {
         warmUpSCrypt(workFactor, 1, parallelization);
 
-        long elapsed;
-        int resources = 0;
-        do
+        int resources = 1;
+        long finalElapsed = -1;
+        SCryptFunction prototype = null;
+
+        while(true)
         {
-            resources += 1;
+            SCryptFunction tmp = new SCryptFunction(workFactor, resources, parallelization);
             long start = System.currentTimeMillis();
 
-            new SCryptFunction(workFactor, resources, parallelization).hash(TO_BE_HASHED, SALT);
+            tmp.hash(TO_BE_HASHED);
 
             long end = System.currentTimeMillis();
-            elapsed = end - start;
+            long elapsed = end - start;
 
+            if(elapsed > maxMilliseconds)
+            {
+                break;
+            }
+            else
+            {
+                finalElapsed = elapsed;
+                prototype = tmp;
+                resources++;
+            }
+        }
 
-        } while (elapsed <= maxMilliseconds);
-
-
-        return resources - 1;
+        return new BenchmarkResult<>(prototype, finalElapsed);
     }
 
 
-    private static void warmUpBCrypt()
+    private static void warmUpBcrypt()
     {
         for (int i = 0; i < WARMUP_ROUNDS; i++)
         {

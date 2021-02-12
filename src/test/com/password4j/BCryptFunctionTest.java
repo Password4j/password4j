@@ -132,7 +132,11 @@ public class BCryptFunctionTest
        new TestCase("~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2y$06$sYDFHqOcXTjBgOsqC0WCKe",
                 "$2y$06$sYDFHqOcXTjBgOsqC0WCKeMd3T1UhHuWQSxncLGtXDLMrcE6vFDti", 6),
        new TestCase("~!@#$%^&*()      ~!@#$%^&*()PNBFRD", "$2y$06$6Xm0gCw4g7ZNDCEp4yTise",
-                "$2y$06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq", 6)
+                "$2y$06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq", 6),
+            new TestCase("A\\xa3", "$2x$06$DCq7YPn5Rq63x1Lad4cll.",
+                    "$2x$06$DCq7YPn5Rq63x1Lad4cll.oEn.1xiAauo2sjfTpvTF/brhoF9upZy", 6),
+            new TestCase("A\\xa3", "$2y$06$DCq7YPn5Rq63x1Lad4cll.",
+                    "$2y$06$DCq7YPn5Rq63x1Lad4cll.oEn.1xiAauo2sjfTpvTF/brhoF9upZy", 6)
     );
 
     @Test(expected = BadParametersException.class)

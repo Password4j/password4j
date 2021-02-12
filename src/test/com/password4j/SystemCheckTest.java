@@ -20,9 +20,12 @@ package com.password4j;
 import com.password4j.types.Argon2;
 import com.password4j.types.Hmac;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.Scanner;
 import java.util.Set;
+
 
 public class SystemCheckTest
 {
@@ -31,12 +34,28 @@ public class SystemCheckTest
     public void testPBKDF2Iterations()
     {
         // GIVEN
+        long maxMilliseconds = 10;
 
         // WHEN
-        int result = SystemChecker.findIterationsForPBKDF2(10, Hmac.SHA256, 256);
+        BenchmarkResult<PBKDF2Function> result = SystemChecker.benchmarkPBKDF2(maxMilliseconds, Hmac.SHA256, 256);
 
         // THEN
-        Assert.assertTrue(result > 0);
+        Assert.assertTrue(result.getPrototype().getIterations() > 150);
+        Assert.assertTrue(result.getElapsed() <= maxMilliseconds);
+    }
+
+    @Test
+    public void testPBKDF2Iterations2()
+    {
+        // GIVEN
+        long maxMilliseconds = 1;
+
+        // WHEN
+        BenchmarkResult<PBKDF2Function> result = SystemChecker.benchmarkPBKDF2(maxMilliseconds, Hmac.SHA512, 4096);
+
+        // THEN
+        Assert.assertNull(result.getPrototype());
+        Assert.assertEquals(-1, result.getElapsed());
     }
 
 
@@ -44,16 +63,36 @@ public class SystemCheckTest
     public void testArgon2Iterations()
     {
         // GIVEN
-        int memoryForEachHash = 4096;
+        long maxMilliseconds = 50;
+        int memoryForEachHash = 512;
         int threadsPerHash = 2;
         int outputLength = 128;
         Argon2 type = Argon2.ID;
 
         // WHEN
-        int result = SystemChecker.findIterationsForArgon2(50, memoryForEachHash, threadsPerHash, outputLength, type);
+        BenchmarkResult<Argon2Function> result = SystemChecker.benchmarkForArgon2(maxMilliseconds, memoryForEachHash, threadsPerHash, outputLength, type);
 
         // THEN
-        Assert.assertTrue(result > 0);
+        Assert.assertTrue(result.getPrototype().getIterations() > 1);
+        Assert.assertTrue(result.getElapsed() <= maxMilliseconds);
+    }
+
+    @Test
+    public void testArgon2Iterations2()
+    {
+        // GIVEN
+        long maxMilliseconds = 2;
+        int memoryForEachHash = 4096;
+        int threadsPerHash = 21;
+        int outputLength = 128;
+        Argon2 type = Argon2.ID;
+
+        // WHEN
+        BenchmarkResult<Argon2Function> result = SystemChecker.benchmarkForArgon2(maxMilliseconds, memoryForEachHash, threadsPerHash, outputLength, type);
+
+        // THEN
+        Assert.assertNull(result.getPrototype());
+        Assert.assertEquals(-1, result.getElapsed());
     }
 
 
@@ -61,28 +100,63 @@ public class SystemCheckTest
     public void testBCryptRounds()
     {
         // GIVEN
+        long maxMilliseconds = 50;
 
         // WHEN
-        int result = SystemChecker.findRoundsForBCrypt(50);
+        BenchmarkResult<BCryptFunction> result = SystemChecker.benchmarkBcrypt(maxMilliseconds);
 
         // THEN
-        Assert.assertTrue(result > 0);
+        Assert.assertTrue(result.getPrototype().getLogarithmicRounds() >= 4);
+        Assert.assertTrue(result.getElapsed() <= maxMilliseconds);
+    }
+
+    @Test
+    public void testBCryptRounds2()
+    {
+        // GIVEN
+        long maxMilliseconds = 0;
+
+        // WHEN
+        BenchmarkResult<BCryptFunction> result = SystemChecker.benchmarkBcrypt(maxMilliseconds);
+
+        // THEN
+        Assert.assertNull(result.getPrototype());
+        Assert.assertEquals(-1, result.getElapsed());
     }
 
     @Test
     public void testSCryptRounds()
     {
         // GIVEN
-        long maxMilliseconds = 1;
+        long maxMilliseconds = 0;
 
         // WHEN
-        int result1 = SystemChecker.findWorkFactorForSCrypt(maxMilliseconds, 16, 1);
-        int result2 = SystemChecker.findResourcesForSCrypt(maxMilliseconds, result1, 1);
+        BenchmarkResult<SCryptFunction> result1 = SystemChecker.findWorkFactorForSCrypt(maxMilliseconds, 16, 1);
+        BenchmarkResult<SCryptFunction> result2 = SystemChecker.findResourcesForSCrypt(maxMilliseconds, 1024, 1);
 
         // THEN
-        Assert.assertTrue(result1 > 0);
-        Assert.assertTrue(result2 > 0);
+        Assert.assertNull(result1.getPrototype());
+        Assert.assertEquals(-1, result1.getElapsed());
+        Assert.assertNull(result2.getPrototype());
+        Assert.assertEquals(-1, result2.getElapsed());
     }
+
+    @Test
+    public void testSCryptRounds2()
+    {
+        // GIVEN
+        long maxMilliseconds = 50;
+
+        // WHEN
+        BenchmarkResult<SCryptFunction> result1 = SystemChecker.findWorkFactorForSCrypt(maxMilliseconds, 16, 1);
+        BenchmarkResult<SCryptFunction> result2 = SystemChecker.findResourcesForSCrypt(maxMilliseconds, result1.getPrototype().getWorkFactor(), 1);
+
+        // THEN
+        Assert.assertTrue(result1.getElapsed() > 0);
+        Assert.assertTrue(result2.getElapsed() > 0);
+    }
+
+
 
     @Test(expected = BadParametersException.class)
     public void testWrongVariants()

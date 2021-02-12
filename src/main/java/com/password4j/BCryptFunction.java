@@ -523,7 +523,7 @@ public class BCryptFunction extends AbstractHashingFunction
         return streamToWords(data, offp, signp)[0];
     }
 
-    protected static int streamToWordBug(byte[] data, int[] offp)
+    protected static int streamToWordMinorX(byte[] data, int[] offp)
     {
         int[] signp = {0};
         return streamToWords(data, offp, signp)[1];
@@ -547,7 +547,7 @@ public class BCryptFunction extends AbstractHashingFunction
             if (!signExtBug)
                 pArray[i] = pArray[i] ^ streamToWord(key, koffp);
             else
-                pArray[i] = pArray[i] ^ streamToWordBug(key, koffp);
+                pArray[i] = pArray[i] ^ streamToWordMinorX(key, koffp);
 
         for (i = 0; i < pLength; i += 2)
         {

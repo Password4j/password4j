@@ -128,7 +128,7 @@ public class SystemCheckTest
     public void testSCryptRounds()
     {
         // GIVEN
-        long maxMilliseconds = 0;
+        long maxMilliseconds = -1;
 
         // WHEN
         BenchmarkResult<SCryptFunction> result1 = SystemChecker.findWorkFactorForSCrypt(maxMilliseconds, 16, 1);

@@ -318,7 +318,7 @@ System.out.println("N: " + N + ", r: " + r);
 [![javadoc](https://javadoc.io/badge2/com.password4j/password4j/javadoc.svg)](https://javadoc.io/doc/com.password4j/password4j)
 
 
-The full documentation can be foud [here](https://github.com/Password4j/password4j/wiki).
+The full documentation can be found **[here](https://github.com/Password4j/password4j/wiki)**.
 
 The javadoc can be found [here](https://javadoc.io/doc/com.password4j/password4j).
 

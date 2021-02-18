@@ -16,15 +16,16 @@
  */
 package com.password4j;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 class PropertyReader
 {
@@ -37,12 +38,11 @@ class PropertyReader
 
     private static final String MESSAGE = "{}. Default value is used ({}). Please set property {} in your " + FILE_NAME + " file.";
 
+    protected static Properties properties;
 
-    protected static  Properties properties;
-
-    static
+    private PropertyReader()
     {
-        init();
+        //
     }
 
     static int readInt(String key, int defaultValue, String message)
@@ -55,7 +55,6 @@ class PropertyReader
         }
         return Integer.parseInt(readString(key));
     }
-
 
     static boolean readBoolean(String key, boolean defaultValue)
     {
@@ -124,7 +123,6 @@ class PropertyReader
 
         Properties props = new Properties();
 
-
         if (in != null)
         {
             try
@@ -141,9 +139,8 @@ class PropertyReader
             LOG.debug("Cannot find any properties file.");
         }
 
-        properties =  props;
+        properties = props;
     }
-
 
     static InputStream getResource(String resource)
     {
@@ -162,7 +159,6 @@ class PropertyReader
                 }
             }
 
-
             // Try with the class loader that loaded this class
             classLoader = PropertyReader.class.getClassLoader();
             if (classLoader != null)
@@ -176,17 +172,16 @@ class PropertyReader
         }
         catch (Exception e)
         {
-            LOG.warn("",e);
+            LOG.warn("", e);
         }
 
         // Get the resource from the class path in case that the class is loaded
         // by the Extension class loader which the parent of the system class loader.
-        in =  ClassLoader.getSystemResourceAsStream(resource);
-        if(in != null)
+        in = ClassLoader.getSystemResourceAsStream(resource);
+        if (in != null)
         {
             return in;
         }
-
 
         try
         {
@@ -199,10 +194,9 @@ class PropertyReader
 
     }
 
-
-    private PropertyReader()
+    static
     {
-        //
+        init();
     }
 
 }

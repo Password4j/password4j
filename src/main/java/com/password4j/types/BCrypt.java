@@ -19,25 +19,22 @@ package com.password4j.types;
 
 public enum BCrypt
 {
-    A,
-    B,
-    X,
-    Y;
+    A, B, X, Y;
+
+    public static BCrypt valueOf(char minor)
+    {
+        for (BCrypt type : BCrypt.values())
+        {
+            if (type.minor() == minor)
+            {
+                return type;
+            }
+        }
+        return null;
+    }
 
     public char minor()
     {
         return name().toLowerCase().charAt(0);
-    }
-
-    public static BCrypt valueOf(char minor)
-    {
-        for(BCrypt type : BCrypt.values())
-        {
-            if(type.minor() == minor)
-            {
-                return  type;
-            }
-        }
-        return null;
     }
 }

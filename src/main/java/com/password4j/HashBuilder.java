@@ -16,7 +16,6 @@
  */
 package com.password4j;
 
-
 /**
  * Builder class that helps to create a chain of parameters to be used
  * in the hashing process.

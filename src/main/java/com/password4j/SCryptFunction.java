@@ -16,13 +16,14 @@
  */
 package com.password4j;
 
-import com.password4j.types.Hmac;
-
 import java.security.GeneralSecurityException;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import com.password4j.types.Hmac;
+
 
 /**
  * Class containing the implementation of SCrypt function and its parameters.
@@ -35,6 +36,8 @@ public class SCryptFunction extends AbstractHashingFunction
 {
     public static final int DERIVED_KEY_LENGTH = 64;
 
+    private static final ConcurrentMap<String, SCryptFunction> INSTANCES = new ConcurrentHashMap<>();
+
     private int workFactor; // N
 
     private int resources; // r
@@ -42,8 +45,6 @@ public class SCryptFunction extends AbstractHashingFunction
     private int parallelization; // p
 
     private int derivedKeyLength; // dkLen
-
-    private static final ConcurrentMap<String, SCryptFunction> INSTANCES = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unused")
     private SCryptFunction()
@@ -141,6 +142,97 @@ public class SCryptFunction extends AbstractHashingFunction
             INSTANCES.put(key, function);
             return function;
         }
+    }
+
+    protected static String toString(int resources, int workFactor, int parallelization, int derivedKeyLength)
+    {
+        return "N=" + workFactor + ", r=" + resources + ", p=" + parallelization + ", l=" + derivedKeyLength;
+    }
+
+    protected static String getUID(int resources, int workFactor, int parallelization, int derivedKeyLength)
+    {
+        return workFactor + "|" + resources + "|" + parallelization + "|" + derivedKeyLength;
+    }
+
+    public static int rOperation(int a, int b)
+    {
+        return a << b | a >>> 32 - b;
+    }
+
+    public static void salsa208(byte[] xArray)
+    {
+        int[] b32 = new int[16];
+        int[] x = new int[16];
+
+        int i;
+        for (i = 0; i < 16; ++i)
+        {
+            b32[i] = (xArray[i * 4] & 255);
+            b32[i] |= (xArray[i * 4 + 1] & 255) << 8;
+            b32[i] |= (xArray[i * 4 + 2] & 255) << 16;
+            b32[i] |= (xArray[i * 4 + 3] & 255) << 24;
+        }
+
+        System.arraycopy(b32, 0, x, 0, 16);
+
+        for (i = 8; i > 0; i -= 2)
+        {
+            x[4] ^= rOperation(x[0] + x[12], 7);
+            x[8] ^= rOperation(x[4] + x[0], 9);
+            x[12] ^= rOperation(x[8] + x[4], 13);
+            x[0] ^= rOperation(x[12] + x[8], 18);
+            x[9] ^= rOperation(x[5] + x[1], 7);
+            x[13] ^= rOperation(x[9] + x[5], 9);
+            x[1] ^= rOperation(x[13] + x[9], 13);
+            x[5] ^= rOperation(x[1] + x[13], 18);
+            x[14] ^= rOperation(x[10] + x[6], 7);
+            x[2] ^= rOperation(x[14] + x[10], 9);
+            x[6] ^= rOperation(x[2] + x[14], 13);
+            x[10] ^= rOperation(x[6] + x[2], 18);
+            x[3] ^= rOperation(x[15] + x[11], 7);
+            x[7] ^= rOperation(x[3] + x[15], 9);
+            x[11] ^= rOperation(x[7] + x[3], 13);
+            x[15] ^= rOperation(x[11] + x[7], 18);
+            x[1] ^= rOperation(x[0] + x[3], 7);
+            x[2] ^= rOperation(x[1] + x[0], 9);
+            x[3] ^= rOperation(x[2] + x[1], 13);
+            x[0] ^= rOperation(x[3] + x[2], 18);
+            x[6] ^= rOperation(x[5] + x[4], 7);
+            x[7] ^= rOperation(x[6] + x[5], 9);
+            x[4] ^= rOperation(x[7] + x[6], 13);
+            x[5] ^= rOperation(x[4] + x[7], 18);
+            x[11] ^= rOperation(x[10] + x[9], 7);
+            x[8] ^= rOperation(x[11] + x[10], 9);
+            x[9] ^= rOperation(x[8] + x[11], 13);
+            x[10] ^= rOperation(x[9] + x[8], 18);
+            x[12] ^= rOperation(x[15] + x[14], 7);
+            x[13] ^= rOperation(x[12] + x[15], 9);
+            x[14] ^= rOperation(x[13] + x[12], 13);
+            x[15] ^= rOperation(x[14] + x[13], 18);
+        }
+
+        for (i = 0; i < 16; ++i)
+        {
+            b32[i] += x[i];
+        }
+
+        for (i = 0; i < 16; ++i)
+        {
+            xArray[i * 4] = (byte) (b32[i] & 255);
+            xArray[i * 4 + 1] = (byte) (b32[i] >> 8 & 255);
+            xArray[i * 4 + 2] = (byte) (b32[i] >> 16 & 255);
+            xArray[i * 4 + 3] = (byte) (b32[i] >> 24 & 255);
+        }
+
+    }
+
+    public static void blockXOR(byte[] sArray, int si, byte[] dArray, int di, int length)
+    {
+        for (int i = 0; i < length; ++i)
+        {
+            dArray[di + i] ^= sArray[si + i];
+        }
+
     }
 
     @Override
@@ -270,12 +362,8 @@ public class SCryptFunction extends AbstractHashingFunction
     @Override
     public String toString()
     {
-        return getClass().getSimpleName() + '(' + toString(this.resources, this.workFactor, this.parallelization, this.derivedKeyLength) + ')';
-    }
-
-    protected static String toString(int resources, int workFactor, int parallelization, int derivedKeyLength)
-    {
-        return "N=" + workFactor + ", r=" + resources + ", p=" + parallelization + ", l=" + derivedKeyLength;
+        return getClass().getSimpleName() + '(' + toString(this.resources, this.workFactor, this.parallelization,
+                this.derivedKeyLength) + ')';
     }
 
     @Override
@@ -283,13 +371,6 @@ public class SCryptFunction extends AbstractHashingFunction
     {
         return Objects.hash(resources, workFactor, parallelization);
     }
-
-    protected static String getUID(int resources, int workFactor, int parallelization, int derivedKeyLength)
-    {
-        return workFactor + "|" + resources + "|" + parallelization + "|" + derivedKeyLength;
-    }
-
-
 
     public byte[] scrypt(byte[] passwd, byte[] salt, int dkLen) throws GeneralSecurityException
     {
@@ -307,9 +388,8 @@ public class SCryptFunction extends AbstractHashingFunction
             {
                 byte[] xyArray = new byte[256 * resources];
                 byte[] vArray = new byte[128 * resources * workFactor];
-                byte[] intensiveSalt = PBKDF2Function
-                        .internalHash(new String(passwd).toCharArray(), salt, Hmac.SHA256.name(), 1,
-                                8 * parallelization * 128 * resources).getEncoded();
+                byte[] intensiveSalt = PBKDF2Function.internalHash(new String(passwd).toCharArray(), salt, Hmac.SHA256.name(), 1,
+                        8 * parallelization * 128 * resources).getEncoded();
 
                 for (int i = 0; i < parallelization; ++i)
                 {
@@ -317,8 +397,8 @@ public class SCryptFunction extends AbstractHashingFunction
                 }
 
                 return PBKDF2Function
-                        .internalHash(new String(passwd).toCharArray(), intensiveSalt, Hmac.SHA256.name(), 1,
-                                8 * dkLen).getEncoded();
+                        .internalHash(new String(passwd).toCharArray(), intensiveSalt, Hmac.SHA256.name(), 1, 8 * dkLen)
+                        .getEncoded();
             }
         }
         else
@@ -371,87 +451,6 @@ public class SCryptFunction extends AbstractHashingFunction
         for (i = 0; i < resources; ++i)
         {
             System.arraycopy(xyArray, yi + (i * 2 + 1) * 64, xyArray, bi + (i + resources) * 64, 64);
-        }
-
-    }
-
-    public static int rOperation(int a, int b)
-    {
-        return a << b | a >>> 32 - b;
-    }
-
-    public static void salsa208(byte[] xArray)
-    {
-        int[] b32 = new int[16];
-        int[] x = new int[16];
-
-        int i;
-        for (i = 0; i < 16; ++i)
-        {
-            b32[i] = (xArray[i * 4] & 255);
-            b32[i] |= (xArray[i * 4 + 1] & 255) << 8;
-            b32[i] |= (xArray[i * 4 + 2] & 255) << 16;
-            b32[i] |= (xArray[i * 4 + 3] & 255) << 24;
-        }
-
-        System.arraycopy(b32, 0, x, 0, 16);
-
-        for (i = 8; i > 0; i -= 2)
-        {
-            x[4] ^= rOperation(x[0] + x[12], 7);
-            x[8] ^= rOperation(x[4] + x[0], 9);
-            x[12] ^= rOperation(x[8] + x[4], 13);
-            x[0] ^= rOperation(x[12] + x[8], 18);
-            x[9] ^= rOperation(x[5] + x[1], 7);
-            x[13] ^= rOperation(x[9] + x[5], 9);
-            x[1] ^= rOperation(x[13] + x[9], 13);
-            x[5] ^= rOperation(x[1] + x[13], 18);
-            x[14] ^= rOperation(x[10] + x[6], 7);
-            x[2] ^= rOperation(x[14] + x[10], 9);
-            x[6] ^= rOperation(x[2] + x[14], 13);
-            x[10] ^= rOperation(x[6] + x[2], 18);
-            x[3] ^= rOperation(x[15] + x[11], 7);
-            x[7] ^= rOperation(x[3] + x[15], 9);
-            x[11] ^= rOperation(x[7] + x[3], 13);
-            x[15] ^= rOperation(x[11] + x[7], 18);
-            x[1] ^= rOperation(x[0] + x[3], 7);
-            x[2] ^= rOperation(x[1] + x[0], 9);
-            x[3] ^= rOperation(x[2] + x[1], 13);
-            x[0] ^= rOperation(x[3] + x[2], 18);
-            x[6] ^= rOperation(x[5] + x[4], 7);
-            x[7] ^= rOperation(x[6] + x[5], 9);
-            x[4] ^= rOperation(x[7] + x[6], 13);
-            x[5] ^= rOperation(x[4] + x[7], 18);
-            x[11] ^= rOperation(x[10] + x[9], 7);
-            x[8] ^= rOperation(x[11] + x[10], 9);
-            x[9] ^= rOperation(x[8] + x[11], 13);
-            x[10] ^= rOperation(x[9] + x[8], 18);
-            x[12] ^= rOperation(x[15] + x[14], 7);
-            x[13] ^= rOperation(x[12] + x[15], 9);
-            x[14] ^= rOperation(x[13] + x[12], 13);
-            x[15] ^= rOperation(x[14] + x[13], 18);
-        }
-
-        for (i = 0; i < 16; ++i)
-        {
-            b32[i] += x[i];
-        }
-
-        for (i = 0; i < 16; ++i)
-        {
-            xArray[i * 4] = (byte) (b32[i] & 255);
-            xArray[i * 4 + 1] = (byte) (b32[i] >> 8 & 255);
-            xArray[i * 4 + 2] = (byte) (b32[i] >> 16 & 255);
-            xArray[i * 4 + 3] = (byte) (b32[i] >> 24 & 255);
-        }
-
-    }
-
-    public static void blockXOR(byte[] sArray, int si, byte[] dArray, int di, int length)
-    {
-        for (int i = 0; i < length; ++i)
-        {
-            dArray[di + i] ^= sArray[si + i];
         }
 
     }

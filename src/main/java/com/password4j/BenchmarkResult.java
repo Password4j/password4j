@@ -16,7 +16,6 @@
  */
 package com.password4j;
 
-
 public class BenchmarkResult<P extends AbstractHashingFunction>
 {
 

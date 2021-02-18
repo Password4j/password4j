@@ -18,6 +18,7 @@ package com.password4j;
 
 import org.apache.commons.lang3.StringUtils;
 
+
 /**
  * This class provides the two main operations on password: hash and verify.
  * <p>
@@ -37,7 +38,6 @@ public class Password
     {
         //
     }
-
 
     /**
      * Starts to hash the given plain text password.
@@ -101,8 +101,7 @@ public class Password
     {
         if (hashObject == null || hashObject.getHashingFunction() == null)
         {
-            throw new BadParametersException("Invalid Hash object. " +
-                    (hashObject != null ? hashObject.toString() : null));
+            throw new BadParametersException("Invalid Hash object. " + (hashObject != null ? hashObject.toString() : null));
         }
         if (plainTextPassword == null)
         {

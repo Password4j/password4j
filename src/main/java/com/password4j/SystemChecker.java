@@ -17,12 +17,12 @@
 
 package com.password4j;
 
+import java.util.List;
+import java.util.Set;
+
 import com.password4j.types.Argon2;
 import com.password4j.types.BCrypt;
 import com.password4j.types.Hmac;
-
-import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -96,6 +96,7 @@ public class SystemChecker
      * @see BCryptFunction
      * @since 1.0.0
      */
+    @SuppressWarnings("Duplicates")
     public static BenchmarkResult<BCryptFunction> benchmarkBcrypt(long maxMilliseconds)
     {
         warmUpBcrypt();
@@ -104,7 +105,7 @@ public class SystemChecker
         BCryptFunction prototype = null;
         int rounds = 4;
 
-        while(true)
+        while (true)
         {
             BCryptFunction tmp = new BCryptFunction(BCrypt.A, rounds);
             long start = System.currentTimeMillis();
@@ -114,7 +115,7 @@ public class SystemChecker
             long end = System.currentTimeMillis();
             long elapsed = end - start;
 
-            if(elapsed > maxMilliseconds)
+            if (elapsed > maxMilliseconds)
             {
                 break;
             }
@@ -129,7 +130,6 @@ public class SystemChecker
         return new BenchmarkResult<>(prototype, finalElapsed);
     }
 
-
     /**
      * Finds the optimal configuration for Argon2.
      * <p>
@@ -142,15 +142,17 @@ public class SystemChecker
      * and prototype null.
      *
      * @param maxMilliseconds max time to perform the hashing
-     * @param memory       logarithmic memory
-     * @param parallelism  level of parallelism
-     * @param outputLength length of the final hash
-     * @param type         argon2 type (i, d or id)
+     * @param memory          logarithmic memory
+     * @param parallelism     level of parallelism
+     * @param outputLength    length of the final hash
+     * @param type            argon2 type (i, d or id)
      * @return a benchmark result for bcrypt
      * @see Argon2Function
      * @since 1.5.0
      */
-    public static BenchmarkResult<Argon2Function> benchmarkForArgon2(long maxMilliseconds, int memory, int parallelism, int outputLength, Argon2 type)
+    @SuppressWarnings("Duplicates")
+    public static BenchmarkResult<Argon2Function> benchmarkForArgon2(long maxMilliseconds, int memory, int parallelism,
+            int outputLength, Argon2 type)
     {
         warmUpArgon2();
 
@@ -158,9 +160,10 @@ public class SystemChecker
         Argon2Function prototype = null;
         int iterations = 1;
 
-        while(true)
+        while (true)
         {
-            Argon2Function tmp = new Argon2Function(memory, iterations, parallelism, outputLength, type, Argon2Function.ARGON2_VERSION_13);
+            Argon2Function tmp = new Argon2Function(memory, iterations, parallelism, outputLength, type,
+                    Argon2Function.ARGON2_VERSION_13);
 
             long start = System.currentTimeMillis();
 
@@ -169,7 +172,7 @@ public class SystemChecker
             long end = System.currentTimeMillis();
             long elapsed = end - start;
 
-            if(elapsed > maxMilliseconds)
+            if (elapsed > maxMilliseconds)
             {
                 break;
             }
@@ -181,7 +184,7 @@ public class SystemChecker
             }
         }
 
-        if(finalElapsed == -1 && memory <= 4)
+        if (finalElapsed == -1 && memory <= 4)
         {
             return benchmarkForArgon2(maxMilliseconds, memory / 2, parallelism, outputLength, type);
         }
@@ -189,7 +192,6 @@ public class SystemChecker
         return new BenchmarkResult<>(prototype, finalElapsed);
 
     }
-
 
     /**
      * Finds the optimal configuration for PBKDF2.
@@ -217,7 +219,7 @@ public class SystemChecker
         int iterations = 150;
         PBKDF2Function prototype = null;
 
-        while(true)
+        while (true)
         {
             PBKDF2Function tmp = new PBKDF2Function(algorithm, iterations, length);
             long start = System.currentTimeMillis();
@@ -227,7 +229,7 @@ public class SystemChecker
             long end = System.currentTimeMillis();
             long elapsed = end - start;
 
-            if(elapsed > maxMilliseconds)
+            if (elapsed > maxMilliseconds)
             {
                 break;
             }
@@ -254,15 +256,16 @@ public class SystemChecker
      * @return the optimal work factor (N)
      * @since 1.0.0
      */
-    public static BenchmarkResult<SCryptFunction> findWorkFactorForSCrypt(long maxMilliseconds, int resources, int parallelization)
+    public static BenchmarkResult<SCryptFunction> findWorkFactorForSCrypt(long maxMilliseconds, int resources,
+            int parallelization)
     {
         int workFactor = 2;
-        warmUpSCrypt(workFactor, 1, parallelization);
+        warmUpSCrypt(workFactor, parallelization);
 
         long finalElapsed = -1;
         SCryptFunction prototype = null;
 
-        while(true)
+        while (true)
         {
             SCryptFunction tmp = new SCryptFunction(workFactor, resources, parallelization);
             long start = System.currentTimeMillis();
@@ -272,7 +275,7 @@ public class SystemChecker
             long end = System.currentTimeMillis();
             long elapsed = end - start;
 
-            if(elapsed > maxMilliseconds)
+            if (elapsed > maxMilliseconds)
             {
                 break;
             }
@@ -287,8 +290,6 @@ public class SystemChecker
         return new BenchmarkResult<>(prototype, finalElapsed);
     }
 
-
-
     /**
      * Finds the optimal resources (r) for SCrypt.
      * <p>
@@ -301,15 +302,16 @@ public class SystemChecker
      * @return the optimal resources (r)
      * @since 1.0.0
      */
-    public static BenchmarkResult<SCryptFunction> findResourcesForSCrypt(long maxMilliseconds, int workFactor, int parallelization)
+    public static BenchmarkResult<SCryptFunction> findResourcesForSCrypt(long maxMilliseconds, int workFactor,
+            int parallelization)
     {
-        warmUpSCrypt(workFactor, 1, parallelization);
+        warmUpSCrypt(workFactor, parallelization);
 
         int resources = 1;
         long finalElapsed = -1;
         SCryptFunction prototype = null;
 
-        while(true)
+        while (true)
         {
             SCryptFunction tmp = new SCryptFunction(workFactor, resources, parallelization);
             long start = System.currentTimeMillis();
@@ -319,7 +321,7 @@ public class SystemChecker
             long end = System.currentTimeMillis();
             long elapsed = end - start;
 
-            if(elapsed > maxMilliseconds)
+            if (elapsed > maxMilliseconds)
             {
                 break;
             }
@@ -334,7 +336,6 @@ public class SystemChecker
         return new BenchmarkResult<>(prototype, finalElapsed);
     }
 
-
     private static void warmUpBcrypt()
     {
         for (int i = 0; i < WARMUP_ROUNDS; i++)
@@ -342,7 +343,6 @@ public class SystemChecker
             BCryptFunction.getInstance(4).hash(TO_BE_HASHED);
         }
     }
-
 
     private static void warmUpArgon2()
     {
@@ -360,13 +360,12 @@ public class SystemChecker
         }
     }
 
-    private static void warmUpSCrypt(int workFactor, int resources, int parallelization)
+    private static void warmUpSCrypt(int workFactor, int parallelization)
     {
         for (int i = 0; i < WARMUP_ROUNDS; i++)
         {
-            SCryptFunction.getInstance(workFactor, resources, parallelization).hash(TO_BE_HASHED);
+            SCryptFunction.getInstance(workFactor, 1, parallelization).hash(TO_BE_HASHED);
         }
     }
-
 
 }

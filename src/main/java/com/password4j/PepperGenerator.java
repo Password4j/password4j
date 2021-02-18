@@ -19,6 +19,7 @@ package com.password4j;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+
 /**
  * This class contains static functions that
  * help to create a secure pepper.

@@ -19,6 +19,7 @@ package com.password4j;
 
 import java.util.Arrays;
 
+
 /**
  * More secure implementation of {@link CharSequence} than {@link String}, preventing heap memory attacks.
  * <p>
@@ -85,6 +86,11 @@ public class SecureString implements CharSequence
         clear(chars);
     }
 
+    private static synchronized void clear(char[] chars)
+    {
+        Arrays.fill(chars, Character.MIN_VALUE);
+    }
+
     /**
      * @return length of the underlying array of {@code char}s.
      * @since 1.2.0
@@ -131,11 +137,6 @@ public class SecureString implements CharSequence
         {
             clear(chars);
         }
-    }
-
-    private static synchronized void clear(char[] chars)
-    {
-        Arrays.fill(chars, Character.MIN_VALUE);
     }
 
     /**

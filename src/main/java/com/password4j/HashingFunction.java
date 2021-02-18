@@ -82,7 +82,7 @@ public interface HashingFunction
      *
      * @param plainTextPassword the password to be hashed
      * @param salt              the salt used in the hashing process
-     * @param pepper the pepper used int the hashing process
+     * @param pepper            the pepper used int the hashing process
      * @return a {@link Hash}
      * @throws BadParametersException if the salt does not pass the validation of the CHF
      * @since 1.5.0
@@ -104,7 +104,7 @@ public interface HashingFunction
      * is thrown.
      *
      * @param plainTextPassword the plaintext password
-     * @param hashed           the hash
+     * @param hashed            the hash
      * @return true if the hash is generated from the plaintext; false otherwise
      * @throws UnsupportedOperationException if the CHF need a salt and it is not part of the hash
      * @throws BadParametersException        if the hash is not well-formed
@@ -146,7 +146,7 @@ public interface HashingFunction
      * @param plainTextPassword the plaintext password
      * @param hashed            the hash
      * @param salt              the salt used to produce the hash
-     * @param pepper the pepper used to produce the hash
+     * @param pepper            the pepper used to produce the hash
      * @return true if the hash is generated from the plaintext; false otherwise
      * @throws BadParametersException if the hash is not well-formed
      * @since 1.5.0

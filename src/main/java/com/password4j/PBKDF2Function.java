@@ -16,17 +16,19 @@
  */
 package com.password4j;
 
-import com.password4j.types.Hmac;
-
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+
+import com.password4j.types.Hmac;
+
 
 /**
  * Class containing the implementation of PBKDF2 function and its parameters.
@@ -113,6 +115,35 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
     }
 
+    protected static SecretKey internalHash(CharSequence plainTextPassword, String salt, String algorithm, int iterations,
+            int length) throws NoSuchAlgorithmException, InvalidKeySpecException
+    {
+        if (salt == null)
+        {
+            throw new IllegalArgumentException("Salt cannot be null");
+        }
+        return internalHash(Utils.fromCharSequenceToChars(plainTextPassword), Utils.fromCharSequenceToBytes(salt), algorithm,
+                iterations, length);
+    }
+
+    protected static SecretKey internalHash(char[] plain, byte[] salt, String algorithm, int iterations, int length)
+            throws NoSuchAlgorithmException, InvalidKeySpecException
+    {
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(ALGORITHM_PREFIX + algorithm);
+        PBEKeySpec spec = new PBEKeySpec(plain, salt, iterations, length);
+        return secretKeyFactory.generateSecret(spec);
+    }
+
+    protected static String getUID(String algorithm, int iterations, int length)
+    {
+        return algorithm + "|" + iterations + "|" + length;
+    }
+
+    protected static String toString(String algorithm, int iterations, int length)
+    {
+        return "a=" + algorithm + ", i=" + iterations + ", l=" + length;
+    }
+
     @Override
     public Hash hash(CharSequence plainTextPassword)
     {
@@ -141,25 +172,6 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
     }
 
-    protected static SecretKey internalHash(CharSequence plainTextPassword, String salt, String algorithm, int iterations, int length)
-            throws NoSuchAlgorithmException, InvalidKeySpecException
-    {
-        if (salt == null)
-        {
-            throw new IllegalArgumentException("Salt cannot be null");
-        }
-        return internalHash(Utils.fromCharSequenceToChars(plainTextPassword), Utils.fromCharSequenceToBytes(salt), algorithm, iterations, length);
-    }
-
-    protected static SecretKey internalHash(char[] plain, byte[] salt, String algorithm, int iterations, int length)
-            throws NoSuchAlgorithmException, InvalidKeySpecException
-    {
-        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(ALGORITHM_PREFIX + algorithm);
-        PBEKeySpec spec = new PBEKeySpec(plain, salt, iterations, length);
-        return secretKeyFactory.generateSecret(spec);
-    }
-
-
     /**
      * Overridable PBKDF2 generator
      *
@@ -187,7 +199,6 @@ public class PBKDF2Function extends AbstractHashingFunction
 
     }
 
-
     public String getAlgorithm()
     {
         return algorithmAsString;
@@ -202,7 +213,6 @@ public class PBKDF2Function extends AbstractHashingFunction
     {
         return length;
     }
-
 
     @Override
     public boolean equals(Object obj)
@@ -228,16 +238,6 @@ public class PBKDF2Function extends AbstractHashingFunction
     public int hashCode()
     {
         return Objects.hash(algorithmAsString, iterations, length);
-    }
-
-    protected static String getUID(String algorithm, int iterations, int length)
-    {
-        return algorithm + "|" + iterations + "|" + length;
-    }
-
-    protected static String toString(String algorithm, int iterations, int length)
-    {
-        return "a=" + algorithm + ", i=" + iterations + ", l=" + length;
     }
 
 }

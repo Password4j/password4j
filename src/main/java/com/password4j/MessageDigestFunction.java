@@ -40,7 +40,6 @@ public class MessageDigestFunction extends AbstractHashingFunction
 
     private final SaltOption saltOption;
 
-
     MessageDigestFunction(String algorithm, SaltOption saltOption)
     {
         this.algorithm = algorithm;
@@ -84,6 +83,15 @@ public class MessageDigestFunction extends AbstractHashingFunction
         }
     }
 
+    protected static String getUID(String algorithm, SaltOption saltOption)
+    {
+        return algorithm + "|" + saltOption.name();
+    }
+
+    protected static String toString(String algorithm, SaltOption saltOption)
+    {
+        return "a=" + algorithm + ", o=" + saltOption.name();
+    }
 
     @Override
     public Hash hash(CharSequence plainTextPassword)
@@ -112,7 +120,6 @@ public class MessageDigestFunction extends AbstractHashingFunction
             throw new UnsupportedOperationException("`" + algorithm + "` is not supported by your system.", nsae);
         }
     }
-
 
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed)
@@ -160,27 +167,19 @@ public class MessageDigestFunction extends AbstractHashingFunction
         return Utils.append(plainTextPassword, salt);
     }
 
-    protected static String getUID(String algorithm, SaltOption saltOption)
-    {
-        return algorithm + "|" + saltOption.name();
-    }
-
     @Override
     public String toString()
     {
         return getClass().getSimpleName() + '(' + toString(this.algorithm, this.saltOption) + ')';
     }
 
-    protected static String toString(String algorithm, SaltOption saltOption)
-    {
-        return "a=" + algorithm + ", o=" + saltOption.name();
-    }
-
     @Override
     public boolean equals(Object o)
     {
-        if (this == o) return true;
-        if (!(o instanceof MessageDigestFunction)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof MessageDigestFunction))
+            return false;
         MessageDigestFunction other = (MessageDigestFunction) o;
         return algorithm.equals(other.algorithm) //
                 && saltOption == other.saltOption;

@@ -19,6 +19,7 @@ package com.password4j.types;
 
 import com.password4j.CompressedPBKDF2Function;
 
+
 /**
  * Static representation of the commonly supported
  * Hmac variants.
@@ -47,22 +48,6 @@ public enum Hmac
     }
 
     /**
-     * @return length of the algorithm in bits
-     */
-    public int bits()
-    {
-        return bits;
-    }
-
-    /**
-     * @return the numeric uid used in {@link CompressedPBKDF2Function}
-     */
-    public int code()
-    {
-        return code;
-    }
-
-    /**
      * Finds the enum associated with the given code
      *
      * @param code a numeric uid that identifies the algorithm
@@ -78,6 +63,22 @@ public enum Hmac
             }
         }
         return null;
+    }
+
+    /**
+     * @return length of the algorithm in bits
+     */
+    public int bits()
+    {
+        return bits;
+    }
+
+    /**
+     * @return the numeric uid used in {@link CompressedPBKDF2Function}
+     */
+    public int code()
+    {
+        return code;
     }
 
     @Override

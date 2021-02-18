@@ -16,10 +16,10 @@
  */
 package com.password4j;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Arrays;
 import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
 
 
 /**
@@ -201,7 +201,6 @@ public class Hash
         this.pepper = pepper;
     }
 
-
     /**
      * Produces a human readable description of the {@link Hash}.
      *
@@ -216,8 +215,8 @@ public class Hash
         {
             sb.append(hashingFunction.getClass().getSimpleName());
         }
-        sb.append("[salt=").append(getSalt())
-                .append(", pepper=").append(getPepper()).append(", hash=").append(getResult()).append("]");
+        sb.append("[salt=").append(getSalt()).append(", pepper=").append(getPepper()).append(", hash=").append(getResult())
+                .append("]");
         return sb.toString();
     }
 

@@ -16,13 +16,14 @@
  */
 package com.password4j;
 
-import com.password4j.types.BCrypt;
-
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import com.password4j.types.BCrypt;
+
 
 /**
  * Class containing the implementation of BCrypt function and its parameters.
@@ -42,7 +43,7 @@ public class BCryptFunction extends AbstractHashingFunction
 
     private static final int[] P_ORIG = { //
             0x243f6a88, 0x85a308d3, 0x13198a2e, 0x03707344, 0xa4093822, 0x299f31d0, 0x082efa98, 0xec4e6c89, 0x452821e6,
-            0x38d01377, 0xbe5466cf, 0x34e90c6c, 0xc0ac29b7, 0xc97c50dd, 0x3f84d5b5, 0xb5470917, 0x9216d5d9, 0x8979fb1b};
+            0x38d01377, 0xbe5466cf, 0x34e90c6c, 0xc0ac29b7, 0xc97c50dd, 0x3f84d5b5, 0xb5470917, 0x9216d5d9, 0x8979fb1b };
 
     private static final int[] S_ORIG = { //
             0xd1310ba6, 0x98dfb5ac, 0x2ffd72db, 0xd01adfb7, 0xb8e1afed, 0x6a267e96, 0xba7c9045, 0xf12c7f99, 0x24a19947,
@@ -158,21 +159,21 @@ public class BCryptFunction extends AbstractHashingFunction
             0x45e1d006, 0xc3f27b9a, 0xc9aa53fd, 0x62a80f00, 0xbb25bfe2, 0x35bdd2f6, 0x71126905, 0xb2040222, 0xb6cbcf7c,
             0xcd769c2b, 0x53113ec0, 0x1640e3d3, 0x38abbd60, 0x2547adf0, 0xba38209c, 0xf746ce76, 0x77afa1c5, 0x20756060,
             0x85cbfe4e, 0x8ae88dd8, 0x7aaaf9b0, 0x4cf9aa7e, 0x1948c25c, 0x02fb8a8c, 0x01c36ae4, 0xd6ebe1f9, 0x90d4f869,
-            0xa65cdea0, 0x3f09252d, 0xc208e69f, 0xb74e6132, 0xce77e25b, 0x578fdfe3, 0x3ac372e6};
+            0xa65cdea0, 0x3f09252d, 0xc208e69f, 0xb74e6132, 0xce77e25b, 0x578fdfe3, 0x3ac372e6 };
 
-    private static final int[] BF_CRYPT_CIPHERTEXT = {0x4f727068, 0x65616e42, 0x65686f6c, 0x64657253, 0x63727944, 0x6f756274};
+    private static final int[] BF_CRYPT_CIPHERTEXT = { 0x4f727068, 0x65616e42, 0x65686f6c, 0x64657253, 0x63727944, 0x6f756274 };
 
     private static final char[] BASE_64_CODE = { //
             '.', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
             'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-            's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+            's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
     private static final byte[] INDEX_64 = { //
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, -1,
             -1, -1, -1, -1, -1, -1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
             27, -1, -1, -1, -1, -1, -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-            50, 51, 52, 53, -1, -1, -1, -1, -1};
+            50, 51, 52, 53, -1, -1, -1, -1, -1 };
 
     private int logRounds;
 
@@ -240,60 +241,6 @@ public class BCryptFunction extends AbstractHashingFunction
         }
     }
 
-
-
-    @Override
-    public Hash hash(CharSequence plainTextPassword)
-    {
-        String salt = generateSalt();
-        return hash(plainTextPassword, salt);
-    }
-
-    @Override
-    public Hash hash(CharSequence plainTextPassword, String salt)
-    {
-        return internalHash(plainTextPassword, salt);
-    }
-
-    @Override
-    public boolean check(CharSequence plainTextPassword, String hashed)
-    {
-        return checkPw(plainTextPassword, hashed);
-    }
-
-    private Hash internalHash(CharSequence plainTextPassword, String salt)
-    {
-        byte[] passwordAsBytes = Utils.fromCharSequenceToBytes(plainTextPassword);
-        return hash(passwordAsBytes, salt);
-    }
-
-
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o) return true;
-        if (!(o instanceof BCryptFunction)) return false;
-        BCryptFunction that = (BCryptFunction) o;
-        return logRounds == that.logRounds && type == that.type;
-    }
-
-    public int getLogarithmicRounds()
-    {
-        return logRounds;
-    }
-
-    public BCrypt getType()
-    {
-        return type;
-    }
-
-    @Override
-    public String toString()
-    {
-        return getClass().getSimpleName() + '(' + toString(type, logRounds) + ')';
-    }
-
     protected static String getUID(BCrypt type, int logRounds)
     {
         return type.minor() + "|" + logRounds;
@@ -302,12 +249,6 @@ public class BCryptFunction extends AbstractHashingFunction
     protected static String toString(BCrypt type, int logRounds)
     {
         return "t=" + type.minor() + ", r=" + logRounds;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(logRounds, type);
     }
 
     /**
@@ -447,6 +388,169 @@ public class BCryptFunction extends AbstractHashingFunction
         return ret;
     }
 
+    /**
+     * Cyclically extracts a word of key material
+     *
+     * @param data       the string to extract the data from
+     * @param offPointer a "pointer" (as a one-entry array) to the
+     *                   current offset into data
+     * @return the next word of material from data
+     * @since 0.1.0
+     */
+    protected static int[] streamToWords(byte[] data, int[] offPointer, int[] signp)
+    {
+        int i;
+        int[] words = { 0, 0 };
+        int off = offPointer[0];
+        int sign = signp[0];
+
+        for (i = 0; i < 4; i++)
+        {
+            words[0] = (words[0] << 8) | (data[off] & 0xff);
+            words[1] = (words[1] << 8) | (int) data[off]; // sign extension bug
+            if (i > 0)
+                sign |= words[1] & 0x80;
+            off = (off + 1) % data.length;
+        }
+
+        offPointer[0] = off;
+        signp[0] = sign;
+        return words;
+    }
+
+    protected static int streamToWord(byte[] data, int[] offp)
+    {
+        int[] signp = { 0 };
+        return streamToWords(data, offp, signp)[0];
+    }
+
+    protected static int streamToWordMinorX(byte[] data, int[] offp)
+    {
+        int[] signp = { 0 };
+        return streamToWords(data, offp, signp)[1];
+    }
+
+    private static boolean isValidMinor(char minor)
+    {
+        return BCrypt.valueOf(minor) != null;
+    }
+
+    private static void internalChecks(String salt)
+    {
+        if (salt == null)
+        {
+            throw new BadParametersException("salt cannot be null");
+        }
+        else if (salt.length() < 28)
+        {
+            throw new BadParametersException("Invalid salt");
+        }
+        else if (salt.charAt(0) != '$' || salt.charAt(1) != '2')
+        {
+            throw new BadParametersException("Invalid salt version");
+        }
+    }
+
+    /**
+     * Generate a salt to be used with the {@link BCryptFunction#hash(CharSequence, String)} method
+     *
+     * @param logRounds the log2 of the number of rounds of
+     *                  hashing to apply - the work factor therefore increases as
+     *                  2^log_rounds.
+     * @param prefix    BCrypt variant
+     * @return an encoded salt value
+     * @since 0.1.0
+     */
+    protected static String generateSalt(String prefix, int logRounds)
+    {
+        StringBuilder rs = new StringBuilder();
+        byte[] rnd = new byte[BCRYPT_SALT_LEN];
+
+        if (!prefix.startsWith("$2") || (prefix.charAt(2) != BCrypt.A.minor() && prefix.charAt(2) != BCrypt.Y.minor() && prefix
+                .charAt(2) != BCrypt.B.minor()))
+        {
+            throw new BadParametersException("Invalid prefix");
+        }
+        if (logRounds < 4 || logRounds > 31)
+        {
+            throw new BadParametersException("Invalid logRounds");
+        }
+
+        AlgorithmFinder.getSecureRandom().nextBytes(rnd);
+
+        rs.append("$2");
+        rs.append(prefix.charAt(2));
+        rs.append('$');
+        if (logRounds < 10)
+            rs.append('0');
+        rs.append(logRounds);
+        rs.append('$');
+        encodeBase64(rnd, rnd.length, rs);
+        return rs.toString();
+    }
+
+    static boolean equalsNoEarlyReturn(String a, String b)
+    {
+        return MessageDigest.isEqual(Utils.fromCharSequenceToBytes(a), Utils.fromCharSequenceToBytes(b));
+    }
+
+    @Override
+    public Hash hash(CharSequence plainTextPassword)
+    {
+        String salt = generateSalt();
+        return hash(plainTextPassword, salt);
+    }
+
+    @Override
+    public Hash hash(CharSequence plainTextPassword, String salt)
+    {
+        return internalHash(plainTextPassword, salt);
+    }
+
+    @Override
+    public boolean check(CharSequence plainTextPassword, String hashed)
+    {
+        return checkPw(plainTextPassword, hashed);
+    }
+
+    private Hash internalHash(CharSequence plainTextPassword, String salt)
+    {
+        byte[] passwordAsBytes = Utils.fromCharSequenceToBytes(plainTextPassword);
+        return hash(passwordAsBytes, salt);
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+            return true;
+        if (!(o instanceof BCryptFunction))
+            return false;
+        BCryptFunction that = (BCryptFunction) o;
+        return logRounds == that.logRounds && type == that.type;
+    }
+
+    public int getLogarithmicRounds()
+    {
+        return logRounds;
+    }
+
+    public BCrypt getType()
+    {
+        return type;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName() + '(' + toString(type, logRounds) + ')';
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(logRounds, type);
+    }
 
     /**
      * Blowfish encipher a single 64-bit block encoded as
@@ -477,36 +581,6 @@ public class BCryptFunction extends AbstractHashingFunction
         lr[off + 1] = l;
     }
 
-    /**
-     * Cyclically extracts a word of key material
-     *
-     * @param data       the string to extract the data from
-     * @param offPointer a "pointer" (as a one-entry array) to the
-     *                   current offset into data
-     * @return the next word of material from data
-     * @since 0.1.0
-     */
-    protected static int[] streamToWords(byte[] data, int[] offPointer, int[] signp)
-    {
-        int i;
-        int[] words = {0, 0};
-        int off = offPointer[0];
-        int sign = signp[0];
-
-        for (i = 0; i < 4; i++)
-        {
-            words[0] = (words[0] << 8) | (data[off] & 0xff);
-            words[1] = (words[1] << 8) | (int) data[off]; // sign extension bug
-            if (i > 0)
-                sign |= words[1] & 0x80;
-            off = (off + 1) % data.length;
-        }
-
-        offPointer[0] = off;
-        signp[0] = sign;
-        return words;
-    }
-
     private int feistelSubstitution(int p, int[] sBox)
     {
         int x = sBox[(p >> 24) & 0xff];
@@ -514,19 +588,6 @@ public class BCryptFunction extends AbstractHashingFunction
         x ^= sBox[0x200 | ((p >> 8) & 0xff)];
         x += sBox[0x300 | (p & 0xff)];
         return x;
-    }
-
-
-    protected static int streamToWord(byte[] data, int[] offp)
-    {
-        int[] signp = {0};
-        return streamToWords(data, offp, signp)[0];
-    }
-
-    protected static int streamToWordMinorX(byte[] data, int[] offp)
-    {
-        int[] signp = {0};
-        return streamToWords(data, offp, signp)[1];
     }
 
     /**
@@ -538,8 +599,8 @@ public class BCryptFunction extends AbstractHashingFunction
     protected void key(byte[] key, boolean signExtBug, int[] pArray, int[] sBox)
     {
         int i;
-        int[] koffp = {0};
-        int[] lr = {0, 0};
+        int[] koffp = { 0 };
+        int[] lr = { 0, 0 };
         int pLength = pArray.length;
         int sLenght = sBox.length;
 
@@ -576,12 +637,12 @@ public class BCryptFunction extends AbstractHashingFunction
     protected void enhancedKeySchedule(byte[] data, byte[] key, boolean signExtBug, int safety, int[] pArray, int[] sBox)
     {
         int i;
-        int[] koffp = {0};
-        int[] doffp = {0};
-        int[] lr = {0, 0};
+        int[] koffp = { 0 };
+        int[] doffp = { 0 };
+        int[] lr = { 0, 0 };
         int pLength = pArray.length;
         int sLength = sBox.length;
-        int[] signP = {0};
+        int[] signP = { 0 };
         int diff = 0;
 
         for (i = 0; i < pLength; i++)
@@ -672,7 +733,6 @@ public class BCryptFunction extends AbstractHashingFunction
         return ret;
     }
 
-
     protected Hash hash(byte[] passwordb, String salt)
     {
         String realSalt;
@@ -728,64 +788,6 @@ public class BCryptFunction extends AbstractHashingFunction
         return new Hash(this, result, hashed, salt);
     }
 
-    private static boolean isValidMinor(char minor)
-    {
-        return BCrypt.valueOf(minor) != null;
-    }
-
-    private static void internalChecks(String salt)
-    {
-        if (salt == null)
-        {
-            throw new BadParametersException("salt cannot be null");
-        }
-        else if (salt.length() < 28)
-        {
-            throw new BadParametersException("Invalid salt");
-        }
-        else if (salt.charAt(0) != '$' || salt.charAt(1) != '2')
-        {
-            throw new BadParametersException("Invalid salt version");
-        }
-    }
-
-    /**
-     * Generate a salt to be used with the {@link BCryptFunction#hash(CharSequence, String)} method
-     *
-     * @param logRounds the log2 of the number of rounds of
-     *                  hashing to apply - the work factor therefore increases as
-     *                  2^log_rounds.
-     * @param prefix BCrypt variant
-     * @return an encoded salt value
-     * @since 0.1.0
-     */
-    protected static String generateSalt(String prefix, int logRounds)
-    {
-        StringBuilder rs = new StringBuilder();
-        byte[] rnd = new byte[BCRYPT_SALT_LEN];
-
-        if (!prefix.startsWith("$2") || (prefix.charAt(2) != BCrypt.A.minor() && prefix.charAt(2) != BCrypt.Y.minor() && prefix.charAt(2) != BCrypt.B.minor()))
-        {
-            throw new BadParametersException("Invalid prefix");
-        }
-        if (logRounds < 4 || logRounds > 31)
-        {
-            throw new BadParametersException("Invalid logRounds");
-        }
-
-        AlgorithmFinder.getSecureRandom().nextBytes(rnd);
-
-        rs.append("$2");
-        rs.append(prefix.charAt(2));
-        rs.append('$');
-        if (logRounds < 10)
-            rs.append('0');
-        rs.append(logRounds);
-        rs.append('$');
-        encodeBase64(rnd, rnd.length, rs);
-        return rs.toString();
-    }
-
     /**
      * Generate a salt to be used with the {@link BCryptFunction#hash(CharSequence, String)} method
      *
@@ -809,11 +811,6 @@ public class BCryptFunction extends AbstractHashingFunction
     protected boolean checkPw(CharSequence plaintext, String hashed)
     {
         return equalsNoEarlyReturn(hashed, hash(plaintext, hashed).getResult());
-    }
-
-    static boolean equalsNoEarlyReturn(String a, String b)
-    {
-        return MessageDigest.isEqual(Utils.fromCharSequenceToBytes(a), Utils.fromCharSequenceToBytes(b));
     }
 
 }

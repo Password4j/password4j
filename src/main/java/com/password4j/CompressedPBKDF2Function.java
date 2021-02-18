@@ -17,12 +17,12 @@
 
 package com.password4j;
 
-import com.password4j.types.Hmac;
-
-import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.password4j.types.Hmac;
+
 
 /**
  * Class containing the implementation of PBKDF2 function and its parameters.
@@ -70,6 +70,11 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         super();
     }
 
+    protected CompressedPBKDF2Function(Hmac fromCode, int iterations, int length)
+    {
+        super(fromCode, iterations, length);
+    }
+
     /**
      * Creates a singleton instance, depending on the provided
      * algorithm, number of iterations and key length.
@@ -102,8 +107,8 @@ public class CompressedPBKDF2Function extends PBKDF2Function
      * @param algorithm  string version of hmac algorithm. This must me mapped in {@link Hmac}.
      * @param iterations number of iterations
      * @param length     length of the derived key
-     * @throws IllegalArgumentException if {@code algorithm} is not mapped in {@link Hmac}.
      * @return a singleton instance
+     * @throws IllegalArgumentException if {@code algorithm} is not mapped in {@link Hmac}.
      * @since 0.1.0
      */
     public static CompressedPBKDF2Function getInstance(String algorithm, int iterations, int length)
@@ -116,12 +121,6 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         {
             throw new UnsupportedOperationException("Algorithm `" + algorithm + "` is not recognized.", iae);
         }
-    }
-
-
-    protected CompressedPBKDF2Function(Hmac fromCode, int iterations, int length)
-    {
-        super(fromCode, iterations, length);
     }
 
     /**
@@ -148,6 +147,10 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }
 
+    protected static String[] getParts(String hashed)
+    {
+        return hashed.split(new StringBuilder(2).append('\\').append(DELIMITER).toString());
+    }
 
     @Override
     protected String getHash(byte[] encodedKey, String salt)
@@ -183,11 +186,5 @@ public class CompressedPBKDF2Function extends PBKDF2Function
             return new String(Base64.getDecoder().decode(Utils.fromCharSequenceToBytes(parts[3])));
         }
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
-    }
-
-
-    protected static String[] getParts(String hashed)
-    {
-        return hashed.split(new StringBuilder(2).append('\\').append(DELIMITER).toString());
     }
 }

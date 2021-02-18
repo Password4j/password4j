@@ -19,15 +19,19 @@ package com.password4j;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.*;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
 
 class Utils
 {
 
-    private static final char[] HEX_ALPHABET = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-
     static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+
+    private static final char[] HEX_ALPHABET = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
     private Utils()
     {
@@ -74,7 +78,6 @@ class Utils
         }
 
     }
-
 
     static char[] fromCharSequenceToChars(CharSequence charSequence)
     {
@@ -174,7 +177,6 @@ class Utils
         return result;
     }
 
-
     static long[] fromBytesToLongs(byte[] input)
     {
         long[] v = new long[128];
@@ -242,7 +244,6 @@ class Utils
             t[i] = t[i] ^ other[i];
         }
     }
-
 
     static int log2(int number)
     {

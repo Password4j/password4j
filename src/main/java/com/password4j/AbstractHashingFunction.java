@@ -26,12 +26,45 @@ package com.password4j;
 public abstract class AbstractHashingFunction implements HashingFunction
 {
 
+    /**
+     * Compares two {@link CharSequence}s as byte arrays in length-constant time. This comparison method
+     * is used so that password hashes cannot be extracted from an on-line
+     * system using a timing attack and then attacked off-line.
+     *
+     * @param a the first CharSequence
+     * @param b the second CharSequence
+     * @return true if both {@link CharSequence}s are the same, false if not
+     */
+    protected static boolean slowEquals(CharSequence a, CharSequence b)
+    {
+        return slowEquals(Utils.fromCharSequenceToBytes(a), Utils.fromCharSequenceToBytes(b));
+    }
+
+    /**
+     * Compares two byte arrays in length-constant time. This comparison method
+     * is used so that password hashes cannot be extracted from an on-line
+     * system using a timing attack and then attacked off-line.
+     *
+     * @param a the first byte array
+     * @param b the second byte array
+     * @return true if both byte arrays are the same, false if not
+     */
+    protected static boolean slowEquals(byte[] a, byte[] b)
+    {
+        int diff = a.length ^ b.length;
+        for (int i = 0; i < a.length && i < b.length; i++)
+        {
+            diff |= a[i] ^ b[i];
+        }
+        return diff == 0;
+    }
+
     @Override
     public Hash hash(CharSequence plainTextPassword, String salt, CharSequence pepper)
     {
         CharSequence peppered = Utils.append(pepper, plainTextPassword);
         Hash result;
-        if(salt == null)
+        if (salt == null)
         {
             result = hash(peppered);
         }
@@ -76,37 +109,6 @@ public abstract class AbstractHashingFunction implements HashingFunction
     public boolean check(CharSequence plainTextPassword, String hashed, String salt, CharSequence pepper)
     {
         return check(Utils.append(pepper, plainTextPassword), hashed, salt);
-    }
-
-    /**
-     * Compares two {@link CharSequence}s as byte arrays in length-constant time. This comparison method
-     * is used so that password hashes cannot be extracted from an on-line
-     * system using a timing attack and then attacked off-line.
-     *
-     * @param a the first CharSequence
-     * @param b the second CharSequence
-     * @return true if both {@link CharSequence}s are the same, false if not
-     */
-    protected static boolean slowEquals(CharSequence a, CharSequence b)
-    {
-        return slowEquals(Utils.fromCharSequenceToBytes(a), Utils.fromCharSequenceToBytes(b));
-    }
-
-    /**
-     * Compares two byte arrays in length-constant time. This comparison method
-     * is used so that password hashes cannot be extracted from an on-line
-     * system using a timing attack and then attacked off-line.
-     *
-     * @param a the first byte array
-     * @param b the second byte array
-     * @return true if both byte arrays are the same, false if not
-     */
-    protected static boolean slowEquals(byte[] a, byte[] b)
-    {
-        int diff = a.length ^ b.length;
-        for (int i = 0; i < a.length && i < b.length; i++)
-            diff |= a[i] ^ b[i];
-        return diff == 0;
     }
 
 }

@@ -19,6 +19,7 @@ package com.password4j;
 
 import java.security.SecureRandom;
 
+
 /**
  * This class contains static functions that
  * help to create a secure salt.

@@ -16,13 +16,6 @@
  */
 package com.password4j;
 
-
-import com.password4j.types.Argon2;
-import com.password4j.types.BCrypt;
-import com.password4j.types.Hmac;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.SecureRandom;
@@ -30,6 +23,13 @@ import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.password4j.types.Argon2;
+import com.password4j.types.BCrypt;
+import com.password4j.types.Hmac;
 
 
 /**
@@ -58,11 +58,6 @@ public class AlgorithmFinder
      * @since 0.1.0
      */
     private static SecureRandom secureRandom;
-
-    static
-    {
-        initialize();
-    }
 
     private AlgorithmFinder()
     {
@@ -171,7 +166,8 @@ public class AlgorithmFinder
 
     private static Param internalGetProperties()
     {
-        String algorithm = PropertyReader.readString("hash.pbkdf2.algorithm", Hmac.SHA512.name(), "PBKDF2 algorithm is not defined");
+        String algorithm = PropertyReader
+                .readString("hash.pbkdf2.algorithm", Hmac.SHA512.name(), "PBKDF2 algorithm is not defined");
         int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", 64_000, "PBKDF2 #iterations are not defined");
         int length = PropertyReader.readInt("hash.pbkdf2.length", Hmac.SHA512.bits(), "PBKDF2 key length is not defined");
         return new Param(algorithm, iterations, length);
@@ -254,8 +250,10 @@ public class AlgorithmFinder
     {
         int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", 32_768, "SCrypt work factor (N) is not defined");
         int resources = PropertyReader.readInt("hash.scrypt.resources", 8, "SCrypt resources (r) is not defined");
-        int parallelization = PropertyReader.readInt("hash.scrypt.parallelization", 1, "SCrypt parallelization (p) is not defined");
-        int derivedKeyLength = PropertyReader.readInt("hash.scrypt.derivedKeyLength", SCryptFunction.DERIVED_KEY_LENGTH, "SCrypt derivedKeyLength (dkLen) is not defined");
+        int parallelization = PropertyReader
+                .readInt("hash.scrypt.parallelization", 1, "SCrypt parallelization (p) is not defined");
+        int derivedKeyLength = PropertyReader.readInt("hash.scrypt.derivedKeyLength", SCryptFunction.DERIVED_KEY_LENGTH,
+                "SCrypt derivedKeyLength (dkLen) is not defined");
         return SCryptFunction.getInstance(workFactor, resources, parallelization, derivedKeyLength);
     }
 
@@ -330,7 +328,8 @@ public class AlgorithmFinder
         int parallelism = PropertyReader.readInt("hash.argon2.parallelism", 2, "Argon2 parallelism is not defined");
         String type = PropertyReader.readString("hash.argon2.type", "id", "Argon2 type is not defined");
         int version = PropertyReader.readInt("hash.argon2.version", 19, "Argon2 version is not defined");
-        return Argon2Function.getInstance(memory, iterations, parallelism, outputLength,  Argon2.valueOf(type.toUpperCase()), version);
+        return Argon2Function
+                .getInstance(memory, iterations, parallelism, outputLength, Argon2.valueOf(type.toUpperCase()), version);
     }
 
     /**
@@ -394,7 +393,9 @@ public class AlgorithmFinder
     private static class Param
     {
         String algorithm;
+
         int iterations;
+
         int length;
 
         Param(String algorithm, int iterations, int length)
@@ -403,5 +404,10 @@ public class AlgorithmFinder
             this.iterations = iterations;
             this.length = length;
         }
+    }
+
+    static
+    {
+        initialize();
     }
 }

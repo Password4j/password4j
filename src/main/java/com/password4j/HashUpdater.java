@@ -34,7 +34,6 @@ public class HashUpdater
         this.hashBuilder = hashBuilder;
     }
 
-
     /**
      * Check if the previously given hash was produced from the given plain text password
      * with a specific implementation of {@link HashingFunction}. If the verification
@@ -138,7 +137,6 @@ public class HashUpdater
         return this;
     }
 
-
     /**
      * Hashes the previously given plain text password
      * with {@link PBKDF2Function}.
@@ -157,7 +155,6 @@ public class HashUpdater
     {
         return withPBKDF2(AlgorithmFinder.getPBKDF2Instance());
     }
-
 
     /**
      * Hashes the previously given plain text password

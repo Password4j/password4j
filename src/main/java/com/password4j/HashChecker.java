@@ -16,7 +16,6 @@
  */
 package com.password4j;
 
-
 /**
  * Builder class that helps to create a chain of parameters to be used
  * in the verification process.
@@ -105,7 +104,6 @@ public class HashChecker
     {
         return new HashUpdater(this, new HashBuilder(plainTextPassword).addPepper(pepper).addSalt(salt));
     }
-
 
     /**
      * Check if the previously given hash was produced from the given plain text password
@@ -226,7 +224,6 @@ public class HashChecker
         Argon2Function argon2 = AlgorithmFinder.getArgon2Instance();
         return with(argon2);
     }
-
 
     protected String getHashed()
     {

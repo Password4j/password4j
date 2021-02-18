@@ -2,7 +2,6 @@
 
 [![Build Status](https://travis-ci.org/Password4j/password4j.svg?branch=master)](https://travis-ci.org/Password4j/password4j)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.password4j/password4j/badge.svg?color=purple)](https://maven-badges.herokuapp.com/maven-central/com.password4j/password4j)
-[![javadoc](https://javadoc.io/badge2/com.password4j/password4j/javadoc.svg)](https://javadoc.io/doc/com.password4j/password4j)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Awesome](https://raw.githubusercontent.com/sindresorhus/awesome/main/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
@@ -314,6 +313,14 @@ r = SystemChecker.findResourcesForSCrypt(maxTimeInMilliseconds, N, p);
 System.out.println("N: " + N + ", r: " + r);
 ```
 
+# Documentation
+[![Wiki](https://img.shields.io/badge/wiki-available-brightgreen?logo=wikipedia&logoColor=white)](https://github.com/Password4j/password4j/wiki)
+[![javadoc](https://javadoc.io/badge2/com.password4j/password4j/javadoc.svg)](https://javadoc.io/doc/com.password4j/password4j)
+
+
+The full documentation can be foud [here](https://github.com/Password4j/password4j/wiki).
+
+The javadoc can be found [here](https://javadoc.io/doc/com.password4j/password4j).
 
 # Contributing
 ![GitHub issues](https://img.shields.io/github/issues/Password4j/password4j?color=success)

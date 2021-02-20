@@ -121,7 +121,7 @@ public class SystemChecker
 
         while (true)
         {
-            BCryptFunction tmp = new BCryptFunction(BCrypt.A, rounds);
+            BCryptFunction tmp = new BCryptFunction(BCrypt.B, rounds);
             long start = System.currentTimeMillis();
 
             tmp.hash(TO_BE_HASHED);

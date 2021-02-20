@@ -302,9 +302,7 @@ public class BCryptFunctionTest
     }
 
 
-    /**
-     * Test method for 'BCrypt.gensalt(int)'
-     */
+
     @Test
     public void testGensaltInt()
     {
@@ -559,8 +557,8 @@ public class BCryptFunctionTest
     @Test
     public void genSaltGeneratesCorrectSaltPrefix()
     {
-        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.getInstance(4).hash("").getResult(), "$2a$04$"));
-        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.getInstance(31).hash("").getResult(), "$2a$31$"));
+        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.getInstance(4).hash("").getResult(), "$2b$04$"));
+        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.getInstance(31).hash("").getResult(), "$2b$31$"));
     }
 
     @Test(expected = BadParametersException.class)

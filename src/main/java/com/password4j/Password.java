@@ -108,13 +108,7 @@ public class Password
             return false;
         }
 
-        CharSequence peppered = plainTextPassword;
-        if (StringUtils.isNotEmpty(hashObject.getPepper()))
-        {
-            peppered = Utils.append(hashObject.getPepper(), peppered);
-        }
-
-        return hashObject.getHashingFunction().check(peppered, hashObject.getResult(), hashObject.getSalt());
+        return hashObject.getHashingFunction().check(plainTextPassword, hashObject.getResult(), hashObject.getSalt(), hashObject.getPepper());
     }
 
 }

@@ -204,7 +204,7 @@ public class BCryptFunction extends AbstractHashingFunction
      */
     public static BCryptFunction getInstance(int logRounds)
     {
-        return getInstance(BCrypt.A, logRounds);
+        return getInstance(BCrypt.B, logRounds);
     }
 
     public static BCryptFunction getInstance(BCrypt type, int logRounds)

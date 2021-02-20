@@ -357,7 +357,9 @@ public class Argon2Function extends AbstractHashingFunction
         initialize(password, salt, Utils.fromCharSequenceToBytes(pepper), null, blockMemory);
         fillMemoryBlocks(blockMemory);
         byte[] hash = ending(blockMemory);
-        return new Hash(this, encodeHash(hash, theSalt), hash, theSalt);
+        Hash result = new Hash(this, encodeHash(hash, theSalt), hash, theSalt);
+        result.setPepper(pepper);
+        return result;
     }
 
     @Override

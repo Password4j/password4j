@@ -30,7 +30,7 @@ and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/
 
 
 # Installation
-Password4j runs on **Java 8**, **Java 9**, **Java 10** and **Java 11** by any vendor. It is supported by **Android API 26+** as well.
+Password4j runs on **Java 8**, **Java 9**, **Java 10** and **Java 11** by any vendor. It is supported by **Android API 21+** as well.
 
 The artifacts are deployed to [Maven Central](https://search.maven.org/).
 ## ![Maven](https://i.imgur.com/2TZzobp.png?1) Maven 

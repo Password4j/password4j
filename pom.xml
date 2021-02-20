@@ -96,8 +96,8 @@
                 <configuration>
                     <signature>
                         <groupId>net.sf.androidscents.signature</groupId>
-                        <artifactId>android-api-level-26</artifactId>
-                        <version>8.0.0_r2</version>
+                        <artifactId>android-api-level-21</artifactId>
+                        <version>5.0.1_r2</version>
                     </signature>
                 </configuration>
             </plugin>

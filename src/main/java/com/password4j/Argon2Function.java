@@ -18,7 +18,6 @@ package com.password4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -309,8 +308,8 @@ public class Argon2Function extends AbstractHashingFunction
             result[2] = Integer.parseInt(StringUtils.removeStart(params[0], "m="));
             result[3] = Integer.parseInt(StringUtils.removeStart(params[1], "t="));
             result[4] = Integer.parseInt(StringUtils.removeStart(params[2], "p="));
-            result[5] = Base64.getDecoder().decode(parts[4]);
-            result[6] = Base64.getDecoder().decode(parts[5]);
+            result[5] = Utils.decodeBase64(parts[4]);
+            result[6] = Utils.decodeBase64(parts[5]);
             return result;
         }
         else
@@ -804,9 +803,9 @@ public class Argon2Function extends AbstractHashingFunction
     private String encodeHash(byte[] hash, String salt)
     {
         return "$argon2" + variant.name()
-                .toLowerCase() + "$v=" + version + "$m=" + memory + ",t=" + iterations + ",p=" + parallelism + "$" + Base64
-                .getEncoder().withoutPadding().encodeToString(Utils.fromCharSequenceToBytes(salt)) + "$" + Base64.getEncoder()
-                .withoutPadding().encodeToString(hash);
+                .toLowerCase() + "$v=" + version + "$m=" + memory + ",t=" + iterations + ",p=" + parallelism + "$"
+                + Utils.encodeBase64(Utils.fromCharSequenceToBytes(salt), false) + "$"
+                + Utils.encodeBase64(hash, false);
     }
 
     @Override

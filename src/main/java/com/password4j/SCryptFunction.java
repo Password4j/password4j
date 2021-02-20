@@ -17,7 +17,6 @@
 package com.password4j;
 
 import java.security.GeneralSecurityException;
-import java.util.Base64;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -96,7 +95,7 @@ public class SCryptFunction extends AbstractHashingFunction
             int workFactor = (int) Math.pow(2.0D, (double) (params >> 16 & 65535L));
             int resources = (int) params >> 8 & 255;
             int parallelization = (int) params & 255;
-            int derivedKeyLength = Base64.getDecoder().decode(parts[4]).length;
+            int derivedKeyLength = Utils.decodeBase64(parts[4]).length;
 
             return SCryptFunction.getInstance(workFactor, resources, parallelization, derivedKeyLength);
         }
@@ -256,8 +255,8 @@ public class SCryptFunction extends AbstractHashingFunction
         {
             byte[] derived = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), salt, derivedKeyLength);
             String params = Long.toString((long) Utils.log2(workFactor) << 16 | (long) resources << 8 | parallelization, 16);
-            String sb = "$s0$" + params + '$' + Base64.getEncoder().encodeToString(salt) + '$' + Base64.getEncoder()
-                    .encodeToString(derived);
+            String sb = "$s0$" + params + '$' + Utils.encodeBase64(salt) + '$'
+                    + Utils.encodeBase64(derived);
             return new Hash(this, sb, derived, stringedSalt);
         }
         catch (IllegalArgumentException | GeneralSecurityException e)
@@ -275,8 +274,8 @@ public class SCryptFunction extends AbstractHashingFunction
             String[] parts = hashed.split("\\$");
             if (parts.length == 5 && parts[1].equals("s0"))
             {
-                byte[] salt = Base64.getDecoder().decode(parts[3]);
-                byte[] derived0 = Base64.getDecoder().decode(parts[4]);
+                byte[] salt = Utils.decodeBase64(parts[3]);
+                byte[] derived0 = Utils.decodeBase64(parts[4]);
                 byte[] derived1 = scrypt(Utils.fromCharSequenceToBytes(plainTextPassword), salt, derivedKeyLength);
                 return slowEquals(derived0, derived1);
             }

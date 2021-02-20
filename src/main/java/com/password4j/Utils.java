@@ -23,7 +23,15 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.security.AccessController;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivilegedAction;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 class Utils
@@ -32,6 +40,25 @@ class Utils
     static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     private static final char[] HEX_ALPHABET = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+
+    private static final char[] TO_BASE64 = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+            'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+            'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+',
+            '/' };
+
+    private static final int[] FROM_BASE64 = new int[256];
+
+    static
+    {
+        Arrays.fill(FROM_BASE64, -1);
+        for (int i = 0; i < TO_BASE64.length; i++)
+        {
+            FROM_BASE64[TO_BASE64[i]] = i;
+        }
+        FROM_BASE64['='] = -2;
+    }
+
+    private static Pattern STRONG_PATTERN = Pattern.compile("\\s*([\\S&&[^:,]]*)(\\:([\\S&&[^,]]*))?\\s*(\\,(.*))?");
 
     private Utils()
     {
@@ -274,6 +301,237 @@ class Utils
     private static int scale(int initialLength, float bytesPerChar)
     {
         return (int) ((double) initialLength * (double) bytesPerChar);
+    }
+
+    static byte[] decodeBase64(String src)
+    {
+        return decodeBase64(src.getBytes(StandardCharsets.ISO_8859_1));
+    }
+
+    static String encodeBase64(byte[] src)
+    {
+        return encodeBase64(src, true);
+    }
+
+    static String encodeBase64(byte[] src, boolean padding)
+    {
+        byte[] encoded = encode(src, padding);
+        return new String(encoded, 0, encoded.length);
+    }
+
+    static byte[] decodeBase64(byte[] src)
+    {
+        byte[] dst = new byte[outLength(src, src.length)];
+        int ret = decode(src, src.length, dst);
+        if (ret != dst.length)
+        {
+            dst = Arrays.copyOf(dst, ret);
+        }
+        return dst;
+    }
+
+    static byte[] encode(byte[] src, boolean padding)
+    {
+        int len = outLength(src.length, padding);
+        byte[] dst = new byte[len];
+        int ret = encode(src, src.length, dst, padding);
+        if (ret != dst.length)
+        {
+            return Arrays.copyOf(dst, ret);
+        }
+        return dst;
+    }
+
+    private static int outLength(int length, boolean doPadding)
+    {
+        int len;
+        if (doPadding)
+        {
+            len = 4 * ((length + 2) / 3);
+        }
+        else
+        {
+            int n = length % 3;
+            len = 4 * (length / 3) + (n == 0 ? 0 : n + 1);
+        }
+        return len;
+    }
+
+    private static int outLength(byte[] source, int length)
+    {
+        int paddings = 0;
+        if (length == 0)
+        {
+            return 0;
+        }
+        if (length < 2)
+        {
+            throw new IllegalArgumentException("Input byte[] should at least have 2 bytes for base64 bytes");
+        }
+
+        if (source[length - 1] == '=')
+        {
+            paddings++;
+            if (source[length - 2] == '=')
+            {
+                paddings++;
+            }
+        }
+
+        if (paddings == 0 && (length & 0x3) != 0)
+        {
+            paddings = 4 - (length & 0x3);
+        }
+        return 3 * ((length + 3) / 4) - paddings;
+    }
+
+    private static int encode(byte[] src, int end, byte[] dst, boolean padding)
+    {
+        char[] base64 = TO_BASE64;
+        int sp = 0;
+        int length = (end) / 3 * 3;
+        int dp = 0;
+        while (sp < length)
+        {
+            int sl0 = sp + length;
+            for (int sp0 = sp, dp0 = dp; sp0 < sl0; sp0 += 3, dp0 += 4)
+            {
+                int bits = (src[sp0] & 0xff) << 16 | (src[sp0 + 1] & 0xff) << 8 | (src[sp0 + 2] & 0xff);
+                dst[dp0] = (byte) base64[(bits >>> 18) & 0x3f];
+                dst[dp0 + 1] = (byte) base64[(bits >>> 12) & 0x3f];
+                dst[dp0 + 2] = (byte) base64[(bits >>> 6) & 0x3f];
+                dst[dp0 + 3] = (byte) base64[bits & 0x3f];
+            }
+            int dlen = (sl0 - sp) / 3 * 4;
+            dp += dlen;
+            sp = sl0;
+        }
+        if (sp < end)
+        {
+            int b0 = src[sp++] & 0xff;
+            dst[dp++] = (byte) base64[b0 >> 2];
+            if (sp == end)
+            {
+                dst[dp++] = (byte) base64[(b0 << 4) & 0x3f];
+                if (padding)
+                {
+                    dst[dp++] = '=';
+                    dst[dp++] = '=';
+                }
+            }
+            else
+            {
+                int b1 = src[sp] & 0xff;
+                dst[dp++] = (byte) base64[(b0 << 4) & 0x3f | (b1 >> 4)];
+                dst[dp++] = (byte) base64[(b1 << 2) & 0x3f];
+                if (padding)
+                {
+                    dst[dp++] = '=';
+                }
+            }
+        }
+        return dp;
+    }
+
+    private static int decode(byte[] src, int sl, byte[] dst)
+    {
+        int dp = 0;
+        int bits = 0;
+        int sp = 0;
+        int shiftTo = 18;
+        while (sp < sl)
+        {
+            int b = src[sp++] & 0xff;
+            if ((b = FROM_BASE64[b]) < 0)
+            {
+                if (b == -2)
+                {
+                    if (shiftTo == 6 && (sp == sl || src[sp] != '=') || shiftTo == 18)
+                    {
+                        throw new IllegalArgumentException("Input byte array has wrong 4-byte ending unit");
+                    }
+                    break;
+                }
+                else
+                    throw new IllegalArgumentException("Illegal base64 character " + Integer.toString(src[sp - 1], 16));
+            }
+            bits |= (b << shiftTo);
+            shiftTo -= 6;
+            if (shiftTo < 0)
+            {
+                dst[dp++] = (byte) (bits >> 16);
+                dst[dp++] = (byte) (bits >> 8);
+                dst[dp++] = (byte) (bits);
+                shiftTo = 18;
+                bits = 0;
+            }
+        }
+        if (shiftTo == 6)
+        {
+            dst[dp++] = (byte) (bits >> 16);
+        }
+        else if (shiftTo == 0)
+        {
+            dst[dp++] = (byte) (bits >> 16);
+            dst[dp++] = (byte) (bits >> 8);
+        }
+        else if (shiftTo == 12)
+        {
+            throw new IllegalArgumentException("Last unit does not have enough valid bits");
+        }
+        return dp;
+    }
+
+    static SecureRandom getInstanceStrong() throws NoSuchAlgorithmException
+    {
+
+        String property = AccessController.doPrivileged(new PrivilegedAction<String>()
+        {
+            @Override
+            public String run()
+            {
+                return Security.getProperty("securerandom.strongAlgorithms");
+            }
+        });
+
+        if ((property == null) || (property.length() == 0))
+        {
+            throw new NoSuchAlgorithmException("Null/empty securerandom.strongAlgorithms Security Property");
+        }
+
+        String remainder = property;
+        while (remainder != null)
+        {
+            Matcher m = STRONG_PATTERN.matcher(remainder);
+            if (m.matches())
+            {
+                String alg = m.group(1);
+                String prov = m.group(3);
+
+                try
+                {
+                    if (prov == null)
+                    {
+                        return SecureRandom.getInstance(alg);
+                    }
+                    else
+                    {
+                        return SecureRandom.getInstance(alg, prov);
+                    }
+                }
+                catch (NoSuchAlgorithmException | NoSuchProviderException e)
+                {
+                    //
+                }
+                remainder = m.group(5);
+            }
+            else
+            {
+                remainder = null;
+            }
+        }
+
+        throw new NoSuchAlgorithmException("No strong SecureRandom impls available: " + property);
     }
 
 }

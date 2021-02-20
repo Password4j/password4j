@@ -17,7 +17,6 @@
 
 package com.password4j;
 
-import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -156,7 +155,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
     protected String getHash(byte[] encodedKey, String salt)
     {
         String params = Long.toString((((long) getIterations()) << 32) | (getLength() & 0xffffffffL));
-        String salt64 = Base64.getEncoder().encodeToString(Utils.fromCharSequenceToBytes(salt));
+        String salt64 = Utils.encodeBase64(Utils.fromCharSequenceToBytes(salt));
         String hash64 = super.getHash(encodedKey, salt);
         return "$" + algorithm.code() + "$" + params + "$" + salt64 + "$" + hash64;
     }
@@ -183,7 +182,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         String[] parts = getParts(hashed);
         if (parts.length == 5)
         {
-            return new String(Base64.getDecoder().decode(Utils.fromCharSequenceToBytes(parts[3])));
+            return new String(Utils.decodeBase64(Utils.fromCharSequenceToBytes(parts[3])));
         }
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }

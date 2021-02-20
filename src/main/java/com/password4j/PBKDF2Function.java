@@ -18,7 +18,6 @@ package com.password4j;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -181,7 +180,7 @@ public class PBKDF2Function extends AbstractHashingFunction
      */
     protected String getHash(byte[] encodedKey, String salt)
     {
-        return Base64.getEncoder().encodeToString(encodedKey);
+        return Utils.encodeBase64(encodedKey);
     }
 
     @Override

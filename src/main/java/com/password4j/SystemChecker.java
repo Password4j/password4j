@@ -59,7 +59,14 @@ public class SystemChecker
             throw new BadParametersException("Algorithm cannot be null.");
         }
         List<String> variants = AlgorithmFinder.getAllPBKDF2Variants();
-        return variants.stream().anyMatch(algorithm::equals);
+        for(String variant : variants)
+        {
+            if(algorithm.equals(variant))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -77,7 +84,14 @@ public class SystemChecker
             throw new BadParametersException("Algorithm cannot be null.");
         }
         Set<String> mds = AlgorithmFinder.getAllMessageDigests();
-        return mds.stream().anyMatch(algorithm::equals);
+        for(String md : mds)
+        {
+            if(algorithm.equals(md))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

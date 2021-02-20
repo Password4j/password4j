@@ -372,7 +372,7 @@ public class AlgorithmFinder
         {
             try
             {
-                sr = SecureRandom.getInstanceStrong();
+                sr = Utils.getInstanceStrong();
             }
             catch (NoSuchAlgorithmException nsae)
             {

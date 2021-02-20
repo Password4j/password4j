@@ -48,7 +48,7 @@ public class SystemCheckTest
     public void testPBKDF2Iterations2()
     {
         // GIVEN
-        long maxMilliseconds = 1;
+        long maxMilliseconds = -1;
 
         // WHEN
         BenchmarkResult<PBKDF2Function> result = SystemChecker.benchmarkPBKDF2(maxMilliseconds, Hmac.SHA512, 4096);

@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/Password4j/password4j.svg?branch=master)](https://travis-ci.org/Password4j/password4j)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.password4j/password4j/badge.svg?color=purple)](https://maven-badges.herokuapp.com/maven-central/com.password4j/password4j)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Java 8 or higher](https://img.shields.io/badge/JDK-8%2B-007396)](https://img.shields.io/badge/JDK-8%2B-007396)
+[![Android 5.0 or higher](https://img.shields.io/badge/Android-5.0%2B-3DDC84)](https://img.shields.io/badge/Android-5.0%2B-3DDC84)
 [![Awesome](https://raw.githubusercontent.com/sindresorhus/awesome/main/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Password4j_password4j&metric=alert_status)](https://sonarcloud.io/dashboard?id=Password4j_password4j)
@@ -29,7 +30,7 @@ and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/
 
 
 # Installation
-Password4j runs on **Java 8**, **Java 9**, **Java 10** and **Java 11** by any vendor. It is supported by **Android API 26+** as well.
+Password4j runs on **Java 8**, **Java 9**, **Java 10** and **Java 11** by any vendor. It is supported by **Android API 21+** as well.
 
 The artifacts are deployed to [Maven Central](https://search.maven.org/).
 ## ![Maven](https://i.imgur.com/2TZzobp.png?1) Maven 

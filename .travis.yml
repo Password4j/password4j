@@ -15,7 +15,7 @@ cache:
 
 
 script:
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=Password4j_password4j
+  - mvn clean animal-sniffer:check org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=Password4j_password4j
 
 addons:
   sonarcloud:

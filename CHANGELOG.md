@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.5.2](https://github.com/Password4j/password4j/releases/tag/1.5.2) - (2021-02-21)
+### Changed
+* Raised the compatibility with Android API level from 26+ (Android 8.0) to 21+ (Android 5.0).
+* `SystemChecker`'s benchmark tools returns a prototype of the function and the real elapsed time ([#23](../../issues/23))
+### Fixed
+* Argon2 was not using the given pepper with `Password.check(String, Hash)`.
+* Salt was converted from `String` to `byte[]` too many times. ([#31](../../issues/31)).
+### Removed
+* Dependency with Apache Commons Text.
+
 ## [1.5.1](https://github.com/Password4j/password4j/releases/tag/1.5.1) - (2021-02-05)
 ### Added
 * `Hash` stores the byte array containing the calculated hash without algorithm's parameters and salt ([#26](../../issues/26))

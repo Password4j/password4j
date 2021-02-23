@@ -2,8 +2,8 @@
 
 [![Build Status](https://travis-ci.org/Password4j/password4j.svg?branch=master)](https://travis-ci.org/Password4j/password4j)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.password4j/password4j/badge.svg?color=purple)](https://maven-badges.herokuapp.com/maven-central/com.password4j/password4j)
-[![Java 8 or higher](https://img.shields.io/badge/JDK-8%2B-007396)](https://img.shields.io/badge/JDK-8%2B-007396)
-[![Android 5.0 or higher](https://img.shields.io/badge/Android-5.0%2B-3DDC84)](https://img.shields.io/badge/Android-5.0%2B-3DDC84)
+[![Java 8 or higher](https://img.shields.io/badge/JDK-8%2B-007396)](https://docs.oracle.com/javase/8/)
+[![Android 5.0 or higher](https://img.shields.io/badge/Android-5.0%2B-3DDC84)](https://developer.android.com/about/versions/lollipop4)
 [![Awesome](https://raw.githubusercontent.com/sindresorhus/awesome/main/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Password4j_password4j&metric=alert_status)](https://sonarcloud.io/dashboard?id=Password4j_password4j)
@@ -28,6 +28,15 @@ a set of optimal parameters** based on the system performance and the desired ma
 The library fully supports **[Argon2](https://en.wikipedia.org/wiki/Argon2)**, **[BCrypt](https://en.wikipedia.org/wiki/Bcrypt)**, **[SCrypt](https://en.wikipedia.org/wiki/Scrypt)** and **[PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)** 
 and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/Salt_%28cryptography%29)** and **[pepper](https://en.wikipedia.org/wiki/Pepper_%28cryptography%29)**.
 
+# Documentation
+[![Wiki](https://img.shields.io/badge/wiki-available-brightgreen?logo=wikipedia&logoColor=white)](https://github.com/Password4j/password4j/wiki)
+[![javadoc](https://javadoc.io/badge2/com.password4j/password4j/javadoc.svg)](https://javadoc.io/doc/com.password4j/password4j)
+
+
+The full documentation can be found **[here](https://github.com/Password4j/password4j/wiki)**. For a quick start you can follow the instuctions in the `README.md`.
+
+The javadoc can be found [here](https://javadoc.io/doc/com.password4j/password4j).
+
 
 # Installation
 Password4j runs on **Java 8**, **Java 9**, **Java 10** and **Java 11** by any vendor. It is supported by **Android API 21+** as well.
@@ -39,7 +48,7 @@ Add the dependency of the latest version to your `pom.xml`:
 <dependency>
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2</version>
 </dependency>
 ```
 
@@ -51,14 +60,14 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.password4j:password4j:1.5.1'
+    implementation 'com.password4j:password4j:1.5.2'
 }
 ```
 
 ## ![Scala SBT](https://i.imgur.com/Nqv3mVd.png?1) Scala SBT 
 Add to the managed dependencies of your `build.sbt` the latest version:
 ```shell script
-libraryDependencies += "com.password4j" % "password4j" % "1.5.1"
+libraryDependencies += "com.password4j" % "password4j" % "1.5.2"
 ```
 
 # Usage
@@ -282,46 +291,8 @@ Password4j is delivered with a tool that helps the developers to choose the righ
 
 The class `SystemChecker` can be used to find these optimal values.
 
-Here's an example on how to configure PBKDF2:
-```java
-Hmac algorithm = Hmac.SHA256;
-int length = algorithm.bits();
-long maxTimeInMilliseconds = 150;
+In the wiki you can find how to configure [PBKDF2](https://github.com/Password4j/password4j/wiki/Recommended-settings#responsiveness), [bcrypt](https://github.com/Password4j/password4j/wiki/Recommended-settings#responsiveness-1), [scrypt](https://github.com/Password4j/password4j/wiki/Recommended-settings#responsiveness-2) and [Argon2](https://github.com/Password4j/password4j/wiki/Recommended-settings#responsiveness-3) depending on your responsiveness requirements.
 
-int iterations  = SystemChecker.findIterationsForPBKDF2(maxTimeInMilliseconds, algorithm, length);
-
-System.out.println("Iterations: " + iterations);
-```
-
-A similar approach can be used for BCrypt:
-```java
-long maxTimeInMilliseconds = 150;
-
-int rounds = SystemChecker.findRoundsForBCrypt(maxTimeInMilliseconds);
-
-System.out.println("Rounds: " + rounds);
-```
-
-And SCrypt:
-```java
-int r = 16;
-int p = 1;
-long maxTimeInMilliseconds = 150;
-
-int N = SystemChecker.findWorkFactorForSCrypt(maxTimeInMilliseconds, r, p);
-r = SystemChecker.findResourcesForSCrypt(maxTimeInMilliseconds, N, p);
-
-System.out.println("N: " + N + ", r: " + r);
-```
-
-# Documentation
-[![Wiki](https://img.shields.io/badge/wiki-available-brightgreen?logo=wikipedia&logoColor=white)](https://github.com/Password4j/password4j/wiki)
-[![javadoc](https://javadoc.io/badge2/com.password4j/password4j/javadoc.svg)](https://javadoc.io/doc/com.password4j/password4j)
-
-
-The full documentation can be found **[here](https://github.com/Password4j/password4j/wiki)**.
-
-The javadoc can be found [here](https://javadoc.io/doc/com.password4j/password4j).
 
 # Contributing
 ![GitHub issues](https://img.shields.io/github/issues/Password4j/password4j?color=success)

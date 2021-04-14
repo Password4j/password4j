@@ -25,6 +25,7 @@ import com.password4j.types.Hmac;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.charset.Charset;
@@ -780,5 +781,15 @@ public class PasswordTest
                 assertTrue(message, Password.check(password, hash));
             }
         }
+    }
+
+    @Test
+    public void testChar()
+    {
+        Hash hash = Password.hash("my password").addRandomSalt().withArgon2();
+        String result = hash.getResult();
+        System.out.println(hash.getResult());
+        System.out.println(Password.check("my password", result).withArgon2());
+        System.out.println(Charset.defaultCharset().name());
     }
 }

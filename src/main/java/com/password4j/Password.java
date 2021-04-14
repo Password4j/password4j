@@ -16,9 +16,6 @@
  */
 package com.password4j;
 
-import org.apache.commons.lang3.StringUtils;
-
-
 /**
  * This class provides the two main operations on password: hash and verify.
  * <p>

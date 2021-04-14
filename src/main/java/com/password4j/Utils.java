@@ -215,6 +215,11 @@ class Utils
         return v;
     }
 
+    static String fromBytesToString(byte[] input)
+    {
+        return new String(input, DEFAULT_CHARSET);
+    }
+
     static long littleEndianBytesToLong(byte[] b)
     {
         long result = 0;

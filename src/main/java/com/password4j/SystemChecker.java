@@ -35,7 +35,7 @@ public class SystemChecker
 {
     private static final String TO_BE_HASHED = "abcDEF123@~# xyz+-*/=456spqr";
 
-    private static final String SALT = new String(SaltGenerator.generate());
+    private static final String SALT = Utils.fromBytesToString(SaltGenerator.generate());
 
     private static final int WARMUP_ROUNDS = 20;
 

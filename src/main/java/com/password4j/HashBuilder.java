@@ -72,7 +72,7 @@ public class HashBuilder
      */
     public HashBuilder addRandomSalt()
     {
-        this.salt = new String(SaltGenerator.generate());
+        this.salt = Utils.fromBytesToString(SaltGenerator.generate());
         return this;
     }
 
@@ -94,7 +94,7 @@ public class HashBuilder
         }
         else
         {
-            this.salt = new String(SaltGenerator.generate(length));
+            this.salt = Utils.fromBytesToString(SaltGenerator.generate(length));
         }
         return this;
     }

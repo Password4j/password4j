@@ -147,7 +147,7 @@ public class PBKDF2Function extends AbstractHashingFunction
     public Hash hash(CharSequence plainTextPassword)
     {
         byte[] salt = SaltGenerator.generate();
-        return hash(plainTextPassword, new String(salt));
+        return hash(plainTextPassword, Utils.fromBytesToString(salt));
     }
 
     @Override

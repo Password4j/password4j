@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;

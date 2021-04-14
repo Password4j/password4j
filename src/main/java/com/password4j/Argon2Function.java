@@ -353,7 +353,7 @@ public class Argon2Function extends AbstractHashingFunction
         {
             salt = SaltGenerator.generate();
         }
-        String theSalt = new String(salt, Utils.DEFAULT_CHARSET);
+        String theSalt = Utils.fromBytesToString(salt);
         initialize(password, salt, Utils.fromCharSequenceToBytes(pepper), null, blockMemory);
         fillMemoryBlocks(blockMemory);
         byte[] hash = ending(blockMemory);
@@ -366,7 +366,7 @@ public class Argon2Function extends AbstractHashingFunction
     public boolean check(CharSequence plainTextPassword, String hashed)
     {
         Object[] params = decodeHash(hashed);
-        return check(plainTextPassword, hashed, new String((byte[]) params[5]), null);
+        return check(plainTextPassword, hashed, Utils.fromBytesToString((byte[]) params[5]), null);
     }
 
     @Override
@@ -376,7 +376,7 @@ public class Argon2Function extends AbstractHashingFunction
         if (salt == null)
         {
             Object[] params = decodeHash(hashed);
-            theSalt = new String((byte[]) params[5]);
+            theSalt = Utils.fromBytesToString((byte[]) params[5]);
         }
         else
         {

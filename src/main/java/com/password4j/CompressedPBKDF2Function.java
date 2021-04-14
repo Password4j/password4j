@@ -182,7 +182,7 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         String[] parts = getParts(hashed);
         if (parts.length == 5)
         {
-            return new String(Utils.decodeBase64(Utils.fromCharSequenceToBytes(parts[3])));
+            return Utils.fromBytesToString(Utils.decodeBase64(Utils.fromCharSequenceToBytes(parts[3])));
         }
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }

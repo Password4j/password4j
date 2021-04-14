@@ -487,6 +487,7 @@ class Utils
         return dp;
     }
 
+    @SuppressWarnings("java:S1604")
     static SecureRandom getInstanceStrong() throws NoSuchAlgorithmException
     {
 

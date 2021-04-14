@@ -1,9 +1,13 @@
 # Changelog
 
+## [1.5.2](https://github.com/Password4j/password4j/releases/tag/1.5.3) - (2021-04-14)
+### Fixed
+* `byte[]` are converted to `String` with environment-based encoding instead of UTF-8 ([#35](../../issues/35) and [#16](../../issues/16)).
+
 ## [1.5.2](https://github.com/Password4j/password4j/releases/tag/1.5.2) - (2021-02-21)
 ### Changed
 * Raised the compatibility with Android API level from 26+ (Android 8.0) to 21+ (Android 5.0).
-* `SystemChecker`'s benchmark tools returns a prototype of the function and the real elapsed time ([#23](../../issues/23))
+* `SystemChecker`'s benchmark tools returns a prototype of the function and the real elapsed time ([#23](../../issues/23)).
 ### Fixed
 * Argon2 was not using the given pepper with `Password.check(String, Hash)`.
 * Salt was converted from `String` to `byte[]` too many times. ([#31](../../issues/31)).
@@ -12,17 +16,17 @@
 
 ## [1.5.1](https://github.com/Password4j/password4j/releases/tag/1.5.1) - (2021-02-05)
 ### Added
-* `Hash` stores the byte array containing the calculated hash without algorithm's parameters and salt ([#26](../../issues/26))
+* `Hash` stores the byte array containing the calculated hash without algorithm's parameters and salt ([#26](../../issues/26)).
 ### Changed
-* Scrypt accepts dynamic key length ([#24](../../issues/24))
+* Scrypt accepts dynamic key length ([#24](../../issues/24)).
 ### Fixed
 * Improved `toString()` methods' readability.
 
 ## [1.5.0](https://github.com/Password4j/password4j/releases/tag/1.5.0) - (2021-02-02)
 ### Added
-* Argon2 support
+* Argon2 support.
 ### Changed
-* Enums `BCrypt` and `Hmac` are moved from `com.password4j` to `com.password4j.types`
+* Enums `BCrypt` and `Hmac` are moved from `com.password4j` to `com.password4j.types`.
 ### Fixed
 * Some typos along the code.
 
@@ -37,39 +41,39 @@
 
 ## [1.3.2](https://github.com/Password4j/password4j/releases/tag/1.3.2) - (2020-09-09)
 ### Fixed
- *  The location of the configuration file is now customizable ([#5](../../issues/5))
+ *  The location of the configuration file is now customizable ([#5](../../issues/5)).
 ### Security
- *  `SecureString.toString()` now hides the length of the string ([#6](../../issues/6))
+ *  `SecureString.toString()` now hides the length of the string ([#6](../../issues/6)).
 
 ## [1.3.1](https://github.com/Password4j/password4j/releases/tag/1.3.1) - (2020-03-25)
 ### Fixed
- *  `toString()` of some `HashingFunction` produced non-unique output ([#3](../../issues/3))
- *  added missing getters for some `HashingFunction`s ([#4](../../issues/4))
+ *  `toString()` of some `HashingFunction` produced non-unique output ([#3](../../issues/3)).
+ *  added missing getters for some `HashingFunction`s ([#4](../../issues/4)).
 
 ## [1.3.0](https://github.com/Password4j/password4j/releases/tag/1.3.0) - (2020-03-19)
 ### Added
- * Capability of updating the hash (re-hash) with a new configuration just after the verification process
+ * Capability of updating the hash (re-hash) with a new configuration just after the verification process.
 ### Changed
  * `HashBuilder` and `HashChecker` are less extendable because there are more maintainability issues than effective advantages
  * Pepper can be provided either with `SecureString` or `String`.
 ### Removed
- * `Password.hash()` and `Password.check()` methods that accepts a custom `HashBuilder` or a custom `HashChecker`
+ * `Password.hash()` and `Password.check()` methods that accepts a custom `HashBuilder` or a custom `HashChecker`.
 
 ## [1.2.1](https://github.com/Password4j/password4j/releases/tag/1.2.1) - (2020-03-17)
 ### Added
- * Constant time equality in `SecureString`
+ * Constant time equality in `SecureString`.
 ### Changed
- * Enum `WithHmac` renamed to `Hmac`
+ * Enum `WithHmac` renamed to `Hmac`.
 
 ## [1.2.0](https://github.com/Password4j/password4j/releases/tag/1.2.0) - (2020-03-15)
 ### Added
- * This CHANGELOG.md file
+ * This CHANGELOG.md file.
 ### Security
  * Plain text passwords can be provided either with `SecureString` or `String`.
 
 ## [1.1.0](https://github.com/Password4j/password4j/releases/tag/1.1.0) - (2020-03-14)
 ### Added
- * Configurable delimiter for `CompressedPBKDF2Function` (before was `$`)
+ * Configurable delimiter for `CompressedPBKDF2Function` (before was `$`).
 ### Removed
  * `Hash.check()` method because `Password.check()` should be the only way to verify passwords.
 ### Fixed
@@ -84,8 +88,8 @@
 
 ## [1.0.1](https://github.com/Password4j/password4j/releases/tag/password4j-1.0.1)  - (2020-03-11)
 ### Change
- * POM structure and dependencies
+ * POM structure and dependencies.
 
 ## [1.0.0](https://github.com/Password4j/password4j/releases/tag/1.0.0) - (2020-03-11)
 ### Change
- * API are more readable for end users
+ * API are more readable for end users.

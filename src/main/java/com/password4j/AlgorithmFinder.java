@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.password4j.types.Argon2;
-import com.password4j.types.BCrypt;
+import com.password4j.types.Bcrypt;
 import com.password4j.types.Hmac;
 
 
@@ -174,7 +174,7 @@ public class AlgorithmFinder
     }
 
     /**
-     * Creates a singleton instance of {@link BCryptFunction}
+     * Creates a singleton instance of {@link BcryptFunction}
      * with the configuration set in the <i>psw4j.properties</i> file.
      * <p>
      * If no <i>psw4j.properties</i> is found in the classpath or no
@@ -198,18 +198,18 @@ public class AlgorithmFinder
      *   </tr>
      * </table>
      *
-     * @return a {@link BCryptFunction}
+     * @return a {@link BcryptFunction}
      * @since 0.1.0
      */
-    public static BCryptFunction getBCryptInstance()
+    public static BcryptFunction getBcryptInstance()
     {
-        char minor = PropertyReader.readChar("hash.bcrypt.minor", 'b', "BCrypt minor version is not defined");
-        int rounds = PropertyReader.readInt("hash.bcrypt.rounds", 10, "BCrypt rounds are not defined");
-        return BCryptFunction.getInstance(BCrypt.valueOf(minor), rounds);
+        char minor = PropertyReader.readChar("hash.bcrypt.minor", 'b', "bcrypt minor version is not defined");
+        int rounds = PropertyReader.readInt("hash.bcrypt.rounds", 10, "bcrypt rounds are not defined");
+        return BcryptFunction.getInstance(Bcrypt.valueOf(minor), rounds);
     }
 
     /**
-     * Creates a singleton instance of {@link SCryptFunction}
+     * Creates a singleton instance of {@link ScryptFunction}
      * with the configuration set in the <i>psw4j.properties</i> file.
      * <p>
      * If no <i>psw4j.properties</i> is found in the classpath or no
@@ -243,18 +243,18 @@ public class AlgorithmFinder
      *   </tr>
      * </table>
      *
-     * @return a {@link SCryptFunction}
+     * @return a {@link ScryptFunction}
      * @since 0.1.0
      */
-    public static SCryptFunction getSCryptInstance()
+    public static ScryptFunction getScryptInstance()
     {
-        int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", 32_768, "SCrypt work factor (N) is not defined");
-        int resources = PropertyReader.readInt("hash.scrypt.resources", 8, "SCrypt resources (r) is not defined");
+        int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", 32_768, "scrypt work factor (N) is not defined");
+        int resources = PropertyReader.readInt("hash.scrypt.resources", 8, "scrypt resources (r) is not defined");
         int parallelization = PropertyReader
-                .readInt("hash.scrypt.parallelization", 1, "SCrypt parallelization (p) is not defined");
-        int derivedKeyLength = PropertyReader.readInt("hash.scrypt.derivedKeyLength", SCryptFunction.DERIVED_KEY_LENGTH,
-                "SCrypt derivedKeyLength (dkLen) is not defined");
-        return SCryptFunction.getInstance(workFactor, resources, parallelization, derivedKeyLength);
+                .readInt("hash.scrypt.parallelization", 1, "scrypt parallelization (p) is not defined");
+        int derivedKeyLength = PropertyReader.readInt("hash.scrypt.derivedKeyLength", ScryptFunction.DERIVED_KEY_LENGTH,
+                "scrypt derivedKeyLength (dkLen) is not defined");
+        return ScryptFunction.getInstance(workFactor, resources, parallelization, derivedKeyLength);
     }
 
     public static MessageDigestFunction getMessageDigestInstance()
@@ -317,7 +317,7 @@ public class AlgorithmFinder
      *   </tr>
      * </table>
      *
-     * @return a {@link SCryptFunction}
+     * @return a {@link ScryptFunction}
      * @since 1.5.0
      */
     public static Argon2Function getArgon2Instance()

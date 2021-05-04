@@ -21,22 +21,22 @@ public class PublicPasswordTest
                     PBKDF2Function.getInstance(Hmac.SHA1, 49999, 160)),
 
             new TestSuite("$2a$06$If6bvum7DFjUnE9p2uDeDu0YHzrHM6tf.iqN8.yx.jNN1ILEf7h0i", "bc", "$2a$06$If6bvum7DFjUnE9p2uDeDu", "a",
-                    BCryptFunction.getInstance(6)),
+                    BcryptFunction.getInstance(6)),
 
             new TestSuite("$2a$09$PVRpK74XnUl/dsFfw6YSsOgwnJ1N3b5jKgbR/qdqerkuIYMa2u6eG", "Password", "$2a$09$PVRpK74XnUl/dsFfw6YSsO", "my",
-                    BCryptFunction.getInstance(9)),
+                    BcryptFunction.getInstance(9)),
 
             new TestSuite("$2a$07$W3mOfB5auMDG3EitumH0S.ffmkA.NZIOZFaXb15tPWQyqq0hDXiEC", "Alice", "$2a$07$W3mOfB5auMDG3EitumH0S.", null,
-                    BCryptFunction.getInstance(7)),
+                    BcryptFunction.getInstance(7)),
 
             new TestSuite("$2a$14$7rdjAp2vQxO0hCK9GvniqeKURflehmGaW5C2CLOONKZauODS7xOGW", "password4j", "$2a$14$7rdjAp2vQxO0hCK9Gvniqe", null,
-                    BCryptFunction.getInstance(14)),
+                    BcryptFunction.getInstance(14)),
 
             new TestSuite("$s0$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==", "word", "salt",
-                    "pass", SCryptFunction.getInstance(16384, 8, 1)),
+                    "pass", ScryptFunction.getInstance(16384, 8, 1)),
 
             new TestSuite("$s0$a0402$bm90UmFuZG9t$upriFfo7v+aAUqOKDpguh0duZlAHiKcQOLM0k/xFcBg7qfRcDfYLEZe/60+b+4NtA1M70LUI0IRY+3+ybuLMZg==", "known", "notRandom",
-                    "un", SCryptFunction.getInstance(1024, 4, 2)),
+                    "un", ScryptFunction.getInstance(1024, 4, 2)),
 
             new TestSuite("$argon2id$v=19$m=1024,t=3,p=12$MTExMTExMTE$0PUE8wVEaK0qdjms3b4pTZOs0+00S/+9j28WZ3gMUno", "first!", "11111111",
                     null, Argon2Function.getInstance(1024, 3, 12, 32, Argon2.ID)),
@@ -103,8 +103,8 @@ public class PublicPasswordTest
             hb.addSalt(salt);
 
             hb.withCompressedPBKDF2();
-            hb.withSCrypt();
-            hb.withBCrypt();
+            hb.withScrypt();
+            hb.withBcrypt();
             hb.withPBKDF2();
             hb.withArgon2();
 
@@ -113,8 +113,8 @@ public class PublicPasswordTest
             hc.addPepper();
             hc.addSalt(salt);
             hc.withCompressedPBKDF2();
-            hc.withSCrypt();
-            hc.withBCrypt();
+            hc.withScrypt();
+            hc.withBcrypt();
             hc.withPBKDF2();
             hc.withArgon2();
 
@@ -128,9 +128,9 @@ public class PublicPasswordTest
             CompressedPBKDF2Function.getInstance(password, 1, 1);
             CompressedPBKDF2Function.getInstanceFromHash(password);
 
-            BCryptFunction.getInstance(1);
-            SCryptFunction.getInstance(2, 1, 1);
-            SCryptFunction.getInstanceFromHash(password);
+            BcryptFunction.getInstance(1);
+            ScryptFunction.getInstance(2, 1, 1);
+            ScryptFunction.getInstanceFromHash(password);
 
             Argon2Function.getInstance(8, 1, 1, 32, Argon2.ID);
             Argon2Function.getInstanceFromHash(password);

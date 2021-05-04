@@ -27,7 +27,7 @@ public class HashBuilderTest
         // GIVEN
 
         // WHEN
-        Hash hash = Password.hash("a password").withBCrypt();
+        Hash hash = Password.hash("a password").withBcrypt();
 
         // THEN
         Assert.assertNotNull(hash.getSalt());
@@ -40,7 +40,7 @@ public class HashBuilderTest
         // GIVEN
 
         // WHEN
-        Hash hash = Password.hash("a password").addRandomSalt().withSCrypt();
+        Hash hash = Password.hash("a password").addRandomSalt().withScrypt();
 
         // THEN
         Assert.assertNotNull(hash.getSalt());

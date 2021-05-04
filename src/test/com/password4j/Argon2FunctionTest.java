@@ -17,7 +17,7 @@
 package com.password4j;
 
 import com.password4j.types.Argon2;
-import com.password4j.types.BCrypt;
+import com.password4j.types.Bcrypt;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -206,7 +206,7 @@ public class Argon2FunctionTest
 
         // THEN
         boolean eqNull = argon2.equals(null);
-        boolean eqClass = argon2.equals(new BCryptFunction(BCrypt.A, 10));
+        boolean eqClass = argon2.equals(new BcryptFunction(Bcrypt.A, 10));
         boolean sameInst = argon2.equals(Argon2Function.getInstance(m, i, p, l, t, v));
         boolean sameInst2 = argon2.equals(new Argon2Function(m, i, p, l, t, v));
         String toString = argon2.toString();

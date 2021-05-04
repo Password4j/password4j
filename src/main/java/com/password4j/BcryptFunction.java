@@ -22,20 +22,20 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.password4j.types.BCrypt;
+import com.password4j.types.Bcrypt;
 
 
 /**
- * Class containing the implementation of BCrypt function and its parameters.
+ * Class containing the implementation of bcrypt function and its parameters.
  *
  * @author David Bertoldi
- * @see <a href="https://en.wikipedia.org/wiki/Bcrypt">BCrypt</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Bcrypt">bcrypt</a>
  * @since 0.1.0
  */
-public class BCryptFunction extends AbstractHashingFunction
+public class BcryptFunction extends AbstractHashingFunction
 {
 
-    private static final ConcurrentMap<String, BCryptFunction> INSTANCES = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, BcryptFunction> INSTANCES = new ConcurrentHashMap<>();
 
     private static final int BCRYPT_SALT_LEN = 16;
 
@@ -177,14 +177,14 @@ public class BCryptFunction extends AbstractHashingFunction
 
     private int logRounds;
 
-    private BCrypt type;
+    private Bcrypt type;
 
-    private BCryptFunction()
+    private BcryptFunction()
     {
         //
     }
 
-    protected BCryptFunction(BCrypt type, int logRounds)
+    protected BcryptFunction(Bcrypt type, int logRounds)
     {
         this();
         this.logRounds = logRounds;
@@ -202,12 +202,12 @@ public class BCryptFunction extends AbstractHashingFunction
      * @return a singleton instance
      * @since 0.3.0
      */
-    public static BCryptFunction getInstance(int logRounds)
+    public static BcryptFunction getInstance(int logRounds)
     {
-        return getInstance(BCrypt.B, logRounds);
+        return getInstance(Bcrypt.B, logRounds);
     }
 
-    public static BCryptFunction getInstance(BCrypt type, int logRounds)
+    public static BcryptFunction getInstance(Bcrypt type, int logRounds)
     {
         String uid = getUID(type, logRounds);
         if (INSTANCES.containsKey(uid))
@@ -216,13 +216,13 @@ public class BCryptFunction extends AbstractHashingFunction
         }
         else
         {
-            BCryptFunction function = new BCryptFunction(type, logRounds);
+            BcryptFunction function = new BcryptFunction(type, logRounds);
             INSTANCES.put(uid, function);
             return function;
         }
     }
 
-    public static BCryptFunction getInstanceFromHash(String hashed)
+    public static BcryptFunction getInstanceFromHash(String hashed)
     {
         internalChecks(hashed);
 
@@ -237,22 +237,22 @@ public class BCryptFunction extends AbstractHashingFunction
             if (!isValidMinor(minor) || hashed.charAt(3) != '$')
                 throw new BadParametersException("Invalid salt revision");
             int rounds = Integer.parseInt(hashed.substring(4, 6));
-            return getInstance(BCrypt.valueOf(minor), rounds);
+            return getInstance(Bcrypt.valueOf(minor), rounds);
         }
     }
 
-    protected static String getUID(BCrypt type, int logRounds)
+    protected static String getUID(Bcrypt type, int logRounds)
     {
         return type.minor() + "|" + logRounds;
     }
 
-    protected static String toString(BCrypt type, int logRounds)
+    protected static String toString(Bcrypt type, int logRounds)
     {
         return "t=" + type.minor() + ", r=" + logRounds;
     }
 
     /**
-     * Encode a byte array using BCrypt's slightly-modified base64
+     * Encode a byte array using bcrypt's slightly-modified base64
      * encoding scheme. Note that this is <strong>not</strong> compatible with
      * the standard MIME-base64 encoding.
      *
@@ -315,7 +315,7 @@ public class BCryptFunction extends AbstractHashingFunction
     }
 
     /**
-     * Decode a string encoded using BCrypt's base64 scheme to a
+     * Decode a string encoded using bcrypt's base64 scheme to a
      * byte array. Note that this is *not* compatible with
      * the standard MIME-base64 encoding.
      *
@@ -432,7 +432,7 @@ public class BCryptFunction extends AbstractHashingFunction
 
     private static boolean isValidMinor(char minor)
     {
-        return BCrypt.valueOf(minor) != null;
+        return Bcrypt.valueOf(minor) != null;
     }
 
     private static void internalChecks(String salt)
@@ -452,12 +452,12 @@ public class BCryptFunction extends AbstractHashingFunction
     }
 
     /**
-     * Generate a salt to be used with the {@link BCryptFunction#hash(CharSequence, String)} method
+     * Generate a salt to be used with the {@link BcryptFunction#hash(CharSequence, String)} method
      *
      * @param logRounds the log2 of the number of rounds of
      *                  hashing to apply - the work factor therefore increases as
      *                  2^log_rounds.
-     * @param prefix    BCrypt variant
+     * @param prefix    bcrypt variant
      * @return an encoded salt value
      * @since 0.1.0
      */
@@ -466,8 +466,8 @@ public class BCryptFunction extends AbstractHashingFunction
         StringBuilder rs = new StringBuilder();
         byte[] rnd = new byte[BCRYPT_SALT_LEN];
 
-        if (!prefix.startsWith("$2") || (prefix.charAt(2) != BCrypt.A.minor() && prefix.charAt(2) != BCrypt.Y.minor() && prefix
-                .charAt(2) != BCrypt.B.minor()))
+        if (!prefix.startsWith("$2") || (prefix.charAt(2) != Bcrypt.A.minor() && prefix.charAt(2) != Bcrypt.Y.minor() && prefix
+                .charAt(2) != Bcrypt.B.minor()))
         {
             throw new BadParametersException("Invalid prefix");
         }
@@ -524,9 +524,9 @@ public class BCryptFunction extends AbstractHashingFunction
     {
         if (this == o)
             return true;
-        if (!(o instanceof BCryptFunction))
+        if (!(o instanceof BcryptFunction))
             return false;
-        BCryptFunction that = (BCryptFunction) o;
+        BcryptFunction that = (BcryptFunction) o;
         return logRounds == that.logRounds && type == that.type;
     }
 
@@ -535,7 +535,7 @@ public class BCryptFunction extends AbstractHashingFunction
         return logRounds;
     }
 
-    public BCrypt getType()
+    public Bcrypt getType()
     {
         return type;
     }
@@ -683,7 +683,7 @@ public class BCryptFunction extends AbstractHashingFunction
 
     /**
      * Perform the central password hashing step in the
-     * BCrypt scheme
+     * bcrypt scheme
      *
      * @param password  the password to hash
      * @param salt      the binary salt to hash with the password
@@ -768,13 +768,13 @@ public class BCryptFunction extends AbstractHashingFunction
         realSalt = salt.substring(off + 3, off + 25);
         saltb = decodeBase64(realSalt, BCRYPT_SALT_LEN);
 
-        if (minor >= BCrypt.A.minor()) // add null terminator
+        if (minor >= Bcrypt.A.minor()) // add null terminator
             passwordb = Arrays.copyOf(passwordb, passwordb.length + 1);
 
-        hashed = cryptRaw(passwordb, saltb, logRounds, minor == BCrypt.X.minor(), minor == BCrypt.A.minor() ? 0x10000 : 0);
+        hashed = cryptRaw(passwordb, saltb, logRounds, minor == Bcrypt.X.minor(), minor == Bcrypt.A.minor() ? 0x10000 : 0);
 
         rs.append("$2");
-        if (minor >= BCrypt.A.minor())
+        if (minor >= Bcrypt.A.minor())
             rs.append(minor);
         rs.append('$');
         if (logRounds < 10)
@@ -789,7 +789,7 @@ public class BCryptFunction extends AbstractHashingFunction
     }
 
     /**
-     * Generate a salt to be used with the {@link BCryptFunction#hash(CharSequence, String)} method
+     * Generate a salt to be used with the {@link BcryptFunction#hash(CharSequence, String)} method
      *
      * @return an encoded salt value
      * @since 0.1.0

@@ -161,35 +161,35 @@ public class HashChecker
 
     /**
      * Check if the previously given hash was produced from the given plain text password
-     * with {@link SCryptFunction}.
+     * with {@link ScryptFunction}.
      * <p>
      * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      *
      * @return true if the hash was produced by the given plain text password; false otherwise.
-     * @see AlgorithmFinder#getSCryptInstance()
+     * @see AlgorithmFinder#getScryptInstance()
      * @since 1.0.0
      */
-    public boolean withSCrypt()
+    public boolean withScrypt()
     {
-        SCryptFunction scrypt = AlgorithmFinder.getSCryptInstance();
+        ScryptFunction scrypt = AlgorithmFinder.getScryptInstance();
         return with(scrypt);
     }
 
     /**
      * Check if the previously given hash was produced from the given plain text password
-     * with {@link BCryptFunction}.
+     * with {@link BcryptFunction}.
      * <p>
      * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
      *
      * @return true if the hash was produced by the given plain text password; false otherwise.
-     * @see AlgorithmFinder#getBCryptInstance()
+     * @see AlgorithmFinder#getBcryptInstance()
      * @since 1.0.0
      */
-    public boolean withBCrypt()
+    public boolean withBcrypt()
     {
-        return with(AlgorithmFinder.getBCryptInstance());
+        return with(AlgorithmFinder.getBcryptInstance());
     }
 
     /**

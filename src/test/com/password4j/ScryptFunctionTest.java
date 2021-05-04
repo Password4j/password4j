@@ -1,6 +1,6 @@
 package com.password4j;
 
-import com.password4j.types.BCrypt;
+import com.password4j.types.Bcrypt;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.util.Base64;
 
 
-public class SCryptFunctionTest
+public class ScryptFunctionTest
 {
 
     @Test(expected = BadParametersException.class)
@@ -18,7 +18,7 @@ public class SCryptFunctionTest
         String badHash = "bad$hash&";
 
         // WHEN
-        SCryptFunction.getInstanceFromHash(badHash);
+        ScryptFunction.getInstanceFromHash(badHash);
 
     }
 
@@ -26,7 +26,7 @@ public class SCryptFunctionTest
     public void testNullPassword()
     {
         // GIVEN
-        SCryptFunction scrypt = SCryptFunction.getInstance(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        ScryptFunction scrypt = ScryptFunction.getInstance(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
 
         // WHEN
         scrypt.hash("password", "salt");
@@ -41,7 +41,7 @@ public class SCryptFunctionTest
         String salt = "salt";
 
         // WHEN
-        Hash hash = new SCryptFunction(16384, 8, 1).hash(password, salt);
+        Hash hash = new ScryptFunction(16384, 8, 1).hash(password, salt);
         String result = hash.getResult();
         byte[] bytes = hash.getBytes();
 
@@ -60,7 +60,7 @@ public class SCryptFunctionTest
         String password = "password";
 
         // WHEN
-        boolean result = new SCryptFunction(16384, 8, 1)
+        boolean result = new ScryptFunction(16384, 8, 1)
                 .check(password, "$s0$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==");
 
         // THEN
@@ -75,7 +75,7 @@ public class SCryptFunctionTest
         String salt = "salt";
 
         // WHEN
-        boolean result = new SCryptFunction(16384, 8, 1).check(password, "$s0$e0801$c2FsdA==$c2FsdA==");
+        boolean result = new ScryptFunction(16384, 8, 1).check(password, "$s0$e0801$c2FsdA==$c2FsdA==");
 
         // THEN
         Assert.assertFalse(result);
@@ -86,14 +86,14 @@ public class SCryptFunctionTest
     {
         // GIVEN
         String password = "password";
-        SCryptFunction sCryptFunction = new SCryptFunction(16384, 8, 1);
+        ScryptFunction sCryptFunction = new ScryptFunction(16384, 8, 1);
 
         // WHEN
         Hash hash = sCryptFunction.hash(password);
 
         // THEN
         Assert.assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
-        Assert.assertEquals(sCryptFunction, SCryptFunction.getInstanceFromHash(hash.getResult()));
+        Assert.assertEquals(sCryptFunction, ScryptFunction.getInstanceFromHash(hash.getResult()));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class SCryptFunctionTest
         String salt = "salt";
 
         // WHEN
-        Hash hash = new SCryptFunction(16384, 8, 1).hash(password, salt);
+        Hash hash = new ScryptFunction(16384, 8, 1).hash(password, salt);
 
         // THEN
         Assert.assertFalse(hash.getHashingFunction().check(password, "$s0$e0801$c2FsdA==$YXNkYXNkYXNkYXNk"));
@@ -117,19 +117,19 @@ public class SCryptFunctionTest
         int r = 1;
         int N = 2;
         int p = 3;
-        SCryptFunction scrypt = SCryptFunction.getInstance(N, r, p);
+        ScryptFunction scrypt = ScryptFunction.getInstance(N, r, p);
 
         // THEN
         boolean eqNull = scrypt.equals(null);
-        boolean eqClass = scrypt.equals(new BCryptFunction(BCrypt.A, 10));
-        boolean difInst = scrypt.equals(SCryptFunction.getInstance(5, 4, 6));
-        boolean sameInst = scrypt.equals(SCryptFunction.getInstance(N, r, p));
-        boolean sameInst2 = scrypt.equals(new SCryptFunction(N, r, p));
+        boolean eqClass = scrypt.equals(new BcryptFunction(Bcrypt.A, 10));
+        boolean difInst = scrypt.equals(ScryptFunction.getInstance(5, 4, 6));
+        boolean sameInst = scrypt.equals(ScryptFunction.getInstance(N, r, p));
+        boolean sameInst2 = scrypt.equals(new ScryptFunction(N, r, p));
         String toString = scrypt.toString();
         int hashCode = scrypt.hashCode();
-        boolean notSameInst1 = scrypt.equals(new SCryptFunction(N + 1, r, p));
-        boolean notSameInst2 = scrypt.equals(new SCryptFunction(N, r + 1 + 1, p));
-        boolean notSameInst3 = scrypt.equals(new SCryptFunction(N, r, p + 1));
+        boolean notSameInst1 = scrypt.equals(new ScryptFunction(N + 1, r, p));
+        boolean notSameInst2 = scrypt.equals(new ScryptFunction(N, r + 1 + 1, p));
+        boolean notSameInst3 = scrypt.equals(new ScryptFunction(N, r, p + 1));
 
         // END
         Assert.assertFalse(eqNull);
@@ -137,8 +137,8 @@ public class SCryptFunctionTest
         Assert.assertFalse(difInst);
         Assert.assertTrue(sameInst);
         Assert.assertTrue(sameInst2);
-        Assert.assertNotEquals(toString, new SCryptFunction(5, 4, 6).toString());
-        Assert.assertNotEquals(hashCode, new SCryptFunction(5, 4, 6).hashCode());
+        Assert.assertNotEquals(toString, new ScryptFunction(5, 4, 6).toString());
+        Assert.assertNotEquals(hashCode, new ScryptFunction(5, 4, 6).hashCode());
         Assert.assertFalse(notSameInst1);
         Assert.assertFalse(notSameInst2);
         Assert.assertFalse(notSameInst3);
@@ -150,9 +150,9 @@ public class SCryptFunctionTest
         // GIVEN
 
         // WHEN
-        SCryptFunction scrypt1 = SCryptFunction.getInstance(5, 3, 7);
-        SCryptFunction scrypt2 = SCryptFunction.getInstance(25, 30, 14);
-        SCryptFunction scrypt3 = SCryptFunction.getInstance(1, 1, 1);
+        ScryptFunction scrypt1 = ScryptFunction.getInstance(5, 3, 7);
+        ScryptFunction scrypt2 = ScryptFunction.getInstance(25, 30, 14);
+        ScryptFunction scrypt3 = ScryptFunction.getInstance(1, 1, 1);
 
         // THEN
         Assert.assertEquals(13_440, scrypt1.getRequiredBytes());
@@ -170,7 +170,7 @@ public class SCryptFunctionTest
         int r = 5;
 
         // WHEN
-        SCryptFunction.getInstance((16777215 / r) + 1, r, 1).hash("password");
+        ScryptFunction.getInstance((16777215 / r) + 1, r, 1).hash("password");
     }
 
     @Test(expected = BadParametersException.class)
@@ -180,7 +180,7 @@ public class SCryptFunctionTest
         int p = 5;
 
         // WHEN
-        SCryptFunction.getInstance(16, (16777215 / p) + 1, p).hash("password");
+        ScryptFunction.getInstance(16, (16777215 / p) + 1, p).hash("password");
     }
 
     @Test(expected = BadParametersException.class)
@@ -190,7 +190,7 @@ public class SCryptFunctionTest
         int k = 16777215;
 
         // WHEN
-        SCryptFunction.getInstance(2, 2 << 20, 16777215).hash("password");
+        ScryptFunction.getInstance(2, 2 << 20, 16777215).hash("password");
     }
 
     @Test(expected = BadParametersException.class)
@@ -199,7 +199,7 @@ public class SCryptFunctionTest
         // GIVEN
 
         // WHEN
-        SCryptFunction.getInstance(1, 4, 3).hash("password");
+        ScryptFunction.getInstance(1, 4, 3).hash("password");
     }
 
     @Test(expected = BadParametersException.class)
@@ -208,7 +208,7 @@ public class SCryptFunctionTest
         // GIVEN
 
         // WHEN
-        SCryptFunction.getInstance(50, 4, 3).hash("password");
+        ScryptFunction.getInstance(50, 4, 3).hash("password");
     }
 
     @Test(expected = BadParametersException.class)
@@ -218,7 +218,7 @@ public class SCryptFunctionTest
         int p = 5;
 
         // WHEN
-        new SCryptFunction(16384, 8, 1).check("password", "$s1$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==");
+        new ScryptFunction(16384, 8, 1).check("password", "$s1$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==");
     }
 
     @Test(expected = BadParametersException.class)
@@ -227,7 +227,7 @@ public class SCryptFunctionTest
         // GIVEN
 
         // WHEN
-        new SCryptFunction(16384, 8, 1).check("password", "$s0e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==");
+        new ScryptFunction(16384, 8, 1).check("password", "$s0e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==");
     }
 
     @Test
@@ -240,14 +240,22 @@ public class SCryptFunctionTest
         int derivedKeyLength = 32;
 
         // WHEN
-        SCryptFunction scrypt = SCryptFunction.getInstance(workFactor, resources, parallelization, derivedKeyLength);
+        ScryptFunction scrypt = ScryptFunction.getInstance(workFactor, resources, parallelization, derivedKeyLength);
 
         // THEN
         Assert.assertEquals(workFactor, scrypt.getWorkFactor());
         Assert.assertEquals(resources, scrypt.getResources());
         Assert.assertEquals(parallelization, scrypt.getParallelization());
         Assert.assertEquals(derivedKeyLength, scrypt.getDerivedKeyLength());
-        Assert.assertEquals("SCryptFunction(N=3, r=5, p=7, l=32)", scrypt.toString());
+        Assert.assertEquals("ScryptFunction(N=3, r=5, p=7, l=32)", scrypt.toString());
+    }
+
+    @Test
+    public void as()
+    {
+        ScryptFunction sCryptFunction = ScryptFunction.getInstance(16384, 8, 1, 128);
+        System.out.println(Password.hash("45674567").addRandomSalt().addPepper("5DUY-RDpcQ!w4esW").with(sCryptFunction).getResult());
+        System.out.println(Password.check("45674567", "$s0$e0801$77+977+9LGrvv71S77+9fl3vv73vv71vGDAv77+9Ge+/vXPvv70M77+977+977+9Ve+/vUhgUmLvv70SRgHXujEMU++/vS9x77+9MO+/vSwA77+977+9V1fvv70L77+977+977+9P2/vv73vv73vv73vv73fjw==$vq8NRVfzMuUU+TpZwuQ55tEI46dJAkCWu3luUHyG/NNmMZMgoJwuQ6tZq6JKpPSjnum6M0MlgCfcFFBRWN+U2er+9yfwP5wX6Xv+fmjGjQQIkMN2BZgYPRpMKB+y4eJSQcSL8f+4TGFmncTcuAmjURUKk6RRLAvk/i7kMtczaSs=").addPepper("5DUY-RDpcQ!w4esW").with(sCryptFunction));
     }
 
 }

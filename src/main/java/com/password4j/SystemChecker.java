@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.password4j.types.Argon2;
-import com.password4j.types.BCrypt;
+import com.password4j.types.Bcrypt;
 import com.password4j.types.Hmac;
 
 
@@ -95,33 +95,33 @@ public class SystemChecker
     }
 
     /**
-     * Finds the optimal configuration for BCrypt.
+     * Finds the optimal configuration for bcrypt.
      * <p>
      * To prevent timing attacks, a maximum interval of time (in milliseconds)
      * is required to perform a single hash.
      * <p>
-     * This function returns a prototype {@link BCryptFunction} and the real
+     * This function returns a prototype {@link BcryptFunction} and the real
      * elapsed time.
      * If the hash cannot be performed under the specified time, the elapsed time is set to -1
      * and prototype null.
      *
      * @param maxMilliseconds max time to perform the hashing
      * @return a benchmark result for bcrypt
-     * @see BCryptFunction
+     * @see BcryptFunction
      * @since 1.0.0
      */
     @SuppressWarnings("Duplicates")
-    public static BenchmarkResult<BCryptFunction> benchmarkBcrypt(long maxMilliseconds)
+    public static BenchmarkResult<BcryptFunction> benchmarkBcrypt(long maxMilliseconds)
     {
         warmUpBcrypt();
 
         long finalElapsed = -1;
-        BCryptFunction prototype = null;
+        BcryptFunction prototype = null;
         int rounds = 4;
 
         while (true)
         {
-            BCryptFunction tmp = new BCryptFunction(BCrypt.B, rounds);
+            BcryptFunction tmp = new BcryptFunction(Bcrypt.B, rounds);
             long start = System.currentTimeMillis();
 
             tmp.hash(TO_BE_HASHED);
@@ -259,7 +259,7 @@ public class SystemChecker
     }
 
     /**
-     * Finds the optimal work factor (N) for SCrypt.
+     * Finds the optimal work factor (N) for scrypt.
      * <p>
      * To prevent timing attacks, a maximum interval of time (in milliseconds)
      * is required to perform a single hash.
@@ -270,18 +270,18 @@ public class SystemChecker
      * @return the optimal work factor (N)
      * @since 1.0.0
      */
-    public static BenchmarkResult<SCryptFunction> findWorkFactorForSCrypt(long maxMilliseconds, int resources,
+    public static BenchmarkResult<ScryptFunction> findWorkFactorForScrypt(long maxMilliseconds, int resources,
             int parallelization)
     {
         int workFactor = 2;
-        warmUpSCrypt(workFactor, parallelization);
+        warmUpScrypt(workFactor, parallelization);
 
         long finalElapsed = -1;
-        SCryptFunction prototype = null;
+        ScryptFunction prototype = null;
 
         while (true)
         {
-            SCryptFunction tmp = new SCryptFunction(workFactor, resources, parallelization);
+            ScryptFunction tmp = new ScryptFunction(workFactor, resources, parallelization);
             long start = System.currentTimeMillis();
 
             tmp.hash(TO_BE_HASHED);
@@ -305,7 +305,7 @@ public class SystemChecker
     }
 
     /**
-     * Finds the optimal resources (r) for SCrypt.
+     * Finds the optimal resources (r) for scrypt.
      * <p>
      * To prevent timing attacks, a maximum interval of time (in milliseconds)
      * is required to perform a single hash.
@@ -316,18 +316,18 @@ public class SystemChecker
      * @return the optimal resources (r)
      * @since 1.0.0
      */
-    public static BenchmarkResult<SCryptFunction> findResourcesForSCrypt(long maxMilliseconds, int workFactor,
+    public static BenchmarkResult<ScryptFunction> findResourcesForScrypt(long maxMilliseconds, int workFactor,
             int parallelization)
     {
-        warmUpSCrypt(workFactor, parallelization);
+        warmUpScrypt(workFactor, parallelization);
 
         int resources = 1;
         long finalElapsed = -1;
-        SCryptFunction prototype = null;
+        ScryptFunction prototype = null;
 
         while (true)
         {
-            SCryptFunction tmp = new SCryptFunction(workFactor, resources, parallelization);
+            ScryptFunction tmp = new ScryptFunction(workFactor, resources, parallelization);
             long start = System.currentTimeMillis();
 
             tmp.hash(TO_BE_HASHED);
@@ -354,7 +354,7 @@ public class SystemChecker
     {
         for (int i = 0; i < WARMUP_ROUNDS; i++)
         {
-            BCryptFunction.getInstance(4).hash(TO_BE_HASHED);
+            BcryptFunction.getInstance(4).hash(TO_BE_HASHED);
         }
     }
 
@@ -374,11 +374,11 @@ public class SystemChecker
         }
     }
 
-    private static void warmUpSCrypt(int workFactor, int parallelization)
+    private static void warmUpScrypt(int workFactor, int parallelization)
     {
         for (int i = 0; i < WARMUP_ROUNDS; i++)
         {
-            SCryptFunction.getInstance(workFactor, 1, parallelization).hash(TO_BE_HASHED);
+            ScryptFunction.getInstance(workFactor, 1, parallelization).hash(TO_BE_HASHED);
         }
     }
 

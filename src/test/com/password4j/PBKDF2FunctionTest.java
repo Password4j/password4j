@@ -19,12 +19,11 @@ package com.password4j;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import com.password4j.types.BCrypt;
+import com.password4j.types.Bcrypt;
 import com.password4j.types.Hmac;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -293,8 +292,8 @@ public class PBKDF2FunctionTest
 
         // THEN
         boolean eqNull = pbkdf2Function.equals(null);
-        boolean eqClass = pbkdf2Function.equals(new BCryptFunction(BCrypt.A,10));
-        boolean difInst = pbkdf2Function.equals(SCryptFunction.getInstance(5, 4, 6));
+        boolean eqClass = pbkdf2Function.equals(new BcryptFunction(Bcrypt.A,10));
+        boolean difInst = pbkdf2Function.equals(ScryptFunction.getInstance(5, 4, 6));
         boolean sameInst = pbkdf2Function.equals(PBKDF2Function.getInstance(hmac, iterations, length));
         boolean notSameInst1 = pbkdf2Function.equals(PBKDF2Function.getInstance(Hmac.SHA1, iterations, length));
         boolean notSameInst2 = pbkdf2Function.equals(PBKDF2Function.getInstance(hmac, iterations+1, length));
@@ -308,8 +307,8 @@ public class PBKDF2FunctionTest
         Assert.assertFalse(eqClass);
         Assert.assertFalse(difInst);
         Assert.assertTrue(sameInst);
-        Assert.assertNotEquals(toString, new SCryptFunction(5, 4, 6).toString());
-        Assert.assertNotEquals(hashCode, new SCryptFunction(5, 4, 6).hashCode());
+        Assert.assertNotEquals(toString, new ScryptFunction(5, 4, 6).toString());
+        Assert.assertNotEquals(hashCode, new ScryptFunction(5, 4, 6).hashCode());
         Assert.assertFalse(notSameInst1);
         Assert.assertFalse(notSameInst2);
         Assert.assertFalse(notSameInst3);

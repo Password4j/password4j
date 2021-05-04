@@ -181,7 +181,7 @@ public class HashBuilder
 
     /**
      * Hashes the previously given plain text password
-     * with {@link BCryptFunction}.
+     * with {@link BcryptFunction}.
      * <p>
      * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
@@ -189,18 +189,18 @@ public class HashBuilder
      * Finally calls {@link #with(HashingFunction)}
      *
      * @return true if the hash was produced by the given plain text password; false otherwise.
-     * @see AlgorithmFinder#getBCryptInstance()
+     * @see AlgorithmFinder#getBcryptInstance()
      * @see #with(HashingFunction)
      * @since 1.0.0
      */
-    public Hash withBCrypt()
+    public Hash withBcrypt()
     {
-        return with(AlgorithmFinder.getBCryptInstance());
+        return with(AlgorithmFinder.getBcryptInstance());
     }
 
     /**
      * Hashes the previously given plain text password
-     * with {@link SCryptFunction}.
+     * with {@link ScryptFunction}.
      * <p>
      * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
@@ -208,13 +208,13 @@ public class HashBuilder
      * Finally calls {@link #with(HashingFunction)}
      *
      * @return true if the hash was produced by the given plain text password; false otherwise.
-     * @see AlgorithmFinder#getSCryptInstance()
+     * @see AlgorithmFinder#getScryptInstance()
      * @see #with(HashingFunction)
      * @since 1.0.0
      */
-    public Hash withSCrypt()
+    public Hash withScrypt()
     {
-        return with(AlgorithmFinder.getSCryptInstance());
+        return with(AlgorithmFinder.getScryptInstance());
     }
 
     /**

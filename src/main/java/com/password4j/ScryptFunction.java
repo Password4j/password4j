@@ -25,17 +25,17 @@ import com.password4j.types.Hmac;
 
 
 /**
- * Class containing the implementation of SCrypt function and its parameters.
+ * Class containing the implementation of scrypt function and its parameters.
  *
  * @author David Bertoldi
- * @see <a href="https://en.wikipedia.org/wiki/Scrypt">SCrypt</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Scrypt">scrypt</a>
  * @since 0.1.0
  */
-public class SCryptFunction extends AbstractHashingFunction
+public class ScryptFunction extends AbstractHashingFunction
 {
     public static final int DERIVED_KEY_LENGTH = 64;
 
-    private static final ConcurrentMap<String, SCryptFunction> INSTANCES = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, ScryptFunction> INSTANCES = new ConcurrentHashMap<>();
 
     private int workFactor; // N
 
@@ -46,7 +46,7 @@ public class SCryptFunction extends AbstractHashingFunction
     private int derivedKeyLength; // dkLen
 
     @SuppressWarnings("unused")
-    private SCryptFunction()
+    private ScryptFunction()
     {
         //
     }
@@ -56,7 +56,7 @@ public class SCryptFunction extends AbstractHashingFunction
      * @param resources       (r)
      * @param parallelization (p)
      */
-    protected SCryptFunction(int workFactor, int resources, int parallelization)
+    protected ScryptFunction(int workFactor, int resources, int parallelization)
     {
         this.resources = resources;
         this.workFactor = workFactor;
@@ -70,7 +70,7 @@ public class SCryptFunction extends AbstractHashingFunction
      * @param parallelization  (p)
      * @param derivedKeyLength (dkLen)
      */
-    protected SCryptFunction(int workFactor, int resources, int parallelization, int derivedKeyLength)
+    protected ScryptFunction(int workFactor, int resources, int parallelization, int derivedKeyLength)
     {
         this.resources = resources;
         this.workFactor = workFactor;
@@ -86,7 +86,7 @@ public class SCryptFunction extends AbstractHashingFunction
      * @return a singleton instance based on the given hash
      * @since 1.0.0
      */
-    public static SCryptFunction getInstanceFromHash(String hashed)
+    public static ScryptFunction getInstanceFromHash(String hashed)
     {
         String[] parts = hashed.split("\\$");
         if (parts.length == 5)
@@ -97,7 +97,7 @@ public class SCryptFunction extends AbstractHashingFunction
             int parallelization = (int) params & 255;
             int derivedKeyLength = Utils.decodeBase64(parts[4]).length;
 
-            return SCryptFunction.getInstance(workFactor, resources, parallelization, derivedKeyLength);
+            return ScryptFunction.getInstance(workFactor, resources, parallelization, derivedKeyLength);
         }
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }
@@ -112,7 +112,7 @@ public class SCryptFunction extends AbstractHashingFunction
      * @return a singleton instance
      * @since 0.3.0
      */
-    public static SCryptFunction getInstance(int workFactor, int resources, int parallelization)
+    public static ScryptFunction getInstance(int workFactor, int resources, int parallelization)
     {
         return getInstance(workFactor, resources, parallelization, DERIVED_KEY_LENGTH);
     }
@@ -128,7 +128,7 @@ public class SCryptFunction extends AbstractHashingFunction
      * @return a singleton instance
      * @since 1.5.1
      */
-    public static SCryptFunction getInstance(int workFactor, int resources, int parallelization, int derivedKeyLength)
+    public static ScryptFunction getInstance(int workFactor, int resources, int parallelization, int derivedKeyLength)
     {
         String key = getUID(resources, workFactor, parallelization, derivedKeyLength);
         if (INSTANCES.containsKey(key))
@@ -137,7 +137,7 @@ public class SCryptFunction extends AbstractHashingFunction
         }
         else
         {
-            SCryptFunction function = new SCryptFunction(workFactor, resources, parallelization, derivedKeyLength);
+            ScryptFunction function = new ScryptFunction(workFactor, resources, parallelization, derivedKeyLength);
             INSTANCES.put(key, function);
             return function;
         }
@@ -352,7 +352,7 @@ public class SCryptFunction extends AbstractHashingFunction
             return false;
         }
 
-        SCryptFunction otherStrategy = (SCryptFunction) obj;
+        ScryptFunction otherStrategy = (ScryptFunction) obj;
         return this.workFactor == otherStrategy.workFactor //
                 && this.resources == otherStrategy.resources //
                 && this.parallelization == otherStrategy.parallelization;

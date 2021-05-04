@@ -16,8 +16,7 @@
  */
 package com.password4j;
 
-import com.password4j.types.Argon2;
-import com.password4j.types.BCrypt;
+import com.password4j.types.Bcrypt;
 import com.password4j.types.Hmac;
 import org.junit.Assert;
 import org.junit.Test;
@@ -298,7 +297,7 @@ public class MessageDigestFunctionTest
 
         // THEN
         boolean eqNull = function.equals(null);
-        boolean eqClass = function.equals(new BCryptFunction(BCrypt.A, 10));
+        boolean eqClass = function.equals(new BcryptFunction(Bcrypt.A, 10));
         boolean sameInst = function.equals(MessageDigestFunction.getInstance(a, o));
         boolean sameInst2 = function.equals(new MessageDigestFunction(a, o));
         String toString = function.toString();

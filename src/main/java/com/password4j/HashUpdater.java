@@ -217,7 +217,7 @@ public class HashUpdater
 
     /**
      * Hashes the previously given plain text password
-     * with {@link BCryptFunction}.
+     * with {@link BcryptFunction}.
      * <p>
      * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
@@ -225,18 +225,18 @@ public class HashUpdater
      * Finally calls {@link #with(HashingFunction, HashingFunction)}
      *
      * @return the result of the verification with the new hash
-     * @see AlgorithmFinder#getBCryptInstance()
+     * @see AlgorithmFinder#getBcryptInstance()
      * @see #with(HashingFunction, HashingFunction)
      * @since 1.3.0
      */
-    public HashUpdate withBCrypt()
+    public HashUpdate withBcrypt()
     {
-        return withBCrypt(AlgorithmFinder.getBCryptInstance());
+        return withBcrypt(AlgorithmFinder.getBcryptInstance());
     }
 
     /**
      * Hashes the previously given plain text password
-     * with {@link BCryptFunction}.
+     * with {@link BcryptFunction}.
      * <p>
      * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
@@ -244,18 +244,18 @@ public class HashUpdater
      * Finally calls {@link #with(HashingFunction, HashingFunction)}
      *
      * @return the result of the verification with the new hash
-     * @see AlgorithmFinder#getBCryptInstance()
+     * @see AlgorithmFinder#getBcryptInstance()
      * @see #with(HashingFunction, HashingFunction)
      * @since 1.3.0
      */
-    public HashUpdate withBCrypt(HashingFunction newHashingFunction)
+    public HashUpdate withBcrypt(HashingFunction newHashingFunction)
     {
-        return with(BCryptFunction.getInstanceFromHash(hashChecker.getHashed()), newHashingFunction);
+        return with(BcryptFunction.getInstanceFromHash(hashChecker.getHashed()), newHashingFunction);
     }
 
     /**
      * Hashes the previously given plain text password
-     * with {@link SCryptFunction}.
+     * with {@link ScryptFunction}.
      * <p>
      * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
@@ -263,18 +263,18 @@ public class HashUpdater
      * Finally calls {@link #with(HashingFunction, HashingFunction)}
      *
      * @return the result of the verification with the new hash
-     * @see AlgorithmFinder#getSCryptInstance()
+     * @see AlgorithmFinder#getScryptInstance()
      * @see #with(HashingFunction, HashingFunction)
      * @since 1.3.0
      */
-    public HashUpdate withSCrypt()
+    public HashUpdate withScrypt()
     {
-        return withSCrypt(AlgorithmFinder.getSCryptInstance());
+        return withScrypt(AlgorithmFinder.getScryptInstance());
     }
 
     /**
      * Hashes the previously given plain text password
-     * with {@link SCryptFunction}.
+     * with {@link ScryptFunction}.
      * <p>
      * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
      * then the default parameters are used.
@@ -282,13 +282,13 @@ public class HashUpdater
      * Finally calls {@link #with(HashingFunction, HashingFunction)}
      *
      * @return the result of the verification with the new hash
-     * @see AlgorithmFinder#getSCryptInstance()
+     * @see AlgorithmFinder#getScryptInstance()
      * @see #with(HashingFunction, HashingFunction)
      * @since 1.3.0
      */
-    public HashUpdate withSCrypt(HashingFunction newHashingFunction)
+    public HashUpdate withScrypt(HashingFunction newHashingFunction)
     {
-        return with(SCryptFunction.getInstanceFromHash(hashChecker.getHashed()), newHashingFunction);
+        return with(ScryptFunction.getInstanceFromHash(hashChecker.getHashed()), newHashingFunction);
     }
 
     /**

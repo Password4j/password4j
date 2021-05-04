@@ -16,10 +16,9 @@
  */
 package com.password4j;
 
-import com.password4j.types.BCrypt;
+import com.password4j.types.Bcrypt;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.*;
@@ -29,7 +28,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
 
-public class BCryptFunctionTest
+public class BcryptFunctionTest
 {
 
 
@@ -140,10 +139,10 @@ public class BCryptFunctionTest
     );
 
     @Test(expected = BadParametersException.class)
-    public void testBCryptBadParams()
+    public void testBcryptBadParams()
     {
         // GIVEN
-        HashingFunction strategy = new BCryptFunction(BCrypt.Y,-1);
+        HashingFunction strategy = new BcryptFunction(Bcrypt.Y,-1);
         String password = "password";
 
         // WHEN
@@ -153,13 +152,13 @@ public class BCryptFunctionTest
     }
 
     @Test
-    public void testBCryptCoherence()
+    public void testBcryptCoherence()
     {
         // GIVEN
         String password = "password";
 
         // WHEN
-        Hash hash = new BCryptFunction(BCrypt.A,10).hash(password);
+        Hash hash = new BcryptFunction(Bcrypt.A,10).hash(password);
 
         // THEN
         Assert.assertTrue(Password.check(password, hash));
@@ -167,30 +166,30 @@ public class BCryptFunctionTest
     }
 
     @Test
-    public void testBCryptCheckWithFixedConfigurations()
+    public void testBcryptCheckWithFixedConfigurations()
     {
         // GIVEN
         String password = "password";
 
         // WHEN
-        Hash hash = new BCryptFunction(BCrypt.A,12).hash(password);
+        Hash hash = new BcryptFunction(Bcrypt.A,12).hash(password);
 
         // THEN
         Assert.assertTrue(Password.check(password, hash));
     }
 
     @Test
-    public void testBCryptequality()
+    public void testBcryptequality()
     {
         // GIVEN
-        BCryptFunction strategy1 = new BCryptFunction(BCrypt.A,10);
-        BCryptFunction strategy2 = new BCryptFunction(BCrypt.A,10);
-        BCryptFunction strategy3 = new BCryptFunction(BCrypt.A,15);
-        BCryptFunction strategy4 = new BCryptFunction(BCrypt.A,15);
-        BCryptFunction strategy5 = new BCryptFunction(BCrypt.A,8);
+        BcryptFunction strategy1 = new BcryptFunction(Bcrypt.A,10);
+        BcryptFunction strategy2 = new BcryptFunction(Bcrypt.A,10);
+        BcryptFunction strategy3 = new BcryptFunction(Bcrypt.A,15);
+        BcryptFunction strategy4 = new BcryptFunction(Bcrypt.A,15);
+        BcryptFunction strategy5 = new BcryptFunction(Bcrypt.A,8);
 
         // WHEN
-        Map<BCryptFunction, String> map = new HashMap<>();
+        Map<BcryptFunction, String> map = new HashMap<>();
         map.put(strategy1, strategy1.toString());
         map.put(strategy2, strategy2.toString());
         map.put(strategy3, strategy3.toString());
@@ -212,8 +211,8 @@ public class BCryptFunctionTest
         String salt = "$2a$10$bJ2SJm8Xyp8H9KLeyNE5EO";
 
         // WHEN
-        Hash hash1 = new BCryptFunction(BCrypt.A, 10).hash(password1, salt);
-        Hash hash2 = new BCryptFunction(BCrypt.A,10).hash(password2, salt);
+        Hash hash1 = new BcryptFunction(Bcrypt.A, 10).hash(password1, salt);
+        Hash hash2 = new BcryptFunction(Bcrypt.A,10).hash(password2, salt);
 
         // THEN
         Assert.assertEquals(hash1, hash2);
@@ -225,16 +224,16 @@ public class BCryptFunctionTest
     {
         // GIVEN
         int rounds = 8;
-        BCryptFunction bcrypt = BCryptFunction.getInstance(BCrypt.A,rounds);
+        BcryptFunction bcrypt = BcryptFunction.getInstance(Bcrypt.A,rounds);
 
         // THEN
         boolean eqNull = bcrypt.equals(null);
         boolean eqClass = bcrypt.equals(new MessageDigestFunction("MD5", SaltOption.APPEND));
-        boolean difInst = bcrypt.equals(new BCryptFunction(BCrypt.A,10));
-        boolean sameInst = bcrypt.equals(new BCryptFunction(BCrypt.A, rounds));
-        boolean sameInst2 = bcrypt.equals(BCryptFunction.getInstance(BCrypt.A, rounds));
-        boolean notSameInst1 = bcrypt.equals(new BCryptFunction(BCrypt.B, rounds));
-        boolean notSameInst2 = bcrypt.equals(new BCryptFunction(BCrypt.A, rounds+1));
+        boolean difInst = bcrypt.equals(new BcryptFunction(Bcrypt.A,10));
+        boolean sameInst = bcrypt.equals(new BcryptFunction(Bcrypt.A, rounds));
+        boolean sameInst2 = bcrypt.equals(BcryptFunction.getInstance(Bcrypt.A, rounds));
+        boolean notSameInst1 = bcrypt.equals(new BcryptFunction(Bcrypt.B, rounds));
+        boolean notSameInst2 = bcrypt.equals(new BcryptFunction(Bcrypt.A, rounds+1));
 
         // END
         Assert.assertFalse(eqNull);
@@ -253,15 +252,15 @@ public class BCryptFunctionTest
     {
         for (TestCase test : CASES)
         {
-            Hash hash = BCryptFunction.getInstance(test.rounds).hash(test.password, test.salt);
+            Hash hash = BcryptFunction.getInstance(test.rounds).hash(test.password, test.salt);
             String result = hash.getResult();
             Assert.assertEquals(test.expected, result);
 
-            int rounds = BCryptFunction.getInstanceFromHash(test.expected).getLogarithmicRounds();
+            int rounds = BcryptFunction.getInstanceFromHash(test.expected).getLogarithmicRounds();
             Assert.assertEquals(rounds, test.rounds);
 
-            byte[] bytes = BCryptFunction.decodeBase64(result.split("\\$")[3], 23);
-            byte[] expectedBytes = BCryptFunction.decodeBase64(test.expected.split("\\$")[3], 23);
+            byte[] bytes = BcryptFunction.decodeBase64(result.split("\\$")[3], 23);
+            byte[] expectedBytes = BcryptFunction.decodeBase64(test.expected.split("\\$")[3], 23);
             assertArrayEquals(expectedBytes, bytes);
         }
     }
@@ -273,7 +272,7 @@ public class BCryptFunctionTest
         String hash = "$2yS06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq";
 
         // WHEN
-        BCryptFunction.getInstanceFromHash(hash);
+        BcryptFunction.getInstanceFromHash(hash);
 
     }
 
@@ -285,7 +284,7 @@ public class BCryptFunctionTest
         String hash = "$a$06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq";
 
         // WHEN
-        BCryptFunction.getInstanceFromHash(hash);
+        BcryptFunction.getInstanceFromHash(hash);
     }
 
     @Test
@@ -295,7 +294,7 @@ public class BCryptFunctionTest
         String hash = "$2$06$6Xm0gCw4g7ZNDCEp4yTisez0kSdpXEl66MvdxGidnmChIe8dFmMnq";
 
         // WHEN
-        BCryptFunction function = BCryptFunction.getInstanceFromHash(hash);
+        BcryptFunction function = BcryptFunction.getInstanceFromHash(hash);
 
         // THEN
         Assert.assertEquals(6, function.getLogarithmicRounds());
@@ -311,7 +310,7 @@ public class BCryptFunctionTest
             for (int j = 0; j < CASES.size(); j += 4)
             {
                 String plain = CASES.get(j).password;
-                BCryptFunction function = BCryptFunction.getInstance(10);
+                BcryptFunction function = BcryptFunction.getInstance(10);
                 String salt = function.generateSalt();
                 Hash hashed1 = function.hash(plain, salt);
                 Hash hashed2 = function.hash(plain, hashed1.getResult());
@@ -328,7 +327,8 @@ public class BCryptFunctionTest
         List<Callable<Boolean>> tasks = new ArrayList<>();
         for (final TestCase test : CASES)
         {
-            Callable<Boolean> c = () -> test.expected.equals(BCryptFunction.getInstance(test.rounds).hash(test.password, test.salt).getResult());
+            Callable<Boolean> c = () -> test.expected.equals(
+                    BcryptFunction.getInstance(test.rounds).hash(test.password, test.salt).getResult());
             tasks.add(c);
         }
         List<Future<Boolean>> results = executors.invokeAll(tasks);
@@ -343,50 +343,44 @@ public class BCryptFunctionTest
     @Test(expected = BadParametersException.class)
     public void generateBadSalt1()
     {
-        BCryptFunction.generateSalt("S2", 10);
+        BcryptFunction.generateSalt("S2", 10);
     }
 
     @Test(expected = BadParametersException.class)
     public void generateBadSalt2()
     {
-        BCryptFunction.generateSalt("$2D", 10);
+        BcryptFunction.generateSalt("$2D", 10);
     }
 
     @Test(expected = BadParametersException.class)
     public void generateBadSalt3()
     {
-        BCryptFunction.generateSalt("$2" + BCrypt.A.minor(), 3);
+        BcryptFunction.generateSalt("$2" + Bcrypt.A.minor(), 3);
     }
 
     @Test(expected = BadParametersException.class)
     public void generateBadSalt4()
     {
-        BCryptFunction.generateSalt("$2" + BCrypt.B.minor(), 32);
+        BcryptFunction.generateSalt("$2" + Bcrypt.B.minor(), 32);
     }
 
 
-    /**
-     * Test method for 'BCrypt.checkpw(String, String)' expecting success
-     */
     @Test
     public void testCheckpw_success()
     {
 
         for (TestCase test : CASES)
         {
-            BCryptFunction function = BCryptFunction.getInstance(test.rounds);
+            BcryptFunction function = BcryptFunction.getInstance(test.rounds);
             Assert.assertTrue(function.check(test.password, test.expected));
         }
     }
 
 
-    /**
-     * Test method for 'BCrypt.checkpw(String, String)' expecting failure
-     */
     @Test
     public void testCheckpw_failure()
     {
-        BCryptFunction function = BCryptFunction.getInstance(10);
+        BcryptFunction function = BcryptFunction.getInstance(10);
         for (int i = 0; i < CASES.size(); i++)
         {
             int broken_index = (i + 8) % CASES.size();
@@ -405,7 +399,7 @@ public class BCryptFunctionTest
     {
         String pw1 = "ππππππππ";
         String pw2 = "????????";
-        BCryptFunction function = BCryptFunction.getInstance(10);
+        BcryptFunction function = BcryptFunction.getInstance(10);
 
 
         String h1 = function.hash(pw1).getResult();
@@ -419,26 +413,26 @@ public class BCryptFunctionTest
     @Test(expected = IllegalArgumentException.class)
     public void emptyByteArrayCannotBeEncoded()
     {
-        BCryptFunction.encodeBase64(new byte[0], 0, new StringBuilder());
+        BcryptFunction.encodeBase64(new byte[0], 0, new StringBuilder());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void moreBytesThanInTheArrayCannotBeEncoded()
     {
-        BCryptFunction.encodeBase64(new byte[1], 2, new StringBuilder());
+        BcryptFunction.encodeBase64(new byte[1], 2, new StringBuilder());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void decodingMustRequestMoreThanZeroBytes()
     {
-        BCryptFunction.decodeBase64("", 0);
+        BcryptFunction.decodeBase64("", 0);
     }
 
     private static String encodeBase64(byte[] d, int len)
             throws IllegalArgumentException
     {
         StringBuilder rs = new StringBuilder();
-        BCryptFunction.encodeBase64(d, len, rs);
+        BcryptFunction.encodeBase64(d, len, rs);
         return rs.toString();
     }
 
@@ -453,24 +447,24 @@ public class BCryptFunctionTest
     @Test
     public void decodingCharsOutsideAsciiGivesNoResults()
     {
-        byte[] ba = BCryptFunction.decodeBase64("ππππππππ", 1);
+        byte[] ba = BcryptFunction.decodeBase64("ππππππππ", 1);
         Assert.assertEquals(0, ba.length);
     }
 
     @Test
     public void decodingStopsWithFirstInvalidCharacter()
     {
-        Assert.assertEquals(1, BCryptFunction.decodeBase64("....", 1).length);
-        Assert.assertEquals(0, BCryptFunction.decodeBase64(" ....", 1).length);
+        Assert.assertEquals(1, BcryptFunction.decodeBase64("....", 1).length);
+        Assert.assertEquals(0, BcryptFunction.decodeBase64(" ....", 1).length);
     }
 
     @Test
     public void decodingOnlyProvidesAvailableBytes()
     {
-        Assert.assertEquals(0, BCryptFunction.decodeBase64("", 1).length);
-        Assert.assertEquals(3, BCryptFunction.decodeBase64("......", 3).length);
-        Assert.assertEquals(4, BCryptFunction.decodeBase64("......", 4).length);
-        Assert.assertEquals(4, BCryptFunction.decodeBase64("......", 5).length);
+        Assert.assertEquals(0, BcryptFunction.decodeBase64("", 1).length);
+        Assert.assertEquals(3, BcryptFunction.decodeBase64("......", 3).length);
+        Assert.assertEquals(4, BcryptFunction.decodeBase64("......", 4).length);
+        Assert.assertEquals(4, BcryptFunction.decodeBase64("......", 5).length);
     }
 
     /**
@@ -491,7 +485,7 @@ public class BCryptFunctionTest
                 String s = encodeBase64(byteArray, 3);
                 Assert.assertEquals(4, s.length());
 
-                byte[] decoded = BCryptFunction.decodeBase64(s, 3);
+                byte[] decoded = BcryptFunction.decodeBase64(s, 3);
                 Assert.assertEquals(Arrays.toString(decoded), Arrays.toString(byteArray));
             }
         }
@@ -505,7 +499,7 @@ public class BCryptFunctionTest
         String badSalt1 = "2b$06$ehKGYiS4wt2HAr7KQXS5z.";
 
         // WHEN
-        BCryptFunction.getInstance(10).hash(password, badSalt1);
+        BcryptFunction.getInstance(10).hash(password, badSalt1);
     }
 
     @Test(expected = BadParametersException.class)
@@ -516,7 +510,7 @@ public class BCryptFunctionTest
         String badSalt2 = "$2b06$ehKGYiS4wt2HAr7KQXS5z.";
 
         // WHEN
-        BCryptFunction.getInstance(6).hash(password, badSalt2);
+        BcryptFunction.getInstance(6).hash(password, badSalt2);
     }
 
     @Test(expected = BadParametersException.class)
@@ -527,7 +521,7 @@ public class BCryptFunctionTest
         String badSalt3 = "$2d$06$ehKGYiS4wt2HAr7KQXS5z.";
 
         // WHEN
-        BCryptFunction.getInstance(6).hash(password, badSalt3);
+        BcryptFunction.getInstance(6).hash(password, badSalt3);
     }
 
     @Test(expected = BadParametersException.class)
@@ -538,7 +532,7 @@ public class BCryptFunctionTest
         String badSalt3 = "$2b$06%ehKGYiS4wt2HAr7KQXS5z.";
 
         // WHEN
-        BCryptFunction.getInstance(10).hash(password, badSalt3);
+        BcryptFunction.getInstance(10).hash(password, badSalt3);
     }
 
 
@@ -550,63 +544,65 @@ public class BCryptFunctionTest
         String badSalt3 = "$2b$06%ehKGYiS4wt2HAr7KQXS5z.";
 
         // WHEN
-        BCryptFunction.getInstance(10).cryptRaw(password.getBytes(Utils.DEFAULT_CHARSET), badSalt3.getBytes(Utils.DEFAULT_CHARSET), 6, false, 1);
+        BcryptFunction
+                .getInstance(10).cryptRaw(password.getBytes(Utils.DEFAULT_CHARSET), badSalt3.getBytes(Utils.DEFAULT_CHARSET), 6, false, 1);
     }
 
 
     @Test
     public void genSaltGeneratesCorrectSaltPrefix()
     {
-        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.getInstance(4).hash("").getResult(), "$2b$04$"));
-        Assert.assertTrue(StringUtils.startsWith(BCryptFunction.getInstance(31).hash("").getResult(), "$2b$31$"));
+        Assert.assertTrue(StringUtils.startsWith(BcryptFunction.getInstance(4).hash("").getResult(), "$2b$04$"));
+        Assert.assertTrue(StringUtils.startsWith(BcryptFunction.getInstance(31).hash("").getResult(), "$2b$31$"));
     }
 
     @Test(expected = BadParametersException.class)
     public void hashpwFailsWhenSaltIsNull()
     {
-        BCryptFunction.getInstance(10).hash("password", null);
+        BcryptFunction.getInstance(10).hash("password", null);
     }
 
     @Test(expected = BadParametersException.class)
     public void hashpwFailsWhenSaltSpecifiesTooFewRounds()
     {
-        BCryptFunction.getInstance(3).hash("password", "$2a$03$......................");
+        BcryptFunction.getInstance(3).hash("password", "$2a$03$......................");
     }
 
     @Test(expected = BadParametersException.class)
     public void hashpwFailsWhenSaltSpecifiesTooManyRounds()
     {
-        BCryptFunction.getInstance(32).hash("password", "$2a$32$......................");
+        BcryptFunction.getInstance(32).hash("password", "$2a$32$......................");
     }
 
     @Test(expected = BadParametersException.class)
     public void saltLengthIsChecked()
     {
-        BCryptFunction.getInstance(10).hash("", "");
+        BcryptFunction.getInstance(10).hash("", "");
     }
 
     @Test
     public void hashpwWorksWithOldRevision()
     {
-        Assert.assertEquals("$2$05$......................bvpG2UfzdyW/S0ny/4YyEZrmczoJfVm", BCryptFunction.getInstance(5).hash("password", "$2$05$......................").getResult());
+        Assert.assertEquals("$2$05$......................bvpG2UfzdyW/S0ny/4YyEZrmczoJfVm", BcryptFunction
+                .getInstance(5).hash("password", "$2$05$......................").getResult());
     }
 
     @Test(expected = BadParametersException.class)
     public void hashpwFailsWhenSaltIsTooShort()
     {
-        BCryptFunction.getInstance(10).hash("password", "$2a$10$123456789012345678901");
+        BcryptFunction.getInstance(10).hash("password", "$2a$10$123456789012345678901");
     }
 
     @Test
     public void equalsOnStringsIsCorrect()
     {
-        Assert.assertTrue(BCryptFunction.equalsNoEarlyReturn("", ""));
-        Assert.assertTrue(BCryptFunction.equalsNoEarlyReturn("test", "test"));
+        Assert.assertTrue(BcryptFunction.equalsNoEarlyReturn("", ""));
+        Assert.assertTrue(BcryptFunction.equalsNoEarlyReturn("test", "test"));
 
-        Assert.assertFalse(BCryptFunction.equalsNoEarlyReturn("test", ""));
-        Assert.assertFalse(BCryptFunction.equalsNoEarlyReturn("", "test"));
+        Assert.assertFalse(BcryptFunction.equalsNoEarlyReturn("test", ""));
+        Assert.assertFalse(BcryptFunction.equalsNoEarlyReturn("", "test"));
 
-        Assert.assertFalse(BCryptFunction.equalsNoEarlyReturn("test", "pass"));
+        Assert.assertFalse(BcryptFunction.equalsNoEarlyReturn("test", "pass"));
     }
 
     @Test
@@ -614,15 +610,15 @@ public class BCryptFunctionTest
     {
         // GIVEN
         int logRounds = 7;
-        BCrypt type = BCrypt.Y;
+        Bcrypt type = Bcrypt.Y;
 
         // WHEN
-        BCryptFunction bcrypt = BCryptFunction.getInstance(type, logRounds);
+        BcryptFunction bcrypt = BcryptFunction.getInstance(type, logRounds);
 
         // THEN
         Assert.assertEquals(logRounds, bcrypt.getLogarithmicRounds());
         Assert.assertEquals(type, bcrypt.getType());
-        Assert.assertEquals("BCryptFunction(t=y, r=7)", bcrypt.toString());
+        Assert.assertEquals("BcryptFunction(t=y, r=7)", bcrypt.toString());
     }
 
 }

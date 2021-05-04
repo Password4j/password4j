@@ -17,13 +17,13 @@
 
 package com.password4j.types;
 
-public enum BCrypt
+public enum Bcrypt
 {
     A, B, X, Y;
 
-    public static BCrypt valueOf(char minor)
+    public static Bcrypt valueOf(char minor)
     {
-        for (BCrypt type : BCrypt.values())
+        for (Bcrypt type : Bcrypt.values())
         {
             if (type.minor() == minor)
             {

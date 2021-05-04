@@ -25,7 +25,7 @@ a set of optimal parameters** based on the system performance and the desired ma
 
 
 
-The library fully supports **[Argon2](https://en.wikipedia.org/wiki/Argon2)**, **[BCrypt](https://en.wikipedia.org/wiki/Bcrypt)**, **[SCrypt](https://en.wikipedia.org/wiki/Scrypt)** and **[PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)** 
+The library fully supports **[Argon2](https://en.wikipedia.org/wiki/Argon2)**, **[bcrypt](https://en.wikipedia.org/wiki/Bcrypt)**, **[scrypt](https://en.wikipedia.org/wiki/Scrypt)** and **[PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)** 
 and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/Salt_%28cryptography%29)** and **[pepper](https://en.wikipedia.org/wiki/Pepper_%28cryptography%29)**.
 
 # Documentation
@@ -74,10 +74,10 @@ libraryDependencies += "com.password4j" % "password4j" % "1.5.3"
 Password4j provides three main features: password hashing, hash checking and hash updating.
 
 ## Hash the password
-Here it is the easiest way to hash a password with a CHF (BCrypt in this case)
+Here it is the easiest way to hash a password with a CHF (bcrypt in this case)
 
 ```java
-Hash hash = Password.hash(password).withBCrypt();
+Hash hash = Password.hash(password).withBcrypt();
 ```
 
 Salt and pepper may be optionally added to the builder (PBKDF2 in this case): 
@@ -102,7 +102,7 @@ The same structure can be adopted for the other CHFs, not just for PBKDF2.
 ## Verify the hash
 With the same ease you can verify the hash:
 ```java
-boolean verified = Password.check(password, hash).withBCrypt();
+boolean verified = Password.check(password, hash).withBcrypt();
 ```
 
 Salt and pepper may be optionally added to the builder (PBKDF2 in this case): 
@@ -117,14 +117,14 @@ boolean verification = Password.check(password, hash).addSalt(salt).withPBKDF2()
 // Verify with PBKDF2 and manually provided salt and pepper.
 boolean verification = Password.check(password, hash).addSalt(salt).addPepper(pepper).withPBKDF2();
 ```
- The same structure can be adopted for the other algorithms, not just for PBKDF2. Take in account that Argon2, BCrypt and SCrypt store the salt
+ The same structure can be adopted for the other algorithms, not just for PBKDF2. Take in account that Argon2, bcrypt and scrypt store the salt
  inside the hash, so the `addSalt()` method is not needed.
 ```java
 // Verify with Argon2, reads the salt from the given hash.
 boolean verification = Password.check(password, hash).withArgon2();
 ```
 
-Some algorithms encode into the hash the parameters that were used to compute that hash, notably BCrypt, SCrypt, and Argon2.
+Some algorithms encode into the hash the parameters that were used to compute that hash, notably bcrypt, scrypt, and Argon2.
 When checking a hash, you can use the parameters from the hash rather than Password4j's configured defaults.
 ```java
 // Verify with Argon2, reads the salt and parameters from the given hash.
@@ -136,7 +136,7 @@ When a configuration is not considered anymore secure  you can
 refresh the hash with a more modern algorithm like this:
 ```java
 // Reads the latest configurations in your psw4j.properties
-HashUpdate update = Password.check(password, hash).update().withBCrypt();
+HashUpdate update = Password.check(password, hash).update().withBcrypt();
 
 if(update.isVerified())
 {
@@ -146,7 +146,7 @@ if(update.isVerified())
 Or if you want to switch from a CHF to another one:
 ```java
 PBKDF2Function pbkdf2 = AlgorithmFinder.getPBKDF2Instance();
-HashUpdate update = Password.check(password, hash).update().withSCrypt(pbkdf2);
+HashUpdate update = Password.check(password, hash).update().withScrypt(pbkdf2);
 
 if(update.isVerified())
 {
@@ -159,7 +159,7 @@ Many systems may still use unsecure algorithms for storing the passwords, like [
 You can easily migrate to stronger algorithms with Password4j
 ```java
 MessageDigestFunction md = MessageDigestFunction.getInstance("SHA-256");
-HashUpdate update = Password.check(password, hash).update().withSCrypt(md);
+HashUpdate update = Password.check(password, hash).update().withScrypt(md);
 
 if(update.isVerified())
 {
@@ -171,8 +171,8 @@ if(update.isVerified())
 | Key derivation Functions | Since | Notes                                                |
 |--------------------------|-------|------------------------------------------------------|
 | PBKDF2                   | 1.0.0 | Depending on the Security Services your JVM provides |
-| BCrypt                   | 1.0.0 |                                                      |
-| SCrypt                   | 1.0.0 |                                                      |
+| bcrypt                   | 1.0.0 |                                                      |
+| scrypt                   | 1.0.0 |                                                      |
 | Argon2                   | 1.5.0 |                                                      |
 
 | Cryptographic Hash Functions | Since | Notes                                                 |
@@ -195,8 +195,8 @@ You can erase the underlying `char[]` with `clear()` method.
 ```java
 SecureString secure = new SecureString(new char[]{...});
 
-Password.hash(secure).withBCrypt();
-Password.check(secure, hash).withBCrypt();
+Password.hash(secure).withBcrypt();
+Password.check(secure, hash).withBcrypt();
 
 secure.clear();
 // At this point the underlying char[] = {\0, \0, \0, ...}
@@ -234,13 +234,13 @@ hash.argon2.parallelism=4
 hash.argon2.type=id
 
 
-### BCrypt
+### bcrypt
 hash.bcrypt.minor=b
 # logarithmic cost (cost = 2^12)
 hash.bcrypt.rounds=12
 
 
-### SCrypt
+### scrypt
 # N
 hash.scrypt.workfactor=16384
 # r
@@ -272,10 +272,10 @@ global.pepper=AlicePepper
 and use it like this
 ```java
 // Hash
-Password.hash("password").addPepper().withSCrypt();
+Password.hash("password").addPepper().withScrypt();
 
 // Verify
-Password.check("password", "hash").addPepper().withSCrypt();
+Password.check("password", "hash").addPepper().withScrypt();
 ```
 
 [SecureRandom](https://docs.oracle.com/javase/8/docs/api/java/security/SecureRandom.html) may be instantiated and used through `SecureRandom.getInstanceStrong()` to generate salts and peppers.

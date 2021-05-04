@@ -20,10 +20,8 @@ package com.password4j;
 import com.password4j.types.Argon2;
 import com.password4j.types.Hmac;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Scanner;
 import java.util.Set;
 
 
@@ -97,13 +95,13 @@ public class SystemCheckTest
 
 
     @Test
-    public void testBCryptRounds()
+    public void testBcryptRounds()
     {
         // GIVEN
         long maxMilliseconds = 50;
 
         // WHEN
-        BenchmarkResult<BCryptFunction> result = SystemChecker.benchmarkBcrypt(maxMilliseconds);
+        BenchmarkResult<BcryptFunction> result = SystemChecker.benchmarkBcrypt(maxMilliseconds);
 
         // THEN
         Assert.assertTrue(result.getPrototype().getLogarithmicRounds() >= 4);
@@ -111,13 +109,13 @@ public class SystemCheckTest
     }
 
     @Test
-    public void testBCryptRounds2()
+    public void testBcryptRounds2()
     {
         // GIVEN
         long maxMilliseconds = 0;
 
         // WHEN
-        BenchmarkResult<BCryptFunction> result = SystemChecker.benchmarkBcrypt(maxMilliseconds);
+        BenchmarkResult<BcryptFunction> result = SystemChecker.benchmarkBcrypt(maxMilliseconds);
 
         // THEN
         Assert.assertNull(result.getPrototype());
@@ -125,14 +123,14 @@ public class SystemCheckTest
     }
 
     @Test
-    public void testSCryptRounds()
+    public void testScryptRounds()
     {
         // GIVEN
         long maxMilliseconds = -1;
 
         // WHEN
-        BenchmarkResult<SCryptFunction> result1 = SystemChecker.findWorkFactorForSCrypt(maxMilliseconds, 16, 1);
-        BenchmarkResult<SCryptFunction> result2 = SystemChecker.findResourcesForSCrypt(maxMilliseconds, 1024, 1);
+        BenchmarkResult<ScryptFunction> result1 = SystemChecker.findWorkFactorForScrypt(maxMilliseconds, 16, 1);
+        BenchmarkResult<ScryptFunction> result2 = SystemChecker.findResourcesForScrypt(maxMilliseconds, 1024, 1);
 
         // THEN
         Assert.assertNull(result1.getPrototype());
@@ -142,14 +140,14 @@ public class SystemCheckTest
     }
 
     @Test
-    public void testSCryptRounds2()
+    public void testScryptRounds2()
     {
         // GIVEN
         long maxMilliseconds = 50;
 
         // WHEN
-        BenchmarkResult<SCryptFunction> result1 = SystemChecker.findWorkFactorForSCrypt(maxMilliseconds, 16, 1);
-        BenchmarkResult<SCryptFunction> result2 = SystemChecker.findResourcesForSCrypt(maxMilliseconds, result1.getPrototype().getWorkFactor(), 1);
+        BenchmarkResult<ScryptFunction> result1 = SystemChecker.findWorkFactorForScrypt(maxMilliseconds, 16, 1);
+        BenchmarkResult<ScryptFunction> result2 = SystemChecker.findResourcesForScrypt(maxMilliseconds, result1.getPrototype().getWorkFactor(), 1);
 
         // THEN
         Assert.assertTrue(result1.getElapsed() > 0);

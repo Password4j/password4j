@@ -214,6 +214,9 @@ The pepper can be expressed as `SecureString` as well.
 Using `SecureString` or `char[]` does not completely defend you from attacks: the Garbage Collector constantly copies objects from the _from space_ to the _to space_ and ereasing the original `char[]` does not erase its copies; moreover it is never guaranteed that `clear()` is applied before the garbage collection.
 For these reasons the usage of `SecureString` or `char[]` just reduces the window of opportunities for an attacker.
 
+## JCA
+Password4j is compatible with JCA. See [this project](https://github.com/Password4j/password4j-jca) for more details.
+
 # Configuration
 Password4j makes available a portable way to configure the library.
 

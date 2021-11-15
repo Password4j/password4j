@@ -250,12 +250,4 @@ public class ScryptFunctionTest
         Assert.assertEquals("ScryptFunction(N=3, r=5, p=7, l=32)", scrypt.toString());
     }
 
-    @Test
-    public void as()
-    {
-        ScryptFunction sCryptFunction = ScryptFunction.getInstance(16384, 8, 1, 128);
-        System.out.println(Password.hash("45674567").addRandomSalt().addPepper("5DUY-RDpcQ!w4esW").with(sCryptFunction).getResult());
-        System.out.println(Password.check("45674567", "$s0$e0801$77+977+9LGrvv71S77+9fl3vv73vv71vGDAv77+9Ge+/vXPvv70M77+977+977+9Ve+/vUhgUmLvv70SRgHXujEMU++/vS9x77+9MO+/vSwA77+977+9V1fvv70L77+977+977+9P2/vv73vv73vv73vv73fjw==$vq8NRVfzMuUU+TpZwuQ55tEI46dJAkCWu3luUHyG/NNmMZMgoJwuQ6tZq6JKpPSjnum6M0MlgCfcFFBRWN+U2er+9yfwP5wX6Xv+fmjGjQQIkMN2BZgYPRpMKB+y4eJSQcSL8f+4TGFmncTcuAmjURUKk6RRLAvk/i7kMtczaSs=").addPepper("5DUY-RDpcQ!w4esW").with(sCryptFunction));
-    }
-
 }

@@ -1,6 +1,11 @@
 # Changelog
 
-## [1.5.2](https://github.com/Password4j/password4j/releases/tag/1.5.3) - (2021-04-14)
+
+## [1.5.4](https://github.com/Password4j/password4j/releases/tag/1.5.4) - (2021-11-19)
+### Fixed
+* Removed `slf4j-nop` which can cause issues if not excluded from the dependency tree ([#46](../../issues/46)
+
+## [1.5.3](https://github.com/Password4j/password4j/releases/tag/1.5.3) - (2021-04-14)
 ### Fixed
 * `byte[]` are converted to `String` with environment-based encoding instead of UTF-8 ([#35](../../issues/35) and [#16](../../issues/16)).
 

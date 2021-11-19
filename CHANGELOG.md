@@ -3,6 +3,8 @@
 ## [1.6.0](https://github.com/Password4j/password4j/releases/tag/1.6.0) - (Coming soon)
 ### Changed
 * `BCryptFunction`, `SCryptFunction`, `#withBCrypt()`, `#withSCrypt()`, `getBCryptInstance()`, `getSCryptInstance()` to `BcryptFunction`, `ScryptFunction`, `#withBcrypt()`, `#withScrypt()`, `getBcryptInstance()`, `getScryptInstance()` ([#36](../../issues/36)).
+
+## [1.5.4](https://github.com/Password4j/password4j/releases/tag/1.5.4) - (2021-11-19)
 ### Fixed
 * Removed `slf4j-nop` which can cause issues if not excluded from the dependency tree ([#46](../../issues/46) 
 

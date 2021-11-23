@@ -15,3 +15,9 @@ jobs:
           distribution: 'adopt'
       - name: Build with Maven
         run: mvn clean animal-sniffer:check install test
+        
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

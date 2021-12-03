@@ -86,17 +86,10 @@ public class Argon2Function extends AbstractHashingFunction
         this.outputLength = outputLength;
         this.version = version;
 
-        int memoryBlocks = this.memory;
-
-        if (this.memory < 2 * ARGON2_SYNC_POINTS * parallelism)
-        {
-            memoryBlocks = 2 * ARGON2_SYNC_POINTS * parallelism;
-        }
-
-        segmentLength = memoryBlocks / (parallelism * ARGON2_SYNC_POINTS);
+        int j = ARGON2_SYNC_POINTS * parallelism;
+        int memoryBlocks = Math.max(this.memory, 2 * j);
+        segmentLength = memoryBlocks / j;
         this.laneLength = segmentLength * ARGON2_SYNC_POINTS;
-
-        memoryBlocks = segmentLength * (parallelism * ARGON2_SYNC_POINTS);
 
         initialBlockMemory = new long[memoryBlocks][ARGON2_QWORDS_IN_BLOCK];
         for (int i = 0; i < memoryBlocks; i++)

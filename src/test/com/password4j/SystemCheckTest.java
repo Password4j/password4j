@@ -112,7 +112,7 @@ public class SystemCheckTest
     public void testBcryptRounds2()
     {
         // GIVEN
-        long maxMilliseconds = 0;
+        long maxMilliseconds = -1;
 
         // WHEN
         BenchmarkResult<BcryptFunction> result = SystemChecker.benchmarkBcrypt(maxMilliseconds);

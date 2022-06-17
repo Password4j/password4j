@@ -726,7 +726,7 @@ public class PasswordTest
         /*
          * This password hash was generated using com.lambdaworks:scrypt, which has a derived key length (dkLen) of 32 bytes.
          */
-        final String testHash = "$s0$e0801$fl+gNAicpGG4gLMkUTCvLw==$N5wE1IKsr4LPBoetJVW6jLzEH4kTVXuKGafvAA8Z+88=";
+        final String testHash = "$e0801$fl+gNAicpGG4gLMkUTCvLw==$N5wE1IKsr4LPBoetJVW6jLzEH4kTVXuKGafvAA8Z+88=";
         assertTrue(Password.check("Hello world!", testHash).with(ScryptFunction.getInstanceFromHash(testHash)));
     }
 

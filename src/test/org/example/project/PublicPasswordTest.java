@@ -32,10 +32,10 @@ public class PublicPasswordTest
             new TestSuite("$2a$14$7rdjAp2vQxO0hCK9GvniqeKURflehmGaW5C2CLOONKZauODS7xOGW", "password4j", "$2a$14$7rdjAp2vQxO0hCK9Gvniqe", null,
                     BcryptFunction.getInstance(14)),
 
-            new TestSuite("$s0$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==", "word", "salt",
+            new TestSuite("$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==", "word", "salt",
                     "pass", ScryptFunction.getInstance(16384, 8, 1)),
 
-            new TestSuite("$s0$a0402$bm90UmFuZG9t$upriFfo7v+aAUqOKDpguh0duZlAHiKcQOLM0k/xFcBg7qfRcDfYLEZe/60+b+4NtA1M70LUI0IRY+3+ybuLMZg==", "known", "notRandom",
+            new TestSuite("$a0402$bm90UmFuZG9t$upriFfo7v+aAUqOKDpguh0duZlAHiKcQOLM0k/xFcBg7qfRcDfYLEZe/60+b+4NtA1M70LUI0IRY+3+ybuLMZg==", "known", "notRandom",
                     "un", ScryptFunction.getInstance(1024, 4, 2)),
 
             new TestSuite("$argon2id$v=19$m=1024,t=3,p=12$MTExMTExMTE$0PUE8wVEaK0qdjms3b4pTZOs0+00S/+9j28WZ3gMUno", "first!", "11111111",

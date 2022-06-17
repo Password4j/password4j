@@ -46,8 +46,8 @@ public class ScryptFunctionTest
         byte[] bytes = hash.getBytes();
 
         // THEN
-        String expected = "$s0$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==";
-        byte[] expectedBytes = Base64.getDecoder().decode(expected.split("\\$")[4]);
+        String expected = "$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==";
+        byte[] expectedBytes = Base64.getDecoder().decode(expected.split("\\$")[3]);
         Assert.assertEquals(expected, result);
         Assert.assertArrayEquals(expectedBytes, bytes);
 
@@ -61,7 +61,7 @@ public class ScryptFunctionTest
 
         // WHEN
         boolean result = new ScryptFunction(16384, 8, 1)
-                .check(password, "$s0$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==");
+                .check(password, "$e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==");
 
         // THEN
         Assert.assertTrue(result);
@@ -75,7 +75,7 @@ public class ScryptFunctionTest
         String salt = "salt";
 
         // WHEN
-        boolean result = new ScryptFunction(16384, 8, 1).check(password, "$s0$e0801$c2FsdA==$c2FsdA==");
+        boolean result = new ScryptFunction(16384, 8, 1).check(password, "$e0801$c2FsdA==$c2FsdA==");
 
         // THEN
         Assert.assertFalse(result);
@@ -107,7 +107,7 @@ public class ScryptFunctionTest
         Hash hash = new ScryptFunction(16384, 8, 1).hash(password, salt);
 
         // THEN
-        Assert.assertFalse(hash.getHashingFunction().check(password, "$s0$e0801$c2FsdA==$YXNkYXNkYXNkYXNk"));
+        Assert.assertFalse(hash.getHashingFunction().check(password, "$e0801$c2FsdA==$YXNkYXNkYXNkYXNk"));
     }
 
     @Test
@@ -227,7 +227,7 @@ public class ScryptFunctionTest
         // GIVEN
 
         // WHEN
-        new ScryptFunction(16384, 8, 1).check("password", "$s0e0801$c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==");
+        new ScryptFunction(16384, 8, 1).check("password", "$e0801c2FsdA==$dFcxr0SE8yOWiWntoomu7gBbWQOsVh5kpayhIXl793NO+f1YQi4uIhg7ysup7Ie6DIO3oueI8Dzg2gZGNDPNpg==");
     }
 
     @Test

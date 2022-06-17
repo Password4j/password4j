@@ -48,7 +48,7 @@ Add the dependency of the latest version to your `pom.xml`:
 <dependency>
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.5.4</version>
+    <version>1.6.0</version>
 </dependency>
 ```
 
@@ -60,14 +60,14 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.password4j:password4j:1.5.4'
+    implementation 'com.password4j:password4j:1.6.0'
 }
 ```
 
 ## ![Scala SBT](https://i.imgur.com/Nqv3mVd.png?1) Scala SBT 
 Add to the managed dependencies of your `build.sbt` the latest version:
 ```shell script
-libraryDependencies += "com.password4j" % "password4j" % "1.5.4"
+libraryDependencies += "com.password4j" % "password4j" % "1.6.0"
 ```
 
 # Usage

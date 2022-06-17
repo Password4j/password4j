@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.6.0](https://github.com/Password4j/password4j/releases/tag/1.6.0) - (Coming soon)
+## [1.6.0](https://github.com/Password4j/password4j/releases/tag/1.6.0) - (2022-06-17)
 ### Changed
 * `BCryptFunction`, `SCryptFunction`, `#withBCrypt()`, `#withSCrypt()`, `getBCryptInstance()`, `getSCryptInstance()` to `BcryptFunction`, `ScryptFunction`, `#withBcrypt()`, `#withScrypt()`, `getBcryptInstance()`, `getScryptInstance()` ([#36](../../issues/36)).
 * Scrypt never prepends `$s0` to the result ([#64](../../issues/64)).

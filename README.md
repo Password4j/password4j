@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.imgur.com/qVNjvOt.png" alt="Password4j" title="Password4j">
+  <img src="https://i.imgur.com/qYYmWcX.png" alt="Password4j" title="Password4j">
 </p>
 
 [![Build Status](https://github.com/Password4j/password4j/actions/workflows/build.yml/badge.svg)](https://github.com/Password4j/password4j/actions/workflows/build.yml)

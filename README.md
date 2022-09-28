@@ -41,7 +41,7 @@ The javadoc can be found [here](https://javadoc.io/doc/com.password4j/password4j
 
 
 # Installation
-Password4j runs on **Java 8 or higher versions** by any vendor. It is supported by **Android API 21+** as well.
+Password4j runs on **Java 8 or higher versions** by any vendor. It is compatible with **Android API 21+** as well.
 
 The artifacts are deployed to [Maven Central](https://search.maven.org/).
 ## ![Maven](https://i.imgur.com/2TZzobp.png?1) Maven 

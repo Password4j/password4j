@@ -16,8 +16,6 @@
  */
 package com.password4j;
 
-import static org.junit.Assert.assertTrue;
-
 import com.password4j.types.Argon2;
 import com.password4j.types.Bcrypt;
 import com.password4j.types.Hmac;
@@ -29,6 +27,8 @@ import org.junit.Test;
 
 import java.security.SecureRandom;
 import java.util.Random;
+
+import static org.junit.Assert.*;
 
 
 public class PasswordTest
@@ -674,19 +674,22 @@ public class PasswordTest
         Assert.assertNull(update.getHash());
     }
 
-    @Test(expected = BadParametersException.class)
+    @Test
     public void testGenericUpdate4()
     {
         String password = "password";
 
-        Hash hash = Password.hash(password).withPBKDF2();
+        try {
+            Hash hash = Password.hash(password).withPBKDF2();
 
-        HashUpdate update = Password.check(password, "hash")
-                .andUpdate().addNewSalt(hash.getSalt()).withPBKDF2();
-
-        Assert.assertFalse(update.isVerified());
-        Assert.assertNotNull(update);
-        Assert.assertNull(update.getHash());
+            HashUpdate update = Password.check(password, "hash")
+                    .andUpdate().addNewSalt(hash.getSalt()).withPBKDF2();
+            Assert.assertFalse(update.isVerified());
+            Assert.assertNotNull(update);
+            Assert.assertNull(update.getHash());
+        } catch (Exception ex) {
+            assertTrue(ex instanceof BadParametersException);
+        }
     }
 
 

@@ -92,7 +92,7 @@ public class ScryptFunction extends AbstractHashingFunction
         if (parts.length == 4)
         {
             long params = Long.parseLong(parts[1], 16);
-            int workFactor = (int) Math.pow(2.0D, (double) (params >> 16 & 65535L));
+            int workFactor = (int) Math.pow(2.0D, (params >> 16 & 65535L));
             int resources = (int) params >> 8 & 255;
             int parallelization = (int) params & 255;
             int derivedKeyLength = Utils.decodeBase64(parts[3]).length;

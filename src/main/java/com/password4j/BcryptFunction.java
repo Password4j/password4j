@@ -407,7 +407,7 @@ public class BcryptFunction extends AbstractHashingFunction
         for (i = 0; i < 4; i++)
         {
             words[0] = (words[0] << 8) | (data[off] & 0xff);
-            words[1] = (words[1] << 8) |  data[off]; // sign extension bug
+            words[1] = (words[1] << 8) |  (data[off] & 0xff); // sign extension bug
             if (i > 0)
                 sign |= words[1] & 0x80;
             off = (off + 1) % data.length;

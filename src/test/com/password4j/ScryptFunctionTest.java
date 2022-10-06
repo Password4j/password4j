@@ -1,11 +1,15 @@
 package com.password4j;
 
+import com.password4j.types.Argon2;
 import com.password4j.types.Bcrypt;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Base64;
+import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class ScryptFunctionTest
@@ -248,6 +252,25 @@ public class ScryptFunctionTest
         Assert.assertEquals(parallelization, scrypt.getParallelization());
         Assert.assertEquals(derivedKeyLength, scrypt.getDerivedKeyLength());
         Assert.assertEquals("ScryptFunction(N=3, r=5, p=7, l=32)", scrypt.toString());
+    }
+
+    @Test
+    public void testOWASP()
+    {
+        // GIVEN
+        Properties oldProps = PropertyReader.properties;
+        PropertyReader.properties = null;
+
+        // WHEN
+        ScryptFunction scrypt = AlgorithmFinder.getScryptInstance();
+
+        // THEN
+        assertEquals(1 << 16, scrypt.getWorkFactor());
+        assertEquals(8, scrypt.getResources());
+        assertEquals(1, scrypt.getParallelization());
+        assertEquals(ScryptFunction.DERIVED_KEY_LENGTH, scrypt.getDerivedKeyLength());
+
+        PropertyReader.properties = oldProps;
     }
 
 }

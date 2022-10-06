@@ -104,7 +104,12 @@ class PropertyReader
         {
             throw new BadParametersException("Key cannot be null");
         }
-        return properties.getProperty(key);
+
+        if(properties != null)
+        {
+            return properties.getProperty(key);
+        }
+        return null;
     }
 
     static void init()

@@ -108,4 +108,10 @@ public class Password
         return hashObject.getHashingFunction().check(plainTextPassword, hashObject.getResult(), hashObject.getSalt(), hashObject.getPepper());
     }
 
+
+    public static PasswordGenerator generate()
+    {
+        return new PasswordGenerator();
+    }
+
 }

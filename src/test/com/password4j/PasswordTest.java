@@ -784,15 +784,16 @@ public class PasswordTest
     }
 
     @Test
-    public void real()
+    public void generateHOTP()
     {
-        BcryptFunction bcrypt = BcryptFunction.getInstance(Bcrypt.B, 12);
+        // GIVEN
+        String secret = "Al3S$4ndR4g10Lo";
 
-        boolean verified = Password.check("my password", "$2b$12$.z6oEtf4KGlPk9y4uzEsKuF.4MfAv9NQCrqXQevjYy0DMvVXZWcK2")
-                .addPepper("shared-secret")
-                .with(bcrypt);
+        // WHEN
+        String hotp = Password.generate().newHOTP(secret, 2022);
 
-        System.out.println(verified);
+        // THEN
+        System.out.println(hotp);
     }
 
 }

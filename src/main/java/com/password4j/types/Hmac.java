@@ -66,6 +66,26 @@ public enum Hmac
     }
 
     /**
+     * Finds the enum associated with the complete name of the algorithm
+     *
+     * @param name the complete name of the algorithm (e.g. HmacSHA1)
+     * @return a {@link Hmac} enum. Null if the name is not present in this enum or if it is null
+     * @since  2.0.0
+     */
+    public static Hmac fromName(String name)
+    {
+        String lowerCase = name.toLowerCase();
+        for(Hmac alg : values())
+        {
+            if(alg.toString().equals(lowerCase))
+            {
+                return alg;
+            }
+        }
+        return null;
+    }
+
+    /**
      * @return length of the algorithm in bits
      */
     public int bits()

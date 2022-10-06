@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -358,6 +359,20 @@ public class AlgorithmFinder
     public static Set<String> getAllMessageDigests()
     {
         return Security.getAlgorithms("MessageDigest");
+    }
+
+    public static HOTPGenerator getHOTPGeneratorInstance()
+    {
+        int length = PropertyReader.readInt("generator.hotp.length", 6, "Length for HOTP is not defined");
+        return HOTPGenerator.getInstance(length);
+    }
+
+    public static TOTPGenerator getTOTPGeneratorInstance()
+    {
+        int length = PropertyReader.readInt("generator.totp.length", 6, "Length for TOTP is not defined");
+        int interval = PropertyReader.readInt("generator.totp.interval", 60000, "Time interval for TOTP is not defined");
+        String algorithm = PropertyReader.readString("generator.totp.algorithm", Hmac.SHA256.toString(), "Length for TOTP is not defined");
+        return TOTPGenerator.getInstance(Hmac.fromName(algorithm), Duration.ofMillis(interval), length);
     }
 
     private static boolean useStrongRandom()

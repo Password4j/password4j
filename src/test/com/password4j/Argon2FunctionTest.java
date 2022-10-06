@@ -24,6 +24,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.*;
 
 import static org.junit.Assert.assertEquals;
@@ -256,6 +257,27 @@ public class Argon2FunctionTest
         Assert.assertEquals(version, argon2Function.getVersion());
 
         Assert.assertEquals("Argon2Function[m=3, i=5, p=7, l=11, t=D, v=13]", argon2Function.toString());
+    }
+
+    @Test
+    public void testOWASP()
+    {
+        // GIVEN
+        Properties oldProps = PropertyReader.properties;
+        PropertyReader.properties = null;
+
+        // WHEN
+        Argon2Function argon2 = AlgorithmFinder.getArgon2Instance();
+
+        // THEN
+        assertEquals(15, argon2.getMemory());
+        assertEquals(2, argon2.getIterations());
+        assertEquals(1, argon2.getParallelism());
+        assertEquals(32, argon2.getOutputLength());
+        assertEquals(Argon2.ID, argon2.getVariant());
+        assertEquals(19, argon2.getVersion());
+
+        PropertyReader.properties = oldProps;
     }
 
 

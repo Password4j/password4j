@@ -102,12 +102,12 @@ public class AlgorithmFinder
      *   <tr>
      *     <td>Algorithm</td>
      *     <td>hash.pbkdf2.algorithm</td>
-     *     <td>PBKDF2WithHmacSHA512</td>
+     *     <td>PBKDF2WithHmacSHA256</td>
      *   </tr>
      *   <tr>
      *     <td># iterations</td>
      *     <td>hash.pbkdf2.iterations</td>
-     *     <td>64000</td>
+     *     <td>310000</td>
      *   </tr>
      *   <tr>
      *     <td>Key length</td>
@@ -167,9 +167,9 @@ public class AlgorithmFinder
     private static Param internalGetProperties()
     {
         String algorithm = PropertyReader
-                .readString("hash.pbkdf2.algorithm", Hmac.SHA512.name(), "PBKDF2 algorithm is not defined");
-        int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", 64_000, "PBKDF2 #iterations are not defined");
-        int length = PropertyReader.readInt("hash.pbkdf2.length", Hmac.SHA512.bits(), "PBKDF2 key length is not defined");
+                .readString("hash.pbkdf2.algorithm", Hmac.SHA256.name(), "PBKDF2 algorithm is not defined");
+        int iterations = PropertyReader.readInt("hash.pbkdf2.iterations", 310_000, "PBKDF2 #iterations are not defined");
+        int length = PropertyReader.readInt("hash.pbkdf2.length", Hmac.SHA256.bits(), "PBKDF2 key length is not defined");
         return new Param(algorithm, iterations, length);
     }
 
@@ -224,7 +224,7 @@ public class AlgorithmFinder
      *   <tr>
      *     <td>Work Factor (N)</td>
      *     <td>hash.scrypt.workfactor</td>
-     *     <td>32768</td>
+     *     <td>65536</td>
      *   </tr>
      *   <tr>
      *     <td>Resources (r)</td>
@@ -248,7 +248,7 @@ public class AlgorithmFinder
      */
     public static ScryptFunction getScryptInstance()
     {
-        int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", 32_768, "scrypt work factor (N) is not defined");
+        int workFactor = PropertyReader.readInt("hash.scrypt.workfactor", 65_536, "scrypt work factor (N) is not defined");
         int resources = PropertyReader.readInt("hash.scrypt.resources", 8, "scrypt resources (r) is not defined");
         int parallelization = PropertyReader
                 .readInt("hash.scrypt.parallelization", 1, "scrypt parallelization (p) is not defined");
@@ -288,12 +288,12 @@ public class AlgorithmFinder
      *   <tr>
      *     <td>Memory (log2)</td>
      *     <td>hash.argon2.memory</td>
-     *     <td>12</td>
+     *     <td>15</td>
      *   </tr>
      *   <tr>
      *     <td>Iterations</td>
      *     <td>hash.argon2.iterations</td>
-     *     <td>20</td>
+     *     <td>2</td>
      *   </tr>
      *   <tr>
      *     <td>Output Length</td>
@@ -303,7 +303,7 @@ public class AlgorithmFinder
      *   <tr>
      *     <td>Parallelism</td>
      *     <td>hash.argon2.parallelism</td>
-     *     <td>2</td>
+     *     <td>1</td>
      *   </tr>
      *   <tr>
      *     <td>Type</td>
@@ -322,10 +322,10 @@ public class AlgorithmFinder
      */
     public static Argon2Function getArgon2Instance()
     {
-        int memory = PropertyReader.readInt("hash.argon2.memory", 12, "Argon2 memory is not defined");
-        int iterations = PropertyReader.readInt("hash.argon2.iterations", 20, "Argon2 #iterations is not defined");
+        int memory = PropertyReader.readInt("hash.argon2.memory", 15, "Argon2 memory is not defined");
+        int iterations = PropertyReader.readInt("hash.argon2.iterations", 2, "Argon2 #iterations is not defined");
         int outputLength = PropertyReader.readInt("hash.argon2.length", 32, "Argon2 output length is not defined");
-        int parallelism = PropertyReader.readInt("hash.argon2.parallelism", 2, "Argon2 parallelism is not defined");
+        int parallelism = PropertyReader.readInt("hash.argon2.parallelism", 1, "Argon2 parallelism is not defined");
         String type = PropertyReader.readString("hash.argon2.type", "id", "Argon2 type is not defined");
         int version = PropertyReader.readInt("hash.argon2.version", 19, "Argon2 version is not defined");
         return Argon2Function

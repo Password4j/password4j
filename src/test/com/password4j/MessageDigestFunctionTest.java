@@ -128,6 +128,23 @@ public class MessageDigestFunctionTest
 
         // THEN
         assertEquals(SaltOption.APPEND, function.getSaltOption());
+        PropertyReader.properties.setProperty("hash.md.salt.option", "append");
+    }
+
+    @Test
+    public void testMDRightSaltOption()
+    {
+        // GIVEN
+
+        PropertyReader.properties.setProperty("hash.md.salt.option", "prepend");
+
+        // WHEN
+        MessageDigestFunction function = AlgorithmFinder.getMessageDigestInstance();
+
+        // THEN
+        assertEquals(SaltOption.PREPEND, function.getSaltOption());
+        PropertyReader.properties.setProperty("hash.md.salt.option", "append");
+
     }
 
 

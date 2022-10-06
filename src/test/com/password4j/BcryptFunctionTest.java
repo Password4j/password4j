@@ -24,8 +24,7 @@ import org.junit.Test;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class BcryptFunctionTest
@@ -619,6 +618,23 @@ public class BcryptFunctionTest
         Assert.assertEquals(logRounds, bcrypt.getLogarithmicRounds());
         Assert.assertEquals(type, bcrypt.getType());
         Assert.assertEquals("BcryptFunction(t=y, r=7)", bcrypt.toString());
+    }
+
+    @Test
+    public void testOWASP()
+    {
+        // GIVEN
+        Properties oldProps = PropertyReader.properties;
+        PropertyReader.properties = null;
+
+        // WHEN
+        BcryptFunction bcrypt = AlgorithmFinder.getBcryptInstance();
+
+        // THEN
+        assertEquals(Bcrypt.B, bcrypt.getType());
+        assertEquals(10, bcrypt.getLogarithmicRounds());
+
+        PropertyReader.properties = oldProps;
     }
 
 }

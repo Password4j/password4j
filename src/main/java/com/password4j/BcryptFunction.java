@@ -16,13 +16,13 @@
  */
 package com.password4j;
 
+import com.password4j.types.Bcrypt;
+
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import com.password4j.types.Bcrypt;
 
 
 /**

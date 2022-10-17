@@ -16,20 +16,13 @@
  */
 package com.password4j;
 
+import com.password4j.types.Argon2;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.password4j.types.Argon2;
+import java.util.concurrent.*;
 
 
 /**
@@ -302,12 +295,12 @@ public class Argon2Function extends AbstractHashingFunction
         String[] parts = hash.split("\\$");
         if (parts.length == 6)
         {
-            result[0] = StringUtils.removeStart(parts[1], "argon2");
+            result[0] = remove(parts[1], "argon2");
             String[] params = parts[3].split(",");
-            result[1] = Integer.parseInt(StringUtils.removeStart(parts[2], "v="));
-            result[2] = Integer.parseInt(StringUtils.removeStart(params[0], "m="));
-            result[3] = Integer.parseInt(StringUtils.removeStart(params[1], "t="));
-            result[4] = Integer.parseInt(StringUtils.removeStart(params[2], "p="));
+            result[1] = Integer.parseInt(remove(parts[2], "v="));
+            result[2] = Integer.parseInt(remove(params[0], "m="));
+            result[3] = Integer.parseInt(remove(params[1], "t="));
+            result[4] = Integer.parseInt(remove(params[2], "p="));
             result[5] = Utils.decodeBase64(parts[4]);
             result[6] = Utils.decodeBase64(parts[5]);
             return result;
@@ -800,6 +793,11 @@ public class Argon2Function extends AbstractHashingFunction
             System.arraycopy(current[i], 0, old[i], 0, ARGON2_QWORDS_IN_BLOCK);
         }
         return current;
+    }
+
+    private static String remove(String source, String remove)
+    {
+        return source.substring(remove.length());
     }
 
     private String encodeHash(byte[] hash, String salt)

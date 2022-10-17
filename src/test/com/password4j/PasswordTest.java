@@ -19,16 +19,13 @@ package com.password4j;
 import com.password4j.types.Argon2;
 import com.password4j.types.Bcrypt;
 import com.password4j.types.Hmac;
-
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.security.SecureRandom;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 
 public class PasswordTest
@@ -301,7 +298,7 @@ public class PasswordTest
 
         // THEN
         assertTrue(check1);
-        assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
+        assertTrue(hash.getSalt() != null && hash.getSalt().length() > 0);
     }
 
 
@@ -317,7 +314,7 @@ public class PasswordTest
 
         // THEN
         assertTrue(check1);
-        assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
+        assertTrue(hash.getSalt() != null && hash.getSalt().length() > 0);
     }
 
 
@@ -514,7 +511,7 @@ public class PasswordTest
 
         // THEN
         assertTrue(check1);
-        assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
+        assertTrue(hash.getSalt() != null && hash.getSalt().length() > 0);
     }
 
 
@@ -530,7 +527,7 @@ public class PasswordTest
 
         // THEN
         assertTrue(check1);
-        assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
+        assertTrue(hash.getSalt() != null && hash.getSalt().length() > 0);
     }
 
 
@@ -759,9 +756,9 @@ public class PasswordTest
         for(int i = 0; i < max; i++, c++)
         {
             int length = RANDOM.nextInt(c);
-            String password = RandomStringUtils.randomPrint(length);
-            String salt = RandomStringUtils.randomPrint(32);
-            String pepper = RandomStringUtils.randomPrint(16);
+            String password = Utils.randomPrintable(length);
+            String salt = Utils.randomPrintable(32);
+            String pepper =Utils.randomPrintable(16);
 
             for(HashingFunction function : functions)
             {
@@ -769,7 +766,6 @@ public class PasswordTest
                 if(function instanceof BcryptFunction)
                 {
                     hash = Password.hash(password).addPepper(pepper).with(function);
-
                 }
                 else
                 {

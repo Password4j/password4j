@@ -16,6 +16,12 @@
  */
 package com.password4j;
 
+import com.password4j.types.Argon2;
+import com.password4j.types.Bcrypt;
+import com.password4j.types.Hmac;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.SecureRandom;
@@ -23,13 +29,6 @@ import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.password4j.types.Argon2;
-import com.password4j.types.Bcrypt;
-import com.password4j.types.Hmac;
 
 
 /**

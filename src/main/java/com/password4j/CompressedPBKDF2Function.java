@@ -17,10 +17,10 @@
 
 package com.password4j;
 
+import com.password4j.types.Hmac;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.password4j.types.Hmac;
 
 
 /**

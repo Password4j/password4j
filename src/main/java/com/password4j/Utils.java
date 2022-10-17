@@ -23,13 +23,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import java.security.AccessController;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivilegedAction;
-import java.security.SecureRandom;
-import java.security.Security;
+import java.security.*;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -538,6 +534,22 @@ class Utils
         }
 
         throw new NoSuchAlgorithmException("No strong SecureRandom impls available: " + property);
+    }
+
+    static String randomPrintable(int count)
+    {
+        Random random = AlgorithmFinder.getSecureRandom();
+
+        StringBuilder builder = new StringBuilder(count);
+        int start = 32;
+        int gap = 126 - start;
+
+        while (count-- != 0)
+        {
+            int codePoint = random.nextInt(gap) + start;
+            builder.appendCodePoint(codePoint);
+        }
+        return builder.toString();
     }
 
 }

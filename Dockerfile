@@ -1,4 +1,4 @@
-FROM maven:3.6.3-amazoncorretto-8
+FROM maven:3.8.6-amazoncorretto-8
 
 WORKDIR /build
 ADD pom.xml /build/pom.xml

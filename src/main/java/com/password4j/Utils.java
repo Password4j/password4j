@@ -561,8 +561,9 @@ class Utils
         {
             String pbkdf2Banner;
             List<String> pbkd2s = AlgorithmFinder.getAllPBKDF2Variants();
-            if (pbkd2s.size() > 0) {
-                pbkdf2Banner = "✅ PBKDF2-" + String.join("/", pbkd2s).replaceAll("PBKDF2WithHmac", "");
+            if (!pbkd2s.isEmpty())
+            {
+                pbkdf2Banner = "✅ PBKDF2-" + String.join("/", pbkd2s).replace("PBKDF2WithHmac", "");
             }
             else
             {

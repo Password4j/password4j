@@ -16,8 +16,6 @@
  */
 package com.password4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class provides the two main operations on password: hash and verify.
@@ -36,7 +34,7 @@ public class Password
 
     static
     {
-        Utils.printBanner(System.out);
+        Utils.printBanner(System.out); //NOSONAR
     }
 
     private Password()

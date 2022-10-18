@@ -788,7 +788,7 @@ public class PasswordTest
                 .addPepper("shared-secret")
                 .with(bcrypt);
 
-        System.out.println(verified);
+        Assert.assertTrue(verified);
     }
 
 }

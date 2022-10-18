@@ -31,7 +31,7 @@ class PropertyReader
 
     private static final Logger LOG = LoggerFactory.getLogger(PropertyReader.class);
 
-    private static final String FILE_NAME = "/psw4j.properties";
+    private static final String FILE_NAME = "psw4j.properties";
 
     private static final String CONFIGURATION_KEY = "psw4j.configuration";
 
@@ -118,7 +118,7 @@ class PropertyReader
         InputStream in;
         if (customPath == null || customPath.length() == 0)
         {
-            in = getResource(FILE_NAME);
+            in = getResource('/' + FILE_NAME);
         }
         else
         {

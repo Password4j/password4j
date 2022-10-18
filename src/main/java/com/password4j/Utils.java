@@ -17,6 +17,7 @@
 
 package com.password4j;
 
+
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -25,6 +26,7 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -550,6 +552,40 @@ class Utils
             builder.appendCodePoint(codePoint);
         }
         return builder.toString();
+    }
+
+    static void printBanner()
+    {
+        if (PropertyReader.readBoolean("global.banner", true))
+        {
+            String pbkdf2Banner;
+            List<String> pbkd2s = AlgorithmFinder.getAllPBKDF2Variants();
+            if (pbkd2s.size() > 0) {
+                pbkdf2Banner = "✅ PBKDF2-" + String.join("/", pbkd2s).replaceAll("PBKDF2WithHmac", "");
+            }
+            else
+            {
+                pbkdf2Banner = "❌ PBKDF2 <-- not supported by " + System.getProperty("java.vm.name");
+            }
+
+            String banner ="\n";
+            banner += "    |\n" +
+                    "    |                \033[0;1mPassword4j\033[0;0m\n" +
+                    "    + \\             .: v1.6.1 :.\n" +
+                    "    \\\\.G_.*=.\n" +
+                    "     `(H'/.\\|        ✅ Argon2\n" +
+                    "      .>' (_--.      ✅ scrypt\n" +
+                    "   _=/d   ,^\\        ✅ bcrypt\n" +
+                    " ~~ \\)-'-'           " + pbkdf2Banner + "\n" +
+                    "    / |\n" +
+                    "    '  '";
+            banner += "\n";
+            banner += " ⭐ If you enjoy Password4j, please star the project at https://github.com/Password4j/password4j\n";
+            banner += " \uD83D\uDC1B Report any issue at https://github.com/Password4j/password4j/issues\n";
+
+            System.out.println(banner);
+
+        }
     }
 
 }

@@ -95,6 +95,8 @@ public class HashTest
         String toString2 = hash2.toString();
         int hc2 = hash2.hashCode();
         String toString3 = hash3.toString();
+        Hash hash4 = new Hash(hash3.getHashingFunction(), hash3.getResult(), hash3.getBytes(), hash3.getSalt());
+
 
         // THEN
         Assert.assertNotNull(toString1);
@@ -102,6 +104,7 @@ public class HashTest
         Assert.assertNotEquals(toString1, toString2);
         Assert.assertNotEquals(toString3, toString2);
         Assert.assertNotEquals(hc1, hc2);
+        Assert.assertNotEquals(hash4, hash3);
     }
 
 }

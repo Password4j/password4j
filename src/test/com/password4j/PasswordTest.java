@@ -23,15 +23,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertTrue;
@@ -843,6 +838,20 @@ public class PasswordTest
             }
         }
 
+    }
+
+    @Test
+    public void testMultiUnicode()
+    {
+        String multiUnicode = "(っ＾▿＾)۶\uD83C\uDF78\uD83C\uDF1F\uD83C\uDF7A٩(˘◡˘ ) ❌❌ ❌❌❌";
+        String salt = "(っ＾▿＾)\uD83D\uDCA8 ❌❌ ❌❌❌";
+        String pepper = "O̲ppa̲ (っ-̶●̃益●̶̃)っ ,︵‿ S̲t̲yl̲e̲  (͠≖ ͜ʖ͠≖)\uD83D\uDC4C ❌❌ ❌❌❌";
+
+        Hash hash = Password.hash(multiUnicode).addSalt(salt).addPepper(pepper).withArgon2();
+        Hash hash2 = Password.hash(multiUnicode).addSalt(salt).addPepper(pepper).withArgon2();
+
+        Assert.assertTrue(Password.check(multiUnicode, hash));
+        Assert.assertEquals(hash, hash2);
     }
 
 

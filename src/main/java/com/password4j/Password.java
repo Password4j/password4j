@@ -16,6 +16,7 @@
  */
 package com.password4j;
 
+
 /**
  * This class provides the two main operations on password: hash and verify.
  * <p>
@@ -30,6 +31,11 @@ package com.password4j;
  */
 public class Password
 {
+
+    static
+    {
+        Utils.printBanner(System.out); //NOSONAR
+    }
 
     private Password()
     {

@@ -34,10 +34,9 @@ import org.slf4j.LoggerFactory;
 public class Password
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Password.class);
-
-    static {
-        Utils.printBanner();
+    static
+    {
+        Utils.printBanner(System.out);
     }
 
     private Password()

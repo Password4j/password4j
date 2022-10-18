@@ -22,7 +22,16 @@ import com.password4j.types.Hmac;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.security.Provider;
 import java.security.SecureRandom;
+import java.security.Security;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertTrue;
@@ -790,5 +799,51 @@ public class PasswordTest
 
         Assert.assertTrue(verified);
     }
+
+    @Test
+    public void testBanner()
+    {
+        ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+
+        PropertyReader.properties.setProperty("global.banner", "false");
+
+        Utils.printBanner(new PrintStream(outputStreamCaptor));
+        Assert.assertEquals(0, outputStreamCaptor.toString().length());
+
+        PropertyReader.properties.setProperty("global.banner", "true");
+
+    }
+
+    @Test
+    public void testBanner2()
+    {
+        ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+
+        Provider[] oldProviders = Security.getProviders();
+        for (Provider provider : oldProviders)
+        {
+            for (Provider.Service service : provider.getServices())
+            {
+                if ("SecretKeyFactory".equals(service.getType()) && service.getAlgorithm().startsWith("PBKDF2"))
+                {
+                    Security.removeProvider(provider.getName());
+                }
+            }
+        }
+
+        Utils.printBanner(new PrintStream(outputStreamCaptor));
+        Assert.assertTrue(outputStreamCaptor.toString().indexOf("❌") > 0);
+        Assert.assertTrue(outputStreamCaptor.toString().indexOf(System.getProperty("java.vm.name")) > 0);
+
+        for (Provider provider : oldProviders)
+        {
+            if (Security.getProvider(provider.getName()) == null)
+            {
+                Security.addProvider(provider);
+            }
+        }
+
+    }
+
 
 }

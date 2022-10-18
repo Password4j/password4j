@@ -18,6 +18,7 @@
 package com.password4j;
 
 
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -554,7 +555,7 @@ class Utils
         return builder.toString();
     }
 
-    static void printBanner()
+    static void printBanner(PrintStream printStream)
     {
         if (PropertyReader.readBoolean("global.banner", true))
         {
@@ -583,7 +584,7 @@ class Utils
             banner += " ⭐ If you enjoy Password4j, please star the project at https://github.com/Password4j/password4j\n";
             banner += " \uD83D\uDC1B Report any issue at https://github.com/Password4j/password4j/issues\n";
 
-            System.out.println(banner);
+            printStream.println(banner);
 
         }
     }

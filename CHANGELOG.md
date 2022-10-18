@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.6.2](https://github.com/Password4j/password4j/releases/tag/1.6.2) - (Coming soon)
+### Added
+* Application banner ([#83](../../issues/83)).
+### Removed
+* Dependencies to Apache Commons Text, which had been vulnerable to arbitrary code execution in the past ([#84](../../issues/84)).
+
 ## [1.6.1](https://github.com/Password4j/password4j/releases/tag/1.6.1) - (2022-10-07)
 ### Changed
 * Algorithms' default values are aligned to [OWASP recommendation](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) ([#80](../../issues/80))

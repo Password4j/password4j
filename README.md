@@ -1,6 +1,7 @@
 <p align="center">
-  <img src="https://i.imgur.com/cJDlHr1.png" alt="Password4j" title="Password4j">
+  <img src="https://i.imgur.com/eiL5IJp.png" alt="Password4j" title="Password4j">
 </p>
+[img][/img]
 
 [![Build Status](https://github.com/Password4j/password4j/actions/workflows/build.yml/badge.svg)](https://github.com/Password4j/password4j/actions/workflows/build.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.password4j/password4j/badge.svg?color=purple)](https://maven-badges.herokuapp.com/maven-central/com.password4j/password4j)

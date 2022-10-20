@@ -573,7 +573,7 @@ class Utils
             String banner ="\n";
             banner += "    |\n" +
                     "    |                \033[0;1mPassword4j\033[0;0m\n" +
-                    "    + \\             .: v1.6.1 :.\n" +
+                    "    + \\             .: v1.6.2 :.\n" +
                     "    \\\\.G_.*=.\n" +
                     "     `(H'/.\\|        ✅ Argon2\n" +
                     "      .>' (_--.      ✅ scrypt\n" +
@@ -583,7 +583,7 @@ class Utils
                     "    '  '";
             banner += "\n";
             banner += " ⭐ If you enjoy Password4j, please star the project at https://github.com/Password4j/password4j\n";
-            banner += " \uD83D\uDC1B Report any issue at https://github.com/Password4j/password4j/issues\n";
+            banner += " \uD83E\uDEB2  Report any issue at https://github.com/Password4j/password4j/issues\n";
 
             printStream.println(banner);
 

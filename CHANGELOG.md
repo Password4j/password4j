@@ -1,8 +1,10 @@
 # Changelog
 
-## [1.6.2](https://github.com/Password4j/password4j/releases/tag/1.6.2) - (Coming soon)
+## [1.6.2](https://github.com/Password4j/password4j/releases/tag/1.6.2) - (2022-10-20)
 ### Added
 * Application banner ([#83](../../issues/83)).
+### Fixed
+* Typo for issue [#80](../../issues/80)
 ### Removed
 * Dependencies to Apache Commons Text, which had been vulnerable to arbitrary code execution in the past ([#84](../../issues/84)).
 

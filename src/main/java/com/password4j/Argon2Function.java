@@ -19,6 +19,7 @@ package com.password4j;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -49,7 +50,7 @@ public class Argon2Function extends AbstractHashingFunction
 
     public static final int ARGON2_ADDRESSES_IN_BLOCK = 128;
 
-    private static final ConcurrentMap<String, Argon2Function> INSTANCES = new ConcurrentHashMap<>();
+    private static final Map<String, Argon2Function> INSTANCES = new ConcurrentHashMap<>();
 
     private static final int ARGON2_SYNC_POINTS = 4;
 

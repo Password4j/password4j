@@ -784,16 +784,16 @@ public class PasswordTest
     }
 
     @Test
-    public void generateHOTP()
+    public void generateSecretKey()
     {
         // GIVEN
-        String secret = "Al3S$4ndR4g10Lo";
+        //String key = Password.generate().secretKey().fromSource("")
 
         // WHEN
-        String hotp = Password.generate().newHOTP(secret, 2022);
+        //String hotp = Password.generate().newHOTP(secret, 2022);
 
         // THEN
-        System.out.println(hotp);
+        //System.out.println(hotp);
     }
 
 }

@@ -109,9 +109,9 @@ public class Password
     }
 
 
-    public static PasswordGenerator generate()
+    public static GeneratorBuilder generate()
     {
-        return new PasswordGenerator();
+        return new GeneratorBuilder();
     }
 
 }

@@ -17,6 +17,14 @@
 
 package com.password4j;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -30,8 +38,11 @@ import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
 
 
 class Utils
@@ -218,6 +229,17 @@ class Utils
     static String fromBytesToString(byte[] input)
     {
         return new String(input, DEFAULT_CHARSET);
+    }
+
+    static String fromInputStreamToString(InputStream inputStream, Charset charset) throws IOException
+    {
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        for (int read = bufferedInputStream.read(); read != -1; read = bufferedInputStream.read())
+        {
+            byteArrayOutputStream.write((byte) read);
+        }
+        return byteArrayOutputStream.toString(charset.name());
     }
 
     static long littleEndianBytesToLong(byte[] b)

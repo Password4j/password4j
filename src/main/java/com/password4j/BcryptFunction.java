@@ -18,6 +18,7 @@ package com.password4j;
 
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -35,7 +36,7 @@ import com.password4j.types.Bcrypt;
 public class BcryptFunction extends AbstractHashingFunction
 {
 
-    private static final ConcurrentMap<String, BcryptFunction> INSTANCES = new ConcurrentHashMap<>();
+    private static final Map<String, BcryptFunction> INSTANCES = new ConcurrentHashMap<>();
 
     private static final int BCRYPT_SALT_LEN = 16;
 

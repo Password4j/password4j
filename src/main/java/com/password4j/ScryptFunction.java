@@ -17,6 +17,7 @@
 package com.password4j;
 
 import java.security.GeneralSecurityException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -35,7 +36,7 @@ public class ScryptFunction extends AbstractHashingFunction
 {
     public static final int DERIVED_KEY_LENGTH = 64;
 
-    private static final ConcurrentMap<String, ScryptFunction> INSTANCES = new ConcurrentHashMap<>();
+    private static final Map<String, ScryptFunction> INSTANCES = new ConcurrentHashMap<>();
 
     private int workFactor; // N
 

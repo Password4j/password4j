@@ -23,7 +23,7 @@ package com.password4j;
  * @author David Bertoldi
  * @since 0.1.0
  */
-public abstract class AbstractHashingFunction implements HashingFunction
+public abstract class AbstractHashingFunction extends AbstractFunction implements HashingFunction
 {
 
     /**

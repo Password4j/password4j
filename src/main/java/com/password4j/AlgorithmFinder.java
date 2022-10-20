@@ -321,7 +321,7 @@ public class AlgorithmFinder
      */
     public static Argon2Function getArgon2Instance()
     {
-        int memory = PropertyReader.readInt("hash.argon2.memory", 15, "Argon2 memory is not defined");
+        int memory = PropertyReader.readInt("hash.argon2.memory", 15_360, "Argon2 memory is not defined");
         int iterations = PropertyReader.readInt("hash.argon2.iterations", 2, "Argon2 #iterations is not defined");
         int outputLength = PropertyReader.readInt("hash.argon2.length", 32, "Argon2 output length is not defined");
         int parallelism = PropertyReader.readInt("hash.argon2.parallelism", 1, "Argon2 parallelism is not defined");

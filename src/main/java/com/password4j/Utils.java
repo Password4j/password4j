@@ -120,6 +120,21 @@ class Utils
         return result;
     }
 
+    protected static boolean slowEquals(CharSequence a, CharSequence b)
+    {
+        return slowEquals(fromCharSequenceToBytes(a), fromCharSequenceToBytes(b));
+    }
+
+    static boolean slowEquals(byte[] a, byte[] b)
+    {
+        int diff = a.length ^ b.length;
+        for (int i = 0; i < a.length && i < b.length; i++)
+        {
+            diff |= a[i] ^ b[i];
+        }
+        return diff == 0;
+    }
+
     static CharSequence append(CharSequence cs1, CharSequence cs2)
     {
         if (cs1 == null || cs1.length() == 0)

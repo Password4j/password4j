@@ -37,7 +37,7 @@ public abstract class AbstractHashingFunction implements HashingFunction
      */
     protected static boolean slowEquals(CharSequence a, CharSequence b)
     {
-        return slowEquals(Utils.fromCharSequenceToBytes(a), Utils.fromCharSequenceToBytes(b));
+        return Utils.slowEquals(a, b);
     }
 
     /**
@@ -51,12 +51,7 @@ public abstract class AbstractHashingFunction implements HashingFunction
      */
     protected static boolean slowEquals(byte[] a, byte[] b)
     {
-        int diff = a.length ^ b.length;
-        for (int i = 0; i < a.length && i < b.length; i++)
-        {
-            diff |= a[i] ^ b[i];
-        }
-        return diff == 0;
+        return Utils.slowEquals(a, b);
     }
 
     @Override

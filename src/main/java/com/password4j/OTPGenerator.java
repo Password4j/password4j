@@ -18,7 +18,6 @@
 package com.password4j;
 
 import com.password4j.types.Hmac;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.ShortBufferException;
@@ -82,7 +81,7 @@ abstract class OTPGenerator
 
     public boolean check(String otp, byte[] secret, long counter)
     {
-        return StringUtils.equals(otp, generate(secret, counter));
+        return Utils.slowEquals(otp, generate(secret, counter));
     }
 
     private static byte[] getBuffer(long counter, Mac mac)

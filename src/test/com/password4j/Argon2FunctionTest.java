@@ -270,7 +270,7 @@ public class Argon2FunctionTest
         Argon2Function argon2 = AlgorithmFinder.getArgon2Instance();
 
         // THEN
-        assertEquals(15, argon2.getMemory());
+        assertEquals(15360, argon2.getMemory());
         assertEquals(2, argon2.getIterations());
         assertEquals(1, argon2.getParallelism());
         assertEquals(32, argon2.getOutputLength());

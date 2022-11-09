@@ -16,6 +16,12 @@
  */
 package com.password4j;
 
+import com.password4j.types.Argon2;
+import com.password4j.types.Bcrypt;
+import com.password4j.types.Hmac;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.SecureRandom;
@@ -24,13 +30,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.password4j.types.Argon2;
-import com.password4j.types.Bcrypt;
-import com.password4j.types.Hmac;
 
 
 /**
@@ -323,7 +322,7 @@ public class AlgorithmFinder
      */
     public static Argon2Function getArgon2Instance()
     {
-        int memory = PropertyReader.readInt("hash.argon2.memory", 15, "Argon2 memory is not defined");
+        int memory = PropertyReader.readInt("hash.argon2.memory", 15_360, "Argon2 memory is not defined");
         int iterations = PropertyReader.readInt("hash.argon2.iterations", 2, "Argon2 #iterations is not defined");
         int outputLength = PropertyReader.readInt("hash.argon2.length", 32, "Argon2 output length is not defined");
         int parallelism = PropertyReader.readInt("hash.argon2.parallelism", 1, "Argon2 parallelism is not defined");

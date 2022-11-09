@@ -17,19 +17,18 @@
 
 package com.password4j;
 
+
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import java.security.AccessController;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivilegedAction;
-import java.security.SecureRandom;
-import java.security.Security;
+import java.security.*;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -538,6 +537,57 @@ class Utils
         }
 
         throw new NoSuchAlgorithmException("No strong SecureRandom impls available: " + property);
+    }
+
+    static String randomPrintable(int count)
+    {
+        Random random = AlgorithmFinder.getSecureRandom();
+
+        StringBuilder builder = new StringBuilder(count);
+        int start = 32;
+        int gap = 126 - start;
+
+        while (count-- != 0)
+        {
+            int codePoint = random.nextInt(gap) + start;
+            builder.appendCodePoint(codePoint);
+        }
+        return builder.toString();
+    }
+
+    static void printBanner(PrintStream printStream)
+    {
+        if (PropertyReader.readBoolean("global.banner", true))
+        {
+            String pbkdf2Banner;
+            List<String> pbkd2s = AlgorithmFinder.getAllPBKDF2Variants();
+            if (!pbkd2s.isEmpty())
+            {
+                pbkdf2Banner = "✅ PBKDF2-" + String.join("/", pbkd2s).replace("PBKDF2WithHmac", "");
+            }
+            else
+            {
+                pbkdf2Banner = "❌ PBKDF2 <-- not supported by " + System.getProperty("java.vm.name");
+            }
+
+            String banner ="\n";
+            banner += "    |\n" +
+                    "    |                \033[0;1mPassword4j\033[0;0m\n" +
+                    "    + \\             .: v1.6.2 :.\n" +
+                    "    \\\\.G_.*=.\n" +
+                    "     `(H'/.\\|        ✅ Argon2\n" +
+                    "      .>' (_--.      ✅ scrypt\n" +
+                    "   _=/d   ,^\\        ✅ bcrypt\n" +
+                    " ~~ \\)-'-'           " + pbkdf2Banner + "\n" +
+                    "    / |\n" +
+                    "    '  '";
+            banner += "\n";
+            banner += " ⭐ If you enjoy Password4j, please star the project at https://github.com/Password4j/password4j\n";
+            banner += " \uD83E\uDEB2  Report any issue at https://github.com/Password4j/password4j/issues\n";
+
+            printStream.println(banner);
+
+        }
     }
 
 }

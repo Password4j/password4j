@@ -16,15 +16,14 @@
  */
 package com.password4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 class PropertyReader
@@ -32,7 +31,7 @@ class PropertyReader
 
     private static final Logger LOG = LoggerFactory.getLogger(PropertyReader.class);
 
-    private static final String FILE_NAME = "/psw4j.properties";
+    private static final String FILE_NAME = "psw4j.properties";
 
     private static final String CONFIGURATION_KEY = "psw4j.configuration";
 
@@ -117,9 +116,9 @@ class PropertyReader
         String customPath = System.getProperty(CONFIGURATION_KEY, null);
 
         InputStream in;
-        if (StringUtils.isEmpty(customPath))
+        if (customPath == null || customPath.length() == 0)
         {
-            in = getResource(FILE_NAME);
+            in = getResource('/' + FILE_NAME);
         }
         else
         {

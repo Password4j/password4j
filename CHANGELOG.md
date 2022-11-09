@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.2](https://github.com/Password4j/password4j/releases/tag/1.6.2) - (2022-10-20)
+### Added
+* Application banner ([#83](../../issues/83)).
+### Fixed
+* Typo for issue [#80](../../issues/80)
+### Removed
+* Dependencies to Apache Commons Text, which had been vulnerable to arbitrary code execution in the past ([#84](../../issues/84)).
+
+## [1.6.1](https://github.com/Password4j/password4j/releases/tag/1.6.1) - (2022-10-07)
+### Changed
+* Algorithms' default values are aligned to [OWASP recommendation](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) ([#80](../../issues/80))
+
 ## [1.6.0](https://github.com/Password4j/password4j/releases/tag/1.6.0) - (2022-06-17)
 ### Changed
 * `BCryptFunction`, `SCryptFunction`, `#withBCrypt()`, `#withSCrypt()`, `getBCryptInstance()`, `getSCryptInstance()` to `BcryptFunction`, `ScryptFunction`, `#withBcrypt()`, `#withScrypt()`, `getBcryptInstance()`, `getScryptInstance()` ([#36](../../issues/36)).

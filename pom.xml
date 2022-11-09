@@ -4,7 +4,7 @@
 
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.6.1-SNAPSHOT</version>
+    <version>1.6.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     
 
@@ -19,7 +19,7 @@
         <connection>scm:git:git@github.com/Password4j/${project.artifactId}.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/Password4j/${project.artifactId}.git</developerConnection>
         <url>https://github.com/Password4j/password4j</url>
-        <tag>1.6.0</tag>
+        <tag>1.6.2</tag>
     </scm>
 
     <licenses>
@@ -49,15 +49,16 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.3</version>
             <scope>test</scope>
         </dependency>
 

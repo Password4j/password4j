@@ -16,12 +16,12 @@
  */
 package com.password4j;
 
+import com.password4j.types.Hmac;
+
 import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import com.password4j.types.Hmac;
 
 
 /**

@@ -1,8 +1,6 @@
 package com.password4j;
 
-import com.password4j.types.Argon2;
 import com.password4j.types.Bcrypt;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -96,7 +94,7 @@ public class ScryptFunctionTest
         Hash hash = sCryptFunction.hash(password);
 
         // THEN
-        Assert.assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
+        Assert.assertTrue(hash.getSalt() != null && hash.getSalt().length() > 0);
         Assert.assertEquals(sCryptFunction, ScryptFunction.getInstanceFromHash(hash.getResult()));
     }
 
@@ -160,9 +158,9 @@ public class ScryptFunctionTest
 
         // THEN
         Assert.assertEquals(13_440, scrypt1.getRequiredBytes());
-        Assert.assertTrue(StringUtils.contains(scrypt1.getRequiredMemory(), "KB"));
+        Assert.assertTrue(scrypt1.getRequiredMemory().indexOf("KB") > 0);
         Assert.assertEquals(1_344_000, scrypt2.getRequiredBytes());
-        Assert.assertTrue(StringUtils.contains(scrypt2.getRequiredMemory(), "MB"));
+        Assert.assertTrue(scrypt2.getRequiredMemory().indexOf("MB") > 0);
         Assert.assertEquals(128, scrypt3.getRequiredBytes());
         Assert.assertEquals("128B", scrypt3.getRequiredMemory());
     }

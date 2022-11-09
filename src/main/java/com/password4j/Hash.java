@@ -19,8 +19,6 @@ package com.password4j;
 import java.util.Arrays;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
-
 
 /**
  * This class contains all the information computed after
@@ -243,11 +241,24 @@ public class Hash
 
     private boolean hasSameValues(Hash otherHash)
     {
-        return StringUtils.equals(this.result, otherHash.result) //
+        return areEquals(this.result, otherHash.result) //
                 && Arrays.equals(this.bytes, otherHash.bytes) //
-                && StringUtils.equals(this.salt, otherHash.salt) //
-                && StringUtils.equals(this.pepper, otherHash.pepper) //
+                && areEquals(this.salt, otherHash.salt) //
+                && areEquals(this.pepper, otherHash.pepper) //
                 && this.hashingFunction.equals(otherHash.hashingFunction);
+    }
+
+    private static boolean areEquals(CharSequence cs1, CharSequence cs2)
+    {
+        if (cs1 == cs2)
+        {
+            return true;
+        }
+        else if (cs1 != null && cs2 != null)
+        {
+            return cs1.equals(cs2);
+        }
+        return false;
     }
 
     @Override

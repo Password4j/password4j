@@ -19,16 +19,17 @@ package com.password4j;
 import com.password4j.types.Argon2;
 import com.password4j.types.Bcrypt;
 import com.password4j.types.Hmac;
-
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.security.Provider;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 
 public class PasswordTest
@@ -301,7 +302,7 @@ public class PasswordTest
 
         // THEN
         assertTrue(check1);
-        assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
+        assertTrue(hash.getSalt() != null && hash.getSalt().length() > 0);
     }
 
 
@@ -317,7 +318,7 @@ public class PasswordTest
 
         // THEN
         assertTrue(check1);
-        assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
+        assertTrue(hash.getSalt() != null && hash.getSalt().length() > 0);
     }
 
 
@@ -514,7 +515,7 @@ public class PasswordTest
 
         // THEN
         assertTrue(check1);
-        assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
+        assertTrue(hash.getSalt() != null && hash.getSalt().length() > 0);
     }
 
 
@@ -530,7 +531,7 @@ public class PasswordTest
 
         // THEN
         assertTrue(check1);
-        assertTrue(StringUtils.isNotEmpty(hash.getSalt()));
+        assertTrue(hash.getSalt() != null && hash.getSalt().length() > 0);
     }
 
 
@@ -759,9 +760,9 @@ public class PasswordTest
         for(int i = 0; i < max; i++, c++)
         {
             int length = RANDOM.nextInt(c);
-            String password = RandomStringUtils.randomPrint(length);
-            String salt = RandomStringUtils.randomPrint(32);
-            String pepper = RandomStringUtils.randomPrint(16);
+            String password = Utils.randomPrintable(length);
+            String salt = Utils.randomPrintable(32);
+            String pepper =Utils.randomPrintable(16);
 
             for(HashingFunction function : functions)
             {
@@ -769,7 +770,6 @@ public class PasswordTest
                 if(function instanceof BcryptFunction)
                 {
                     hash = Password.hash(password).addPepper(pepper).with(function);
-
                 }
                 else
                 {
@@ -784,16 +784,75 @@ public class PasswordTest
     }
 
     @Test
-    public void generateHOTP()
+    public void real()
     {
-        // GIVEN
-        String secret = "Al3S$4ndR4g10Lo";
+        BcryptFunction bcrypt = BcryptFunction.getInstance(Bcrypt.B, 12);
 
-        // WHEN
-        String hotp = Password.generate().newHOTP(secret, 2022);
+        boolean verified = Password.check("my password", "$2b$12$.z6oEtf4KGlPk9y4uzEsKuF.4MfAv9NQCrqXQevjYy0DMvVXZWcK2")
+                .addPepper("shared-secret")
+                .with(bcrypt);
 
-        // THEN
-        System.out.println(hotp);
+        Assert.assertTrue(verified);
     }
+
+    @Test
+    public void testBanner()
+    {
+        ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+
+        PropertyReader.properties.setProperty("global.banner", "false");
+
+        Utils.printBanner(new PrintStream(outputStreamCaptor));
+        Assert.assertEquals(0, outputStreamCaptor.toString().length());
+
+        PropertyReader.properties.setProperty("global.banner", "true");
+
+    }
+
+    @Test
+    public void testBanner2()
+    {
+        ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+
+        Provider[] oldProviders = Security.getProviders();
+        for (Provider provider : oldProviders)
+        {
+            for (Provider.Service service : provider.getServices())
+            {
+                if ("SecretKeyFactory".equals(service.getType()) && service.getAlgorithm().startsWith("PBKDF2"))
+                {
+                    Security.removeProvider(provider.getName());
+                }
+            }
+        }
+
+        Utils.printBanner(new PrintStream(outputStreamCaptor));
+        Assert.assertTrue(outputStreamCaptor.toString().indexOf("❌") > 0);
+        Assert.assertTrue(outputStreamCaptor.toString().indexOf(System.getProperty("java.vm.name")) > 0);
+
+        for (Provider provider : oldProviders)
+        {
+            if (Security.getProvider(provider.getName()) == null)
+            {
+                Security.addProvider(provider);
+            }
+        }
+
+    }
+
+    @Test
+    public void testMultiUnicode()
+    {
+        String multiUnicode = "(っ＾▿＾)۶\uD83C\uDF78\uD83C\uDF1F\uD83C\uDF7A٩(˘◡˘ ) ❌❌ ❌❌❌";
+        String salt = "(っ＾▿＾)\uD83D\uDCA8 ❌❌ ❌❌❌";
+        String pepper = "O̲ppa̲ (っ-̶●̃益●̶̃)っ ,︵‿ S̲t̲yl̲e̲  (͠≖ ͜ʖ͠≖)\uD83D\uDC4C ❌❌ ❌❌❌";
+
+        Hash hash = Password.hash(multiUnicode).addSalt(salt).addPepper(pepper).withArgon2();
+        Hash hash2 = Password.hash(multiUnicode).addSalt(salt).addPepper(pepper).withArgon2();
+
+        Assert.assertTrue(Password.check(multiUnicode, hash));
+        Assert.assertEquals(hash, hash2);
+    }
+
 
 }

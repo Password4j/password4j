@@ -17,7 +17,6 @@
 package com.password4j;
 
 import com.password4j.types.Bcrypt;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -551,8 +550,8 @@ public class BcryptFunctionTest
     @Test
     public void genSaltGeneratesCorrectSaltPrefix()
     {
-        Assert.assertTrue(StringUtils.startsWith(BcryptFunction.getInstance(4).hash("").getResult(), "$2b$04$"));
-        Assert.assertTrue(StringUtils.startsWith(BcryptFunction.getInstance(31).hash("").getResult(), "$2b$31$"));
+        Assert.assertEquals(0, BcryptFunction.getInstance(4).hash("").getResult().indexOf("$2b$04$"));
+        Assert.assertEquals(0, BcryptFunction.getInstance(31).hash("").getResult().indexOf("$2b$31$"));
     }
 
     @Test(expected = BadParametersException.class)

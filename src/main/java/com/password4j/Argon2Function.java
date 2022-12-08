@@ -18,6 +18,7 @@ package com.password4j;
 
 import com.password4j.types.Argon2;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -346,11 +347,10 @@ public class Argon2Function extends AbstractHashingFunction
         {
             salt = SaltGenerator.generate();
         }
-        String theSalt = Utils.fromBytesToString(salt);
         initialize(password, salt, Utils.fromCharSequenceToBytes(pepper), null, blockMemory);
         fillMemoryBlocks(blockMemory);
         byte[] hash = ending(blockMemory);
-        Hash result = new Hash(this, encodeHash(hash, theSalt), hash, theSalt);
+        Hash result = new Hash(this, encodeHash(hash, salt), hash, Utils.fromBytesToString(salt));
         result.setPepper(pepper);
         return result;
     }
@@ -365,18 +365,18 @@ public class Argon2Function extends AbstractHashingFunction
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed, String salt, CharSequence pepper)
     {
-        String theSalt;
+        byte[] theSalt;
         if (salt == null)
         {
             Object[] params = decodeHash(hashed);
-            theSalt = Utils.fromBytesToString((byte[]) params[5]);
+            theSalt = (byte[]) params[5];
         }
         else
         {
-            theSalt = salt;
+            theSalt = salt.getBytes(StandardCharsets.UTF_8);
         }
 
-        Hash internalHash = hash(plainTextPassword, theSalt, pepper);
+        Hash internalHash = internalHash(plainTextPassword, theSalt, pepper);
         return slowEquals(internalHash.getResult(), hashed);
     }
 
@@ -800,11 +800,11 @@ public class Argon2Function extends AbstractHashingFunction
         return source.substring(remove.length());
     }
 
-    private String encodeHash(byte[] hash, String salt)
+    private String encodeHash(byte[] hash, byte[] salt)
     {
         return "$argon2" + variant.name()
                 .toLowerCase() + "$v=" + version + "$m=" + memory + ",t=" + iterations + ",p=" + parallelism + "$"
-                + Utils.encodeBase64(Utils.fromCharSequenceToBytes(salt), false) + "$"
+                + Utils.encodeBase64(salt, false) + "$"
                 + Utils.encodeBase64(hash, false);
     }
 

@@ -16,11 +16,8 @@
  */
 package com.password4j;
 
-import com.password4j.types.Argon2;
-import com.password4j.types.Bcrypt;
-import com.password4j.types.Hmac;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -29,7 +26,12 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Random;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.password4j.types.Argon2;
+import com.password4j.types.Bcrypt;
+import com.password4j.types.Hmac;
 
 
 public class PasswordTest
@@ -854,5 +856,23 @@ public class PasswordTest
         Assert.assertEquals(hash, hash2);
     }
 
+    /**
+     * @see <a href="https://github.com/Password4j/password4j/issues/92">issue #92</a>
+     */
+    @Test
+    public void issue92()
+    {
+        String hash = "$argon2id$v=19$m=16384,t=2,p=1$nlm7oNI5zquzSYkyby6oVw$JOkJAYrDB0i2gmiJrXC6o2r+u1rszCm/RO9gIQtnxlY";
+        String plain = "Test123!";
+        Argon2Function function = Argon2Function.getInstanceFromHash(hash);
+
+        boolean verified = Password.check(plain, hash).with(function);
+        Hash newHash = Password.hash(plain).addSalt("Y9ΫI2o.W").with(function);
+        boolean verified2 = Password.check(plain, newHash);
+
+        assertTrue(verified);
+        assertTrue(verified2);
+        assertEquals("$argon2id$v=19$m=16384,t=2,p=1$WTnOq0kyby5X$SewIdM+Ywctw0lfNQ0xKYoUIlyRs3qF+gVmEVtpdmyg", newHash.getResult());
+    }
 
 }

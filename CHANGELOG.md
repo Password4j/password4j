@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.6.3](https://github.com/Password4j/password4j/releases/tag/1.6.3) - (2022-12-08)
+### Fixed
+* Inconsistency of Argon2 with some kind of salts generated from external libraries [#92](../../issues/92)
+
 ## [1.6.2](https://github.com/Password4j/password4j/releases/tag/1.6.2) - (2022-10-20)
 ### Added
 * Application banner ([#83](../../issues/83)).

@@ -141,5 +141,16 @@ public class SaltGeneratorTest
         });
     }
 
+    @Test
+    public void testSaltLength2()
+    {
+        //GIVEN
+
+        //WHEN
+        String saltLength = SaltGenerator.get();
+
+        //THEN
+        Assert.assertEquals("16", saltLength);
+    }
 
 }

@@ -147,10 +147,10 @@ public class SaltGeneratorTest
         //GIVEN
 
         //WHEN
-        String saltLength = SaltGenerator.get();
+        int saltLength = SaltGenerator.get();
 
         //THEN
-        Assert.assertEquals("16", saltLength);
+        Assert.assertEquals(16, saltLength);
     }
 
 }

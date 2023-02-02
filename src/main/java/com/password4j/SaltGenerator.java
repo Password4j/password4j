@@ -77,11 +77,11 @@ public class SaltGenerator
      */
     public static byte[] generate()
     {
-        return generate(64);
+        return generate(get());
     }
 
     /**
-     * Salt by definition are shared between all passwords and
+     * Get the length of salt from configurations and
      * must be stored in a location different from the one used
      * for the passwords.
      * <p>
@@ -92,11 +92,11 @@ public class SaltGenerator
      * are not found, {@code null} is returned.
      *
      * @return a shared pepper set in the <i>psw4j.properties</i> file.
-     * @since 0.1.1
+     * @since 1.6.4
      */
-    public static String get()
+    public static int get()
     {
-        return PropertyReader.readString("global.salt.length", null, "Global salt length is not defined");
+        return PropertyReader.readInt("global.salt.length", 64, "Global salt length is not defined in properties file");
     }
 
 }

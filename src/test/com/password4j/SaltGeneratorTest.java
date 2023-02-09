@@ -45,7 +45,23 @@ public class SaltGeneratorTest
 
         // THEN
         Assert.assertNotNull(salt);
+        Assert.assertEquals(16, salt.length);
+    }
+
+    @Test
+    public void testSaltNoProp()
+    {
+        // GIVEN
+        PropertyReader.properties.remove("global.salt.length");
+
+        // WHEN
+        byte[] salt = SaltGenerator.generate();
+
+        // THEN
+        Assert.assertNotNull(salt);
         Assert.assertEquals(64, salt.length);
+
+        PropertyReader.properties.put("global.salt.length", "16");
     }
 
     @Test(expected = BadParametersException.class)
@@ -141,5 +157,16 @@ public class SaltGeneratorTest
         });
     }
 
+    @Test
+    public void testSaltLength2()
+    {
+        //GIVEN
+
+        //WHEN
+        int saltLength = SaltGenerator.get();
+
+        //THEN
+        Assert.assertEquals(16, saltLength);
+    }
 
 }

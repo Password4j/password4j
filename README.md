@@ -99,7 +99,7 @@ Or if you want to switch from a CHF to another one:
 | MD Family                    | 1.4.0 |                                                       |
 | SHA1 Family                  | 1.4.0 |                                                       |
 | SHA2 Family                  | 1.4.0 |                                                       |
-| SHA3 FAmily                  | 1.4.0 | Depending on the Security Providers your JVM provides |
+| SHA3 Family                  | 1.4.0 | Depending on the Security Providers your JVM provides |
 
 ### Unsecure Algorithms
 Many systems may still use unsecure algorithms for storing the passwords, like [MD5](https://en.wikipedia.org/wiki/MD5) or [SHA-256](https://en.wikipedia.org/wiki/SHA-2).

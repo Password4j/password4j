@@ -759,6 +759,25 @@ public class PasswordTest
     }
 
     @Test
+    public void testGenericUpdate7()
+    {
+        String password = "password";
+
+        HashingFunction oldFunction = BcryptFunction.getInstance(6);
+        Hash hash = Password.hash(password).with(oldFunction);
+
+        HashUpdate notUpdated = Password.check(password, hash.getResult())
+                .andUpdate().with(oldFunction, oldFunction);
+
+        HashUpdate updated = Password.check(password, hash.getResult())
+                .andUpdate().forceUpdate().with(oldFunction, oldFunction);
+
+        assertFalse(notUpdated.isUpdated());
+        assertTrue(updated.isUpdated());
+        assertNotEquals(hash.getSalt(), updated.getHash().getSalt());
+    }
+
+    @Test
     public void testBcryptNonStandardParams()
     {
         final String testHash = "$2b$16$.1FczuSNl2iXHmLojhwBZO9vCfA5HIqrONkefhvn2qLQpth3r7Jwe";

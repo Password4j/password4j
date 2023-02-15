@@ -797,11 +797,11 @@ public class PasswordTest
     @Test
     public void testArgon2NonstandardParams()
     {
-        /*
-         * This password hash comes from the Argon2 C reference implementation (https://github.com/P-H-C/phc-winner-argon2).
-         */
+        // This password hash comes from the Argon2 C reference implementation (https://github.com/P-H-C/phc-winner-argon2).
+
         final String testHash = "$argon2i$v=19$m=65536,t=2,p=4$c29tZXNhbHQ$RdescudvJCsgt3ub+b+dWRWJTmaaJObG";
-        assertTrue(Password.check("password", testHash).with(Argon2Function.getInstanceFromHash(testHash)));
+        Argon2Function argon2Function = Argon2Function.getInstanceFromHash(testHash);
+        assertTrue(Password.check("password", testHash).with(argon2Function));
     }
 
 

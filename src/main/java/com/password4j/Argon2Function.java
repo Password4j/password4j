@@ -165,6 +165,84 @@ public class Argon2Function extends AbstractHashingFunction
         return getInstance(memory, iterations, parallelism, outputLength, type, version);
     }
 
+    @Override
+    public Hash hash(CharSequence plainTextPassword)
+    {
+        byte[] salt = SaltGenerator.generate();
+        return internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), salt, null);
+    }
+
+    @Override
+    public Hash hash(CharSequence plainTextPassword, String salt)
+    {
+        return hash(plainTextPassword, salt, null);
+    }
+
+    public Hash hash(byte[] plainTextPassword, byte[] salt)
+    {
+        return hash(plainTextPassword, salt, null);
+    }
+
+    @Override
+    public Hash hash(CharSequence plainTextPassword, String salt, CharSequence pepper)
+    {
+        return internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(salt), pepper);
+    }
+
+    public Hash hash(byte[] plainTextPassword, byte[] salt, CharSequence pepper)
+    {
+        return internalHash(plainTextPassword, salt, pepper);
+    }
+
+    private Hash internalHash(byte[] plainTextPassword, byte[] salt, CharSequence pepper)
+    {
+        long[][] blockMemory = copyOf(initialBlockMemory);
+
+        if (salt == null)
+        {
+            salt = SaltGenerator.generate();
+        }
+        initialize(plainTextPassword, salt, Utils.fromCharSequenceToBytes(pepper), null, blockMemory);
+        fillMemoryBlocks(blockMemory);
+        byte[] hash = ending(blockMemory);
+        Hash result = new Hash(this, encodeHash(hash, salt), hash, Utils.fromBytesToString(salt));
+        result.setPepper(pepper);
+        return result;
+    }
+
+    @Override
+    public boolean check(CharSequence plainTextPassword, String hashed)
+    {
+        Object[] params = decodeHash(hashed);
+        return check(plainTextPassword, hashed, Utils.fromBytesToString((byte[]) params[5]), null);
+    }
+
+    @Override
+    public boolean check(CharSequence plainTextPassword, String hashed, String salt, CharSequence pepper)
+    {
+        byte[] plainTextPasswordAsBytes = Utils.fromCharSequenceToBytes(plainTextPassword);
+        byte[] saltAsBytes = Utils.fromCharSequenceToBytes(salt);
+        byte[] hashedAsBytes = Utils.fromCharSequenceToBytes(hashed);
+        return check(plainTextPasswordAsBytes, hashedAsBytes, saltAsBytes, pepper);
+    }
+
+    public boolean check(byte[] plainTextPassword, byte[] hashed, byte[] salt, CharSequence pepper)
+    {
+        byte[] theSalt;
+        if (salt == null || salt.length == 0)
+        {
+            Object[] params = decodeHash(Utils.fromBytesToString(hashed));
+            theSalt = (byte[]) params[5];
+        }
+        else
+        {
+            theSalt = salt;
+        }
+
+        Hash internalHash = internalHash(plainTextPassword, theSalt, pepper);
+        return slowEquals(internalHash.getResultAsBytes(), hashed);
+    }
+
     protected static String getUID(int memory, int iterations, int parallelism, int outputLength, Argon2 type, int version)
     {
         return memory + "|" + iterations + "|" + parallelism + "|" + outputLength + "|" + type.ordinal() + "|" + version;
@@ -319,66 +397,7 @@ public class Argon2Function extends AbstractHashingFunction
                 .name() + ", v=" + version;
     }
 
-    @Override
-    public Hash hash(CharSequence plainTextPassword)
-    {
-        byte[] salt = SaltGenerator.generate();
-        return internalHash(plainTextPassword, salt, null);
-    }
 
-    @Override
-    public Hash hash(CharSequence plainTextPassword, String salt)
-    {
-        return hash(plainTextPassword, salt, null);
-    }
-
-    @Override
-    public Hash hash(CharSequence plainTextPassword, String salt, CharSequence pepper)
-    {
-        return internalHash(plainTextPassword, Utils.fromCharSequenceToBytes(salt), pepper);
-    }
-
-    private Hash internalHash(CharSequence plainTextPassword, byte[] salt, CharSequence pepper)
-    {
-        byte[] password = Utils.fromCharSequenceToBytes(plainTextPassword);
-        long[][] blockMemory = copyOf(initialBlockMemory);
-
-        if (salt == null)
-        {
-            salt = SaltGenerator.generate();
-        }
-        initialize(password, salt, Utils.fromCharSequenceToBytes(pepper), null, blockMemory);
-        fillMemoryBlocks(blockMemory);
-        byte[] hash = ending(blockMemory);
-        Hash result = new Hash(this, encodeHash(hash, salt), hash, Utils.fromBytesToString(salt));
-        result.setPepper(pepper);
-        return result;
-    }
-
-    @Override
-    public boolean check(CharSequence plainTextPassword, String hashed)
-    {
-        Object[] params = decodeHash(hashed);
-        return check(plainTextPassword, hashed, Utils.fromBytesToString((byte[]) params[5]), null);
-    }
-
-    @Override
-    public boolean check(CharSequence plainTextPassword, String hashed, String salt, CharSequence pepper)
-    {
-        byte[] theSalt;
-        if (salt == null)
-        {
-            Object[] params = decodeHash(hashed);
-            theSalt = (byte[]) params[5];
-        }
-        else
-        {
-            theSalt = salt.getBytes(StandardCharsets.UTF_8);
-        }
-
-        Hash internalHash = internalHash(plainTextPassword, theSalt, pepper);
-        return slowEquals(internalHash.getResult(), hashed);
-    }
 
     /**
      * @return the memory in bytes

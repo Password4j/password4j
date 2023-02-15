@@ -67,11 +67,16 @@ class Utils
 
     static byte[] fromCharSequenceToBytes(CharSequence charSequence)
     {
+        return fromCharSequenceToBytes(charSequence, DEFAULT_CHARSET);
+    }
+
+    static byte[] fromCharSequenceToBytes(CharSequence charSequence, Charset charset)
+    {
         if (charSequence == null)
         {
             return new byte[0];
         }
-        CharsetEncoder encoder = DEFAULT_CHARSET.newEncoder();
+        CharsetEncoder encoder = charset.newEncoder();
         int length = charSequence.length();
         int arraySize = scale(length, encoder.maxBytesPerChar());
         byte[] result = new byte[arraySize];

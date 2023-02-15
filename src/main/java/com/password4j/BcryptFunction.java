@@ -234,7 +234,7 @@ public class BcryptFunction extends AbstractHashingFunction
         else
         {
             char minor = hashed.charAt(2);
-            if (!isValidMinor(minor) || hashed.charAt(3) != '$')
+            if (isNotValidMinor(minor) || hashed.charAt(3) != '$')
                 throw new BadParametersException("Invalid salt revision");
             int rounds = Integer.parseInt(hashed.substring(4, 6));
             return getInstance(Bcrypt.valueOf(minor), rounds);
@@ -430,9 +430,9 @@ public class BcryptFunction extends AbstractHashingFunction
         return streamToWords(data, offp, signp)[1];
     }
 
-    private static boolean isValidMinor(char minor)
+    private static boolean isNotValidMinor(char minor)
     {
-        return Bcrypt.valueOf(minor) != null;
+        return Bcrypt.valueOf(minor) == null;
     }
 
     private static void internalChecks(String salt)
@@ -751,7 +751,7 @@ public class BcryptFunction extends AbstractHashingFunction
         else
         {
             minor = salt.charAt(2);
-            if (!isValidMinor(minor) || salt.charAt(3) != '$')
+            if (isNotValidMinor(minor) || salt.charAt(3) != '$')
                 throw new BadParametersException("Invalid salt revision");
             off = 4;
         }

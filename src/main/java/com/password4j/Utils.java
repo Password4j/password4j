@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 class Utils
 {
 
-    static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+    static final Charset DEFAULT_CHARSET = StandardCharsets.ISO_8859_1;
 
     private static final char[] HEX_ALPHABET = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
@@ -120,6 +120,11 @@ class Utils
         return result;
     }
 
+    static char[] fromBytesToChars(byte[] bytes)
+    {
+        return new String(bytes, DEFAULT_CHARSET).toCharArray();
+    }
+
     static CharSequence append(CharSequence cs1, CharSequence cs2)
     {
         if (cs1 == null || cs1.length() == 0)
@@ -141,6 +146,14 @@ class Utils
 
         return new SecureString(result);
 
+    }
+
+    static byte[] append(byte[] byteArray1, byte[] byteArray2)
+    {
+        byte[] result = new byte[byteArray1.length + byteArray2.length];
+        System.arraycopy(byteArray1, 0, result, 0, byteArray1.length);
+        System.arraycopy(byteArray2, 0, result, byteArray1.length, byteArray2.length);
+        return result;
     }
 
     static String toHex(byte[] bytes)

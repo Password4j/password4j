@@ -391,7 +391,7 @@ public class PasswordTest
     @Test(expected = BadParametersException.class)
     public void testBad8()
     {
-        Password.check(PASSWORD, new Hash(null, null, null, null));
+        Password.check(PASSWORD, new Hash((HashingFunction) null, (String) null, (byte[]) null, (String) null));
     }
 
     @Test
@@ -568,7 +568,7 @@ public class PasswordTest
     @Test(expected = BadParametersException.class)
     public void testBad8SecureString()
     {
-        Password.check(SECURE_PASSWORD, new Hash(null, null, null, null));
+        Password.check(SECURE_PASSWORD, new Hash((HashingFunction) null, (String) null, (byte[]) null, (String) null));
     }
 
     @Test

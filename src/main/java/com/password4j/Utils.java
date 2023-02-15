@@ -27,6 +27,7 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -322,7 +323,7 @@ class Utils
 
     static byte[] decodeBase64(String src)
     {
-        return decodeBase64(src.getBytes(StandardCharsets.ISO_8859_1));
+        return decodeBase64(src.getBytes(DEFAULT_CHARSET));
     }
 
     static String encodeBase64(byte[] src)
@@ -601,6 +602,24 @@ class Utils
             printStream.println(banner);
 
         }
+    }
+
+    static List<byte[]> split(byte[] array, byte delimiter) {
+        List<byte[]> byteArrays = new LinkedList<>();
+
+        int begin = 0;
+
+        for (int i = 0; i < array.length; i++) {
+
+            if (array[i] != delimiter) {
+                continue;
+            }
+
+            byteArrays.add(Arrays.copyOfRange(array, begin, i));
+            begin = i + 1;
+        }
+        byteArrays.add(Arrays.copyOfRange(array, begin, array.length));
+        return byteArrays;
     }
 
 }

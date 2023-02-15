@@ -66,7 +66,7 @@ public class Hash
      * Depending on the implementation of the CHF, it may contain
      * the salt and the configuration of the CHF itself.
      */
-    private String result;
+    private byte[] result;
 
     /**
      * Represents the computed output of a cryptographic hashing function.
@@ -123,11 +123,10 @@ public class Hash
      */
     public Hash(HashingFunction hashingFunction, String result, byte[] bytes, String salt)
     {
-        this.hashingFunction = hashingFunction;
-        this.salt = Utils.fromCharSequenceToBytes(salt);
-        this.result = result;
-        this.bytes = bytes;
+        this(hashingFunction, Utils.fromCharSequenceToBytes(result), bytes, Utils.fromCharSequenceToBytes(salt));
     }
+
+
 
     /**
      * Constructs an {@link Hash} containing the basic information
@@ -146,6 +145,26 @@ public class Hash
      */
     public Hash(HashingFunction hashingFunction, String result, byte[] bytes, byte[] salt)
     {
+        this(hashingFunction, Utils.fromCharSequenceToBytes(result), bytes, salt);
+    }
+
+    /**
+     * Constructs an {@link Hash} containing the basic information
+     * used and produced by the computational process of hashing a password.
+     * Other information, like <i>pepper</i> can be added with
+     * {@link #setPepper(CharSequence)}.
+     * <p>
+     * This constructor populates the object's attributes.
+     *
+     * @param hashingFunction the cryptographic algorithm used to produce the hash.
+     * @param result          the result of the computation of the hash as bytes array.
+     *                        Notice that the format varies depending on the algorithm.
+     * @param bytes           the hash without additional information.
+     * @param salt            the salt used for the computation as bytes array.
+     * @since 1.7.0
+     */
+    public Hash(HashingFunction hashingFunction, byte[] result, byte[] bytes, byte[] salt)
+    {
         this.hashingFunction = hashingFunction;
         this.salt = salt;
         this.result = result;
@@ -159,6 +178,17 @@ public class Hash
      * @since 0.1.0
      */
     public String getResult()
+    {
+        return Utils.fromBytesToString(result);
+    }
+
+    /**
+     * Retrieves the hash computed by the hashing function.
+     *
+     * @return the hash.
+     * @since 0.1.0
+     */
+    public byte[] getResultAsBytes()
     {
         return result;
     }
@@ -275,7 +305,7 @@ public class Hash
 
     private boolean hasSameValues(Hash otherHash)
     {
-        return areEquals(this.result, otherHash.result) //
+        return Arrays.equals(this.result, otherHash.result) //
                 && Arrays.equals(this.bytes, otherHash.bytes) //
                 && Arrays.equals(this.salt, otherHash.salt) //
                 && areEquals(this.pepper, otherHash.pepper) //
@@ -298,6 +328,6 @@ public class Hash
     @Override
     public int hashCode()
     {
-        return Objects.hash(result, Arrays.hashCode(salt), pepper, hashingFunction);
+        return Objects.hash(Arrays.hashCode(result), Arrays.hashCode(salt), pepper, hashingFunction);
     }
 }

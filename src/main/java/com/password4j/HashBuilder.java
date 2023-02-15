@@ -27,9 +27,9 @@ public class HashBuilder
 {
     private CharSequence plainTextPassword;
 
-    private String salt;
+    protected String salt;
 
-    private CharSequence pepper;
+    protected CharSequence pepper;
 
     @SuppressWarnings("unused")
     private HashBuilder()

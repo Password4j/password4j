@@ -28,6 +28,8 @@ public class HashUpdater
 
     protected HashBuilder hashBuilder;
 
+    private boolean force;
+
     HashUpdater(HashChecker hashChecker, HashBuilder hashBuilder)
     {
         this.hashChecker = hashChecker;
@@ -55,10 +57,25 @@ public class HashUpdater
         {
             throw new BadParametersException("New hashing function cannot be null.");
         }
+
+        boolean toBeUpdated = force || //
+                !oldHashingFunction.equals(newHashingFunction) //
+                || hashBuilder.salt != null //
+                || hashBuilder.pepper != null;
+
         if (hashChecker.with(oldHashingFunction))
         {
-            Hash hash = this.hashBuilder.with(newHashingFunction);
-            return new HashUpdate(hash);
+            if (toBeUpdated)
+            {
+                Hash hash = this.hashBuilder.with(newHashingFunction);
+                return new HashUpdate(hash, true);
+            }
+            else
+            {
+                Hash hash = new Hash(oldHashingFunction, hashChecker.hashed, null, hashChecker.salt);
+                return new HashUpdate(hash, false);
+            }
+
         }
         else
         {
@@ -134,6 +151,19 @@ public class HashUpdater
     public HashUpdater addNewPepper(CharSequence pepper)
     {
         this.hashBuilder.addPepper(pepper);
+        return this;
+    }
+
+    /**
+     * Forces the update of the hash even if function, salt and pepper did not change.
+     * This can be helpful with algorithm like Bcrypt that generates their own salt.
+     *
+     * @return this builder
+     * @since 1.7.0
+     */
+    public HashUpdater forceUpdate()
+    {
+        this.force = true;
         return this;
     }
 

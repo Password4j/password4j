@@ -16,9 +16,6 @@
  */
 package com.password4j;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.security.Provider;
@@ -32,6 +29,8 @@ import org.junit.Test;
 import com.password4j.types.Argon2;
 import com.password4j.types.Bcrypt;
 import com.password4j.types.Hmac;
+
+import static org.junit.Assert.*;
 
 
 public class PasswordTest
@@ -596,7 +595,7 @@ public class PasswordTest
         boolean result = hc.with(AlgorithmFinder.getPBKDF2Instance());
 
         // THEN
-        Assert.assertFalse(result);
+        assertFalse(result);
     }
 
     @Test
@@ -642,7 +641,7 @@ public class PasswordTest
         Assert.assertEquals(pepper, hash.getPepper());
         Assert.assertEquals(prefix + salt, update.getHash().getSalt());
         Assert.assertEquals(prefix + salt, update.getHash().getSalt());
-
+        Assert.assertTrue(update.isUpdated());
     }
 
     @Test
@@ -658,7 +657,7 @@ public class PasswordTest
         assertTrue(update.isVerified());
         Assert.assertEquals(hash.getSalt(), update.getHash().getSalt());
         Assert.assertEquals(hash.getPepper(), update.getHash().getPepper());
-
+        Assert.assertTrue(update.isUpdated());
     }
 
 
@@ -672,9 +671,10 @@ public class PasswordTest
         HashUpdate update = Password.check(password, "hash").addSalt("salt")
                 .andUpdate().addNewSalt(hash.getSalt()).withPBKDF2();
 
-        Assert.assertFalse(update.isVerified());
+        assertFalse(update.isVerified());
         Assert.assertNotNull(update);
         Assert.assertNull(update.getHash());
+        assertFalse(update.isUpdated());
     }
 
     @Test
@@ -687,9 +687,10 @@ public class PasswordTest
 
             HashUpdate update = Password.check(password, "hash")
                     .andUpdate().addNewSalt(hash.getSalt()).withPBKDF2();
-            Assert.assertFalse(update.isVerified());
+            assertFalse(update.isVerified());
             Assert.assertNotNull(update);
             Assert.assertNull(update.getHash());
+            assertFalse(update.isUpdated());
         } catch (Exception ex) {
             assertTrue(ex instanceof BadParametersException);
         }
@@ -716,7 +717,45 @@ public class PasswordTest
         assertTrue(updateSalt.getHash().getPepper() == null && updateFixedSalt.getHash().getPepper() == null);
         assertTrue(updateSalt.getHash().getSalt() != null && updateFixedSalt.getHash().getSalt() != null && updateFixedSaltPepper.getHash().getSalt() != null);
         Assert.assertEquals(PropertyReader.readString("global.pepper", null, null), updateFixedSaltPepper.getHash().getPepper());
+        Assert.assertTrue(updateSalt.isUpdated());
+        Assert.assertTrue(updateFixedSalt.isUpdated());
+        Assert.assertTrue(updateFixedSaltPepper.isUpdated());
+    }
 
+
+    @Test
+    public void testGenericUpdate6()
+    {
+        String password = "password";
+
+        HashingFunction oldFunction = ScryptFunction.getInstance(1024, 4, 2);
+        Hash hash = Password.hash(password).with(oldFunction);
+
+        HashUpdate notUpdated1 = Password.check(password, hash.getResult())
+                .andUpdate().with(oldFunction, oldFunction);
+
+        HashUpdate updated1 = Password.check(password, hash.getResult())
+                .andUpdate().addNewRandomSalt().with(oldFunction, oldFunction);
+
+        HashUpdate updated2 = Password.check(password, hash.getResult())
+                .andUpdate().addNewPepper("pepper").with(oldFunction, oldFunction);
+
+        HashUpdate updated3 = Password.check(password, hash.getResult())
+                .andUpdate().with(oldFunction, BcryptFunction.getInstance(5));
+
+        HashUpdate updated4 = Password.check(password, hash.getResult())
+                .andUpdate().with(oldFunction, ScryptFunction.getInstance(512, 4, 2));
+
+        HashUpdate updated5 = Password.check(password, hash.getResult())
+                .andUpdate().forceUpdate().with(oldFunction, oldFunction);
+
+
+        assertFalse(notUpdated1.isUpdated());
+        assertTrue(updated1.isUpdated());
+        assertTrue(updated2.isUpdated());
+        assertTrue(updated3.isUpdated());
+        assertTrue(updated4.isUpdated());
+        assertTrue(updated5.isUpdated());
     }
 
     @Test

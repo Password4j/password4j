@@ -156,7 +156,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
     public boolean check(byte[] plainTextPassword, byte[] hashed, byte[] salt)
     {
         Hash hash = internalHash(plainTextPassword, salt);
-        return slowEquals(hash.getBytes(), hashed);
+        return slowEquals(hash.getResultAsBytes(), hashed);
     }
 
     /**

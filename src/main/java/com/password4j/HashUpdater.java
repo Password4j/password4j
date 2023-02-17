@@ -97,6 +97,19 @@ public class HashUpdater
     }
 
     /**
+     * Adds new cryptographic salt to be applied in the hash update.
+     *
+     * @param saltAsBytes cryptographic salt as bytes array
+     * @return this builder
+     * @since 1.3.0
+     */
+    public HashUpdater addNewSalt(byte[] saltAsBytes)
+    {
+        this.hashBuilder.addSalt(saltAsBytes);
+        return this;
+    }
+
+    /**
      * Add a random cryptographic salt in the hash update process.
      * The salt is applied differently depending on the new chosen algorithm.
      *

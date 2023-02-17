@@ -143,7 +143,7 @@ public class HashChecker
      */
     public boolean with(HashingFunction hashingFunction)
     {
-        if (plainTextPassword == null)
+        if (plainTextPassword == null || plainTextPassword.length == 0)
         {
             return false;
         }

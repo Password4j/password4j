@@ -152,7 +152,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
         catch (IllegalArgumentException | InvalidKeySpecException e)
         {
-            String message = "Invalid specification with salt=" + Arrays.toString(salt) + ", #iterations=" + iterations + " and length=" + length;
+            String message = "Invalid specification with salt=" + Arrays.toString(salt) + ", iterations=" + iterations + " and length=" + length;
             throw new BadParametersException(message, e);
         }
     }
@@ -222,7 +222,7 @@ public class PBKDF2Function extends AbstractHashingFunction
     public boolean check(byte[] plainTextPasswordAsBytes, byte[] hashed, byte[] salt)
     {
         Hash internalHash = hash(plainTextPasswordAsBytes, salt);
-        return slowEquals(internalHash.getBytes(), hashed);
+        return slowEquals(internalHash.getResultAsBytes(), hashed);
     }
 
 

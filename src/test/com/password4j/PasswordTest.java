@@ -18,6 +18,7 @@ package com.password4j;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
@@ -213,6 +214,36 @@ public class PasswordTest
         Assert.assertEquals(Password.hash(PASSWORD).addPepper("newpepper").addSalt("newsalt").withArgon2().getResult(), update.getHash().getResult());
     }
 
+    @Test
+    public void testRawUpdate6()
+    {
+        // GIVEN
+        Hash hash = Password.hash(PASSWORD.getBytes(StandardCharsets.UTF_8)).addPepper(PEPPER).withBcrypt();
+
+        // WHEN
+        HashUpdate update = Password.check(PASSWORD.getBytes(StandardCharsets.UTF_8), hash.getResultAsBytes()).addPepper(PEPPER).addSalt(SALT.getBytes(StandardCharsets.UTF_8))
+                .andUpdate().addNewSalt("$2a$07$W3mOfB5auMDG3EitumH0S.").addNewPepper("newpepper").withBcrypt();
+
+        // THEN
+        assertTrue(update.isVerified());
+        Assert.assertEquals(Password.hash(PASSWORD.getBytes(StandardCharsets.UTF_8)).addPepper("newpepper").addSalt("$2a$07$W3mOfB5auMDG3EitumH0S.").withBcrypt().getResult(), update.getHash().getResult());
+    }
+
+    @Test
+    public void testRawUpdate7()
+    {
+        // GIVEN
+        Hash hash = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withScrypt();
+
+        // WHEN
+        HashUpdate update = Password.check(PASSWORD, hash.getResult()).addPepper(PEPPER).addSalt(SALT)
+                .andUpdate().addNewSalt("newsalt").addNewPepper("newpepper").withScrypt();
+
+        // THEN
+        assertTrue(update.isVerified());
+        Assert.assertEquals(Password.hash(PASSWORD).addPepper("newpepper").addSalt("newsalt").withScrypt().getResult(), update.getHash().getResult());
+    }
+
 
 
     @Test
@@ -351,7 +382,7 @@ public class PasswordTest
     @Test(expected = BadParametersException.class)
     public void testBad1()
     {
-        Password.hash(null);
+        Password.hash((byte[]) null);
     }
 
     @Test(expected = BadParametersException.class)
@@ -385,7 +416,7 @@ public class PasswordTest
     @Test(expected = BadParametersException.class)
     public void testBad7()
     {
-        Password.check(null, (Hash)null);
+        Password.check((CharSequence) null, (Hash)null);
     }
 
     @Test(expected = BadParametersException.class)
@@ -925,7 +956,7 @@ public class PasswordTest
         Argon2Function function = Argon2Function.getInstanceFromHash(hash);
 
         boolean verified = Password.check(plain, hash).with(function);
-        Hash newHash = Password.hash(plain).addSalt("Y9ΫI2o.W").with(function);
+        Hash newHash = Password.hash(plain).addSalt("Y9ΫI2o.W".getBytes(StandardCharsets.UTF_8)).with(function);
         boolean verified2 = Password.check(plain, newHash);
 
         assertTrue(verified);

@@ -64,7 +64,29 @@ public class Password
     }
 
     /**
-     * Starts to verify if an hash string has been generated with
+     * Starts to hash the given plain text password.
+     * <p>
+     * This method is used to start the setup of a {@link HashBuilder}
+     * instance that finally should execute the {@link HashBuilder#with(HashingFunction)}
+     * method to hash the password.
+     *
+     * @param plainTextPassword the plain text password as bytes array
+     * @return a builder instance of {@link HashBuilder}
+     * @throws BadParametersException if any of the arguments are null.
+     * @since 1.7.0
+     */
+    public static HashBuilder hash(byte[] plainTextPassword)
+    {
+        if (plainTextPassword == null || plainTextPassword.length == 0)
+        {
+            throw new BadParametersException("Password cannot be null");
+        }
+        return new HashBuilder(plainTextPassword);
+    }
+
+
+    /**
+     * Starts to verify if a hash string has been generated with
      * the given plain text password.
      * <p>
      * This method is used to start the setup of an {@link HashChecker}
@@ -72,7 +94,7 @@ public class Password
      * method to verify the hash.
      *
      * @param plainTextPassword the plain text password
-     * @param hash              an hash string
+     * @param hash              a hash string
      * @return a builder instance of {@link HashChecker}
      * @throws BadParametersException if any of the arguments are null.
      * @since 0.1.1
@@ -86,8 +108,32 @@ public class Password
         return new HashChecker(plainTextPassword, hash);
     }
 
+
     /**
-     * Starts to verify if an hash object has been generated with
+     * Starts to verify if a hash string has been generated with
+     * the given plain text password.
+     * <p>
+     * This method is used to start the setup of an {@link HashChecker}
+     * instance that finally should execute the {@link HashChecker#with(HashingFunction)}
+     * method to verify the hash.
+     *
+     * @param plainTextPassword the plain text password as bytes  array
+     * @param hash              a hash string as bytes array
+     * @return a builder instance of {@link HashChecker}
+     * @throws BadParametersException if any of the arguments are null.
+     * @since 1.7.0
+     */
+    public static HashChecker check(byte[] plainTextPassword, byte[] hash)
+    {
+        if (hash == null || plainTextPassword == null || hash.length == 0 || plainTextPassword.length == 0)
+        {
+            throw new BadParametersException("Hash or plain cannot be null");
+        }
+        return new HashChecker(plainTextPassword, hash);
+    }
+
+    /**
+     * Starts to verify if a hash object has been generated with
      * the given plain text password.
      * <p>
      * This method uses the {@link HashingFunction} used to calculate the given {@link Hash}.
@@ -112,6 +158,34 @@ public class Password
         }
 
         return hashObject.getHashingFunction().check(plainTextPassword, hashObject.getResult(), hashObject.getSalt(), hashObject.getPepper());
+    }
+
+    /**
+     * Starts to verify if a hash object has been generated with
+     * the given plain text password.
+     * <p>
+     * This method uses the {@link HashingFunction} used to calculate the given {@link Hash}.
+     * Il the password is null, this returns false;
+     * otherwise {@link HashingFunction#check(CharSequence, String)} is invoked.
+     *
+     * @param plainTextPassword the original password as bytes array.
+     * @param hashObject        an {@link Hash} object.
+     * @return true if the check passes, false otherwise.
+     * @throws BadParametersException if the Hash is null or if there's no hashing function defined in it.
+     * @since 1.7.0
+     */
+    public static boolean check(byte[] plainTextPassword, Hash hashObject)
+    {
+        if (hashObject == null || hashObject.getHashingFunction() == null)
+        {
+            throw new BadParametersException("Invalid Hash object. " + (hashObject != null ? hashObject.toString() : null));
+        }
+        if (plainTextPassword == null)
+        {
+            return false;
+        }
+
+        return hashObject.getHashingFunction().check(plainTextPassword, hashObject.getResultAsBytes(), hashObject.getResultAsBytes(), hashObject.getPepper());
     }
 
 }

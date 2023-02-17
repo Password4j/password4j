@@ -19,6 +19,7 @@ package com.password4j;
 
 import com.password4j.types.Hmac;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -160,32 +161,54 @@ public class CompressedPBKDF2Function extends PBKDF2Function
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed)
     {
-        String salt = getSaltFromHash(hashed);
+        return check(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(hashed));
+    }
+
+    @Override
+    public boolean check(byte[] plainTextPassword, byte[] hashed)
+    {
+        byte[] salt = getSaltFromHash(hashed);
         Hash internalHas = hash(plainTextPassword, salt);
 
-        return slowEquals(internalHas.getResult(), hashed);
+        return slowEquals(internalHas.getResultAsBytes(), hashed);
     }
 
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed, String salt)
     {
-        String realSalt = getSaltFromHash(hashed);
-        Hash internalHas = hash(plainTextPassword, realSalt);
-        return slowEquals(internalHas.getResult(), hashed);
+        byte[] hashAsBytes = Utils.fromCharSequenceToBytes(hashed);
+        byte[] realSalt = getSaltFromHash(hashAsBytes);
+        byte[] plainTextPasswordAsBytes = Utils.fromCharSequenceToBytes(plainTextPassword);
+        Hash internalHash = hash(plainTextPasswordAsBytes, realSalt);
+        return slowEquals(internalHash.getResult(), hashed);
+    }
+
+    @Override
+    public boolean check(byte[] plainTextPassword, byte[] hashed, byte[] salt)
+    {
+        byte[] realSalt = getSaltFromHash(hashed);
+        Hash internalHash = hash(plainTextPassword, realSalt);
+        return slowEquals(internalHash.getResultAsBytes(), hashed);
+    }
+
+    protected static List<byte[]> getParts(byte[] hashed)
+    {
+       return Utils.split(hashed, (byte) DELIMITER);
     }
 
     protected static String[] getParts(String hashed)
     {
-        return hashed.split(new StringBuilder(2).append('\\').append(DELIMITER).toString());
+        String regex = "\\" + DELIMITER;
+        return hashed.split(regex);
     }
 
-    private String getSaltFromHash(String hashed)
+    private byte[] getSaltFromHash(byte[] hashed)
     {
-        String[] parts = getParts(hashed);
-        if (parts.length == 5)
+        List<byte[]> parts = getParts(hashed);
+        if (parts.size() == 5)
         {
-            return Utils.fromBytesToString(Utils.decodeBase64(Utils.fromCharSequenceToBytes(parts[3])));
+            return Utils.decodeBase64(parts.get(3));
         }
-        throw new BadParametersException("`" + hashed + "` is not a valid hash");
+        throw new BadParametersException("`" + Utils.fromBytesToString(hashed) + "` is not a valid hash");
     }
 }

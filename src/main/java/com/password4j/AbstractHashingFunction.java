@@ -77,6 +77,25 @@ public abstract class AbstractHashingFunction implements HashingFunction
         return result;
     }
 
+    @Override
+    public Hash hash(byte[] plainTextPassword, byte[] salt, CharSequence pepper)
+    {
+        byte[] pepperAsBytes = Utils.fromCharSequenceToBytes(pepper);
+        byte[] peppered = Utils.append(pepperAsBytes, plainTextPassword);
+        Hash result;
+        if (salt == null)
+        {
+            result = hash(peppered);
+        }
+        else
+        {
+            result = hash(peppered, salt);
+        }
+
+        result.setPepper(pepper);
+        return result;
+    }
+
     /**
      * Just calls {@link #check(CharSequence, String)} without salt
      * parameter.
@@ -97,6 +116,25 @@ public abstract class AbstractHashingFunction implements HashingFunction
     }
 
     /**
+     * Just calls {@link #check(CharSequence, String)} without salt
+     * parameter.
+     * <p>
+     * Do not override this if the algorithm doesn't need a manually
+     * provided salt.
+     *
+     * @param plainTextPassword the plaintext password as bytes array
+     * @param hashed            the hash as bytes array
+     * @param salt              the salt as bytes array used to produce the hash
+     * @return true if the hash is generated from the plaintext; false otherwise
+     * @since 1.7.0
+     */
+    @Override
+    public boolean check(byte[] plainTextPassword, byte[] hashed, byte[] salt)
+    {
+        return check(plainTextPassword, hashed);
+    }
+
+    /**
      * Just calls {@link #check(CharSequence, String, String)}, with a prepended pepper.
      *
      * @param plainTextPassword the plaintext password
@@ -109,6 +147,22 @@ public abstract class AbstractHashingFunction implements HashingFunction
     public boolean check(CharSequence plainTextPassword, String hashed, String salt, CharSequence pepper)
     {
         return check(Utils.append(pepper, plainTextPassword), hashed, salt);
+    }
+
+    /**
+     * Just calls {@link #check(CharSequence, String, String)}, with a prepended pepper.
+     *
+     * @param plainTextPassword the plaintext password
+     * @param hashed            the hash
+     * @param salt              the salt used to produce the hash
+     * @return true if the hash is generated from the plaintext; false otherwise
+     * @since 1.7.0
+     */
+    @Override
+    public boolean check(byte[] plainTextPassword, byte[] hashed, byte[] salt, CharSequence pepper)
+    {
+        byte[] pepperAsBytes = Utils.fromCharSequenceToBytes(pepper);
+        return check(Utils.append(pepperAsBytes, plainTextPassword), hashed, salt);
     }
 
 }

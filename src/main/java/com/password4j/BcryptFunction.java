@@ -248,6 +248,7 @@ public class BcryptFunction extends AbstractHashingFunction
         return hash(plainTextPassword, salt);
     }
 
+    @Override
     public Hash hash(byte[] plainTextPasswordAsBytes)
     {
         String salt = generateSalt();
@@ -260,6 +261,7 @@ public class BcryptFunction extends AbstractHashingFunction
         return internalHash(plainTextPassword, salt);
     }
 
+    @Override
     public Hash hash(byte[] plainTextPassword, byte[] salt)
     {
         return internalHash(plainTextPassword, Utils.fromBytesToString(salt));
@@ -271,6 +273,7 @@ public class BcryptFunction extends AbstractHashingFunction
         return check(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(hashed));
     }
 
+    @Override
     public boolean check(byte[] plainTextPassword, byte[] hashed)
     {
         return internalCheck(plainTextPassword, hashed);

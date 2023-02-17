@@ -99,6 +99,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
         return hash(plainTextPassword, null);
     }
 
+    @Override
     public Hash hash(byte[] plainTextPasswordAsBytes)
     {
         return hash(plainTextPasswordAsBytes, null);
@@ -110,6 +111,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
         return internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(salt));
     }
 
+    @Override
     public Hash hash(byte[] plainTextPasswordAsBytes, byte[] saltAsBytes)
     {
         return internalHash(plainTextPasswordAsBytes, saltAsBytes);
@@ -137,6 +139,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
         return check(plainTextPassword, hashed, null);
     }
 
+    @Override
     public boolean check(byte[] plainTextPasswordAsBytes, byte[] hashed)
     {
         return check(plainTextPasswordAsBytes, hashed, null);
@@ -149,6 +152,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
         return slowEquals(hash.getResult(), hashed);
     }
 
+    @Override
     public boolean check(byte[] plainTextPassword, byte[] hashed, byte[] salt)
     {
         Hash hash = internalHash(plainTextPassword, salt);
@@ -180,6 +184,11 @@ public class MessageDigestFunction extends AbstractHashingFunction
 
     private byte[] concatenateSalt(byte[] plainTextPassword, byte[] salt)
     {
+        if (salt == null || salt.length == 0)
+        {
+            return  plainTextPassword;
+        }
+
         if (saltOption == SaltOption.PREPEND)
         {
             return Utils.append(salt, plainTextPassword);

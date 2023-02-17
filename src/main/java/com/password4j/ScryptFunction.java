@@ -151,6 +151,7 @@ public class ScryptFunction extends AbstractHashingFunction
         return internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), salt);
     }
 
+    @Override
     public Hash hash(byte[] plainTextPasswordAsBytes)
     {
         byte[] salt = SaltGenerator.generate();
@@ -165,6 +166,7 @@ public class ScryptFunction extends AbstractHashingFunction
         return internalHash(plainTextPasswordAsBytes, saltAsBytes);
     }
 
+    @Override
     public Hash hash(byte[] plainTextPasswordAsBytes, byte[] salt)
     {
         return internalHash(plainTextPasswordAsBytes, salt);
@@ -194,6 +196,7 @@ public class ScryptFunction extends AbstractHashingFunction
         return check(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(hashed));
     }
 
+    @Override
     public boolean check(byte[] plainTextPassword, byte[] hashed)
     {
         try

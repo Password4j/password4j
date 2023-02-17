@@ -25,9 +25,9 @@ package com.password4j;
  */
 public class HashBuilder
 {
-    private CharSequence plainTextPassword;
+    private byte[] plainTextPassword;
 
-    protected String salt;
+    protected byte[] salt;
 
     protected CharSequence pepper;
 
@@ -43,7 +43,16 @@ public class HashBuilder
      */
     protected HashBuilder(CharSequence plainTextPassword)
     {
-        this.plainTextPassword = plainTextPassword;
+        this.plainTextPassword = Utils.fromCharSequenceToBytes(plainTextPassword);
+    }
+
+    /**
+     * @param plainTextPasswordAsBytes the plain text password as bytes array
+     * @since 1.7.0
+     */
+    protected HashBuilder(byte[] plainTextPasswordAsBytes)
+    {
+        this.plainTextPassword = plainTextPasswordAsBytes;
     }
 
     /**
@@ -56,7 +65,21 @@ public class HashBuilder
      */
     public HashBuilder addSalt(String salt)
     {
-        this.salt = salt;
+        this.salt = Utils.fromCharSequenceToBytes(salt);
+        return this;
+    }
+
+    /**
+     * Add a cryptographic salt in the hashing process.
+     * The salt is applied differently depending on the chosen algorithm.
+     *
+     * @param saltAsBytes cryptographic salt as bytes array
+     * @return this builder
+     * @since 1.7.0
+     */
+    public HashBuilder addSalt(byte[] saltAsBytes)
+    {
+        this.salt = saltAsBytes;
         return this;
     }
 
@@ -72,7 +95,7 @@ public class HashBuilder
      */
     public HashBuilder addRandomSalt()
     {
-        this.salt = Utils.fromBytesToString(SaltGenerator.generate());
+        this.salt = SaltGenerator.generate();
         return this;
     }
 
@@ -94,7 +117,7 @@ public class HashBuilder
         }
         else
         {
-            this.salt = Utils.fromBytesToString(SaltGenerator.generate(length));
+            this.salt = SaltGenerator.generate(length);
         }
         return this;
     }

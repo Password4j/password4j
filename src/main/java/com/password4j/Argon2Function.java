@@ -173,11 +173,19 @@ public class Argon2Function extends AbstractHashingFunction
     }
 
     @Override
+    public Hash hash(byte[] plainTextPassword)
+    {
+        byte[] salt = SaltGenerator.generate();
+        return internalHash(plainTextPassword, salt, null);
+    }
+
+    @Override
     public Hash hash(CharSequence plainTextPassword, String salt)
     {
         return hash(plainTextPassword, salt, null);
     }
 
+    @Override
     public Hash hash(byte[] plainTextPassword, byte[] salt)
     {
         return hash(plainTextPassword, salt, null);
@@ -189,6 +197,7 @@ public class Argon2Function extends AbstractHashingFunction
         return internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(salt), pepper);
     }
 
+    @Override
     public Hash hash(byte[] plainTextPassword, byte[] salt, CharSequence pepper)
     {
         return internalHash(plainTextPassword, salt, pepper);
@@ -213,8 +222,13 @@ public class Argon2Function extends AbstractHashingFunction
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed)
     {
-        Object[] params = decodeHash(hashed);
-        return check(plainTextPassword, hashed, Utils.fromBytesToString((byte[]) params[5]), null);
+        return check(plainTextPassword, hashed, null, null);
+    }
+
+    @Override
+    public boolean check(byte[] plainTextPassword, byte[] hashed)
+    {
+        return check(plainTextPassword, hashed, null, null);
     }
 
     @Override
@@ -226,6 +240,7 @@ public class Argon2Function extends AbstractHashingFunction
         return check(plainTextPasswordAsBytes, hashedAsBytes, saltAsBytes, pepper);
     }
 
+    @Override
     public boolean check(byte[] plainTextPassword, byte[] hashed, byte[] salt, CharSequence pepper)
     {
         byte[] theSalt;

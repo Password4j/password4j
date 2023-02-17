@@ -123,6 +123,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         return hash(Utils.fromCharSequenceToBytes(plainTextPassword), salt);
     }
 
+    @Override
     public Hash hash(byte[] plainTextPasswordAsBytes)
     {
         byte[] salt = SaltGenerator.generate();
@@ -135,6 +136,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         return hash(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(salt));
     }
 
+    @Override
     public Hash hash(byte[] plainTextPassword, byte[] salt)
     {
         try
@@ -202,6 +204,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         return check((byte[]) null, null);
     }
 
+    @Override
     public boolean check(byte[] plainTextPasswordAsBytes, byte[] hashed)
     {
         throw new UnsupportedOperationException("This implementation requires an explicit salt.");
@@ -215,6 +218,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         return slowEquals(internalHash.getResult(), hashed);
     }
 
+    @Override
     public boolean check(byte[] plainTextPasswordAsBytes, byte[] hashed, byte[] salt)
     {
         Hash internalHash = hash(plainTextPasswordAsBytes, salt);

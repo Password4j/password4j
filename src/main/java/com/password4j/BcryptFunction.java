@@ -234,11 +234,132 @@ public class BcryptFunction extends AbstractHashingFunction
         else
         {
             char minor = hashed.charAt(2);
-            if (!isValidMinor(minor) || hashed.charAt(3) != '$')
+            if (isNotValidMinor(minor) || hashed.charAt(3) != '$')
                 throw new BadParametersException("Invalid salt revision");
             int rounds = Integer.parseInt(hashed.substring(4, 6));
             return getInstance(Bcrypt.valueOf(minor), rounds);
         }
+    }
+
+    @Override
+    public Hash hash(CharSequence plainTextPassword)
+    {
+        String salt = generateSalt();
+        return hash(plainTextPassword, salt);
+    }
+
+    @Override
+    public Hash hash(byte[] plainTextPasswordAsBytes)
+    {
+        String salt = generateSalt();
+        return internalHash(plainTextPasswordAsBytes, salt);
+    }
+
+    @Override
+    public Hash hash(CharSequence plainTextPassword, String salt)
+    {
+        return internalHash(plainTextPassword, salt);
+    }
+
+    @Override
+    public Hash hash(byte[] plainTextPassword, byte[] salt)
+    {
+        return internalHash(plainTextPassword, Utils.fromBytesToString(salt));
+    }
+
+    @Override
+    public boolean check(CharSequence plainTextPassword, String hashed)
+    {
+        return check(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(hashed));
+    }
+
+    @Override
+    public boolean check(byte[] plainTextPassword, byte[] hashed)
+    {
+        return internalCheck(plainTextPassword, hashed);
+    }
+
+    private Hash internalHash(CharSequence plainTextPassword, String salt)
+    {
+        byte[] passwordAsBytes = Utils.fromCharSequenceToBytes(plainTextPassword);
+        return internalHash(passwordAsBytes, salt);
+    }
+
+    protected Hash internalHash(byte[] plainTextPasswordAsBytes, String salt)
+    {
+        String realSalt;
+        byte[] saltAsBytes;
+        byte[] hashed;
+        char minor = (char) 0;
+        int off;
+        StringBuilder rs = new StringBuilder();
+
+        internalChecks(salt);
+
+        int saltLength = salt.length();
+
+        if (salt.charAt(2) == '$')
+            off = 3;
+        else
+        {
+            minor = salt.charAt(2);
+            if (isNotValidMinor(minor) || salt.charAt(3) != '$')
+                throw new BadParametersException("Invalid salt revision");
+            off = 4;
+        }
+
+        // Extract number of rounds
+        if (salt.charAt(off + 2) > '$')
+            throw new BadParametersException("Missing salt rounds");
+
+        if (off == 4 && saltLength < 29)
+        {
+            throw new BadParametersException("Invalid salt");
+        }
+
+        realSalt = salt.substring(off + 3, off + 25);
+        saltAsBytes = decodeBase64(realSalt, BCRYPT_SALT_LEN);
+
+        if (minor >= Bcrypt.A.minor()) // add null terminator
+            plainTextPasswordAsBytes = Arrays.copyOf(plainTextPasswordAsBytes, plainTextPasswordAsBytes.length + 1);
+
+        hashed = cryptRaw(plainTextPasswordAsBytes, saltAsBytes, logRounds, minor == Bcrypt.X.minor(), minor == Bcrypt.A.minor() ? 0x10000 : 0);
+
+        rs.append("$2");
+        if (minor >= Bcrypt.A.minor())
+            rs.append(minor);
+        rs.append('$');
+        if (logRounds < 10)
+            rs.append('0');
+        rs.append(logRounds);
+        rs.append('$');
+        encodeBase64(saltAsBytes, saltAsBytes.length, rs);
+        encodeBase64(hashed, BF_CRYPT_CIPHERTEXT.length * 4 - 1, rs);
+        String result = rs.toString();
+
+        return new Hash(this, result, hashed, saltAsBytes);
+    }
+
+    public int getLogarithmicRounds()
+    {
+        return logRounds;
+    }
+
+    public Bcrypt getType()
+    {
+        return type;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName() + '(' + toString(type, logRounds) + ')';
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(logRounds, type);
     }
 
     protected static String getUID(Bcrypt type, int logRounds)
@@ -430,9 +551,9 @@ public class BcryptFunction extends AbstractHashingFunction
         return streamToWords(data, offp, signp)[1];
     }
 
-    private static boolean isValidMinor(char minor)
+    private static boolean isNotValidMinor(char minor)
     {
-        return Bcrypt.valueOf(minor) != null;
+        return Bcrypt.valueOf(minor) == null;
     }
 
     private static void internalChecks(String salt)
@@ -489,68 +610,9 @@ public class BcryptFunction extends AbstractHashingFunction
         return rs.toString();
     }
 
-    static boolean equalsNoEarlyReturn(String a, String b)
-    {
-        return MessageDigest.isEqual(Utils.fromCharSequenceToBytes(a), Utils.fromCharSequenceToBytes(b));
-    }
 
-    @Override
-    public Hash hash(CharSequence plainTextPassword)
-    {
-        String salt = generateSalt();
-        return hash(plainTextPassword, salt);
-    }
 
-    @Override
-    public Hash hash(CharSequence plainTextPassword, String salt)
-    {
-        return internalHash(plainTextPassword, salt);
-    }
 
-    @Override
-    public boolean check(CharSequence plainTextPassword, String hashed)
-    {
-        return checkPw(plainTextPassword, hashed);
-    }
-
-    private Hash internalHash(CharSequence plainTextPassword, String salt)
-    {
-        byte[] passwordAsBytes = Utils.fromCharSequenceToBytes(plainTextPassword);
-        return hash(passwordAsBytes, salt);
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-            return true;
-        if (!(o instanceof BcryptFunction))
-            return false;
-        BcryptFunction that = (BcryptFunction) o;
-        return logRounds == that.logRounds && type == that.type;
-    }
-
-    public int getLogarithmicRounds()
-    {
-        return logRounds;
-    }
-
-    public Bcrypt getType()
-    {
-        return type;
-    }
-
-    @Override
-    public String toString()
-    {
-        return getClass().getSimpleName() + '(' + toString(type, logRounds) + ')';
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(logRounds, type);
-    }
 
     /**
      * Blowfish encipher a single 64-bit block encoded as
@@ -733,60 +795,18 @@ public class BcryptFunction extends AbstractHashingFunction
         return ret;
     }
 
-    protected Hash hash(byte[] passwordb, String salt)
+    @Override
+    public boolean equals(Object o)
     {
-        String realSalt;
-        byte[] saltb;
-        byte[] hashed;
-        char minor = (char) 0;
-        int off;
-        StringBuilder rs = new StringBuilder();
-
-        internalChecks(salt);
-
-        int saltLength = salt.length();
-
-        if (salt.charAt(2) == '$')
-            off = 3;
-        else
-        {
-            minor = salt.charAt(2);
-            if (!isValidMinor(minor) || salt.charAt(3) != '$')
-                throw new BadParametersException("Invalid salt revision");
-            off = 4;
-        }
-
-        // Extract number of rounds
-        if (salt.charAt(off + 2) > '$')
-            throw new BadParametersException("Missing salt rounds");
-
-        if (off == 4 && saltLength < 29)
-        {
-            throw new BadParametersException("Invalid salt");
-        }
-
-        realSalt = salt.substring(off + 3, off + 25);
-        saltb = decodeBase64(realSalt, BCRYPT_SALT_LEN);
-
-        if (minor >= Bcrypt.A.minor()) // add null terminator
-            passwordb = Arrays.copyOf(passwordb, passwordb.length + 1);
-
-        hashed = cryptRaw(passwordb, saltb, logRounds, minor == Bcrypt.X.minor(), minor == Bcrypt.A.minor() ? 0x10000 : 0);
-
-        rs.append("$2");
-        if (minor >= Bcrypt.A.minor())
-            rs.append(minor);
-        rs.append('$');
-        if (logRounds < 10)
-            rs.append('0');
-        rs.append(logRounds);
-        rs.append('$');
-        encodeBase64(saltb, saltb.length, rs);
-        encodeBase64(hashed, BF_CRYPT_CIPHERTEXT.length * 4 - 1, rs);
-        String result = rs.toString();
-
-        return new Hash(this, result, hashed, salt);
+        if (this == o)
+            return true;
+        if (!(o instanceof BcryptFunction))
+            return false;
+        BcryptFunction that = (BcryptFunction) o;
+        return logRounds == that.logRounds && type == that.type;
     }
+
+
 
     /**
      * Generate a salt to be used with the {@link BcryptFunction#hash(CharSequence, String)} method
@@ -803,14 +823,19 @@ public class BcryptFunction extends AbstractHashingFunction
      * Check that a plaintext password matches a previously hashed
      * one
      *
-     * @param plaintext the plaintext password to verify
+     * @param plainTextPasswordAsBytes the plaintext password to verify
      * @param hashed    the previously-hashed password
      * @return true if the passwords match, false otherwise
      * @since 0.1.0
      */
-    protected boolean checkPw(CharSequence plaintext, String hashed)
+    protected boolean internalCheck(byte[] plainTextPasswordAsBytes, byte[] hashed)
     {
-        return equalsNoEarlyReturn(hashed, hash(plaintext, hashed).getResult());
+        return equalsNoEarlyReturn(hashed, hash(plainTextPasswordAsBytes, hashed).getResultAsBytes());
+    }
+
+    static boolean equalsNoEarlyReturn(byte[] a, byte[] b)
+    {
+        return MessageDigest.isEqual(a, b);
     }
 
 }

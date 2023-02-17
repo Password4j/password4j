@@ -185,7 +185,7 @@ public class Password
             return false;
         }
 
-        return hashObject.getHashingFunction().check(plainTextPassword, hashObject.getResultAsBytes(), hashObject.getResultAsBytes(), hashObject.getPepper());
+        return hashObject.getHashingFunction().check(plainTextPassword, hashObject.getResultAsBytes(), hashObject.getSaltBytes(), hashObject.getPepper());
     }
 
 }

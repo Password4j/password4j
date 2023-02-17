@@ -592,7 +592,7 @@ class Utils
             String banner ="\n";
             banner += "    |\n" +
                     "    |                \033[0;1mPassword4j\033[0;0m\n" +
-                    "    + \\             .: v1.6.3 :.\n" +
+                    "    + \\             .: v1.7.0 :.\n" +
                     "    \\\\.G_.*=.\n" +
                     "     `(H'/.\\|        ✅ Argon2\n" +
                     "      .>' (_--.      ✅ scrypt\n" +

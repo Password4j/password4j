@@ -92,7 +92,7 @@ public class SaltGenerator
      * are not found, {@code null} is returned.
      *
      * @return a shared pepper set in the <i>psw4j.properties</i> file.
-     * @since 1.6.4
+     * @since 1.7.0
      */
     public static int get()
     {

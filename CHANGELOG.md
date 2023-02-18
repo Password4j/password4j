@@ -4,6 +4,7 @@
 ### Added
 * APIs now accepts `byte[]` arguments ([#93](../../issues/99))
 * `.forceUpdate()` forces Password4j to recalculate a new hash even if the parameters didn't change ([#102](../../issues/102))
+* configurable salt length with property `global.salt.length` when using `#addRandomSalt()` ([#97](../../issues/97))
 ### Changed
 * `.andUpdate()` no more recalculates the hash if the algorithm, salt or pepper changed from the hash found in `Password.check()` ([#102](../../issues/102))
 ### Fixed

@@ -1193,6 +1193,19 @@ public class PasswordTest
     }
 
     @Test
+    public void issue93()
+    {
+        String hash = "$argon2id$v=19$m=16384,t=2,p=1$nlm7oNI5zquzSYkyby6oVw$JOkJAYrDB0i2gmiJrXC6o2r+u1rszCm/RO9gIQtnxlY";
+        Argon2Function function = Argon2Function.getInstanceFromHash(hash);
+
+        boolean test1 = Password.check("Test123!", hash).with(function);
+        assertTrue(test1);
+
+        boolean test2 = function.check("Test123!", hash);
+        assertTrue(test2);
+    }
+
+    @Test
     public void afterMigrationTests()
     {
         assertThrows(BadParametersException.class, () -> Password.hash((CharSequence) null));

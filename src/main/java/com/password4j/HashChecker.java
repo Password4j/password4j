@@ -25,13 +25,14 @@ package com.password4j;
  */
 public class HashChecker
 {
-    private String hashed;
+    private byte[] plainTextPassword;
 
-    private String salt;
+    protected byte[] hashed;
+
+    protected byte[] salt;
 
     private CharSequence pepper;
 
-    private CharSequence plainTextPassword;
 
     @SuppressWarnings("unused")
     private HashChecker()
@@ -45,6 +46,17 @@ public class HashChecker
      * @since 1.0.0
      */
     HashChecker(CharSequence plainTextPassword, String hashed)
+    {
+        this.hashed = Utils.fromCharSequenceToBytes(hashed);
+        this.plainTextPassword = Utils.fromCharSequenceToBytes(plainTextPassword);
+    }
+
+    /**
+     * @param plainTextPassword the plain text password as bytes array
+     * @param hashed            the hash to verify as bytes array
+     * @since 1.7.0
+     */
+    HashChecker(byte[] plainTextPassword, byte[] hashed)
     {
         this.hashed = hashed;
         this.plainTextPassword = plainTextPassword;
@@ -87,6 +99,20 @@ public class HashChecker
      */
     public HashChecker addSalt(String salt)
     {
+        this.salt = Utils.fromCharSequenceToBytes(salt);
+        return this;
+    }
+
+    /**
+     * Add a cryptographic salt in the verifying process.
+     * The salt is applied differently depending on the chosen algorithm.
+     *
+     * @param salt cryptographic salt as bytes array
+     * @return this builder
+     * @since 1.7.0
+     */
+    public HashChecker addSalt(byte[] salt)
+    {
         this.salt = salt;
         return this;
     }
@@ -117,7 +143,7 @@ public class HashChecker
      */
     public boolean with(HashingFunction hashingFunction)
     {
-        if (plainTextPassword == null)
+        if (plainTextPassword == null || plainTextPassword.length == 0)
         {
             return false;
         }
@@ -225,9 +251,15 @@ public class HashChecker
         return with(argon2);
     }
 
+    /**
+     * This method returns the String version of the hash bytes. This
+     * should be always a safe operation when using ISO-8859-1 encoding.
+     *
+     * @return String version of the hash
+     */
     protected String getHashed()
     {
-        return hashed;
+        return Utils.fromBytesToString(hashed);
     }
 
 }

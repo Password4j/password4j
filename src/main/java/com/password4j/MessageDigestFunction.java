@@ -96,23 +96,35 @@ public class MessageDigestFunction extends AbstractHashingFunction
     @Override
     public Hash hash(CharSequence plainTextPassword)
     {
-        return internalHash(plainTextPassword, null);
+        return hash(plainTextPassword, null);
+    }
+
+    @Override
+    public Hash hash(byte[] plainTextPasswordAsBytes)
+    {
+        return hash(plainTextPasswordAsBytes, null);
     }
 
     @Override
     public Hash hash(CharSequence plainTextPassword, String salt)
     {
-        return internalHash(plainTextPassword, salt);
+        return internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(salt));
     }
 
-    protected Hash internalHash(CharSequence plainTextPassword, String salt)
+    @Override
+    public Hash hash(byte[] plainTextPasswordAsBytes, byte[] saltAsBytes)
+    {
+        return internalHash(plainTextPasswordAsBytes, saltAsBytes);
+    }
+
+    protected Hash internalHash(byte[] plainTextPassword, byte[] salt)
     {
         try
         {
             MessageDigest messageDigest = MessageDigest.getInstance(algorithm);
-            CharSequence finalCharSequence = concatenateSalt(plainTextPassword, salt);
+            byte[] finalCharSequence = concatenateSalt(plainTextPassword, salt);
 
-            byte[] result = messageDigest.digest(Utils.fromCharSequenceToBytes(finalCharSequence));
+            byte[] result = messageDigest.digest(finalCharSequence);
             return new Hash(this, Utils.toHex(result), result, salt);
         }
         catch (NoSuchAlgorithmException nsae)
@@ -124,15 +136,27 @@ public class MessageDigestFunction extends AbstractHashingFunction
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed)
     {
-        Hash hash = internalHash(plainTextPassword, null);
-        return slowEquals(hash.getResult(), hashed);
+        return check(plainTextPassword, hashed, null);
+    }
+
+    @Override
+    public boolean check(byte[] plainTextPasswordAsBytes, byte[] hashed)
+    {
+        return check(plainTextPasswordAsBytes, hashed, null);
     }
 
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed, String salt)
     {
-        Hash hash = internalHash(plainTextPassword, salt);
+        Hash hash = internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(salt));
         return slowEquals(hash.getResult(), hashed);
+    }
+
+    @Override
+    public boolean check(byte[] plainTextPassword, byte[] hashed, byte[] salt)
+    {
+        Hash hash = internalHash(plainTextPassword, salt);
+        return slowEquals(hash.getResultAsBytes(), hashed);
     }
 
     /**
@@ -158,8 +182,13 @@ public class MessageDigestFunction extends AbstractHashingFunction
         return algorithm;
     }
 
-    private CharSequence concatenateSalt(CharSequence plainTextPassword, CharSequence salt)
+    private byte[] concatenateSalt(byte[] plainTextPassword, byte[] salt)
     {
+        if (salt == null || salt.length == 0)
+        {
+            return  plainTextPassword;
+        }
+
         if (saltOption == SaltOption.PREPEND)
         {
             return Utils.append(salt, plainTextPassword);

@@ -1,4 +1,4 @@
-# ![Build Status](https://i.imgur.com/eiL5IJp.png)
+# ![Build Status](https://i.imgur.com/KVDSJrF.png)
 
 [![Build Status](https://github.com/Password4j/password4j/actions/workflows/build.yml/badge.svg)](https://github.com/Password4j/password4j/actions/workflows/build.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.password4j/password4j/badge.svg?color=purple)](https://maven-badges.herokuapp.com/maven-central/com.password4j/password4j)
@@ -45,7 +45,7 @@ Add the dependency of the latest version to your `pom.xml`:
 <dependency>
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.6.2</version>
+    <version>1.7.0</version>
 </dependency>
 ```
 
@@ -99,7 +99,7 @@ Or if you want to switch from a CHF to another one:
 | MD Family                    | 1.4.0 |                                                       |
 | SHA1 Family                  | 1.4.0 |                                                       |
 | SHA2 Family                  | 1.4.0 |                                                       |
-| SHA3 FAmily                  | 1.4.0 | Depending on the Security Providers your JVM provides |
+| SHA3 Family                  | 1.4.0 | Depending on the Security Providers your JVM provides |
 
 ### Unsecure Algorithms
 Many systems may still use unsecure algorithms for storing the passwords, like [MD5](https://en.wikipedia.org/wiki/MD5) or [SHA-256](https://en.wikipedia.org/wiki/SHA-2).

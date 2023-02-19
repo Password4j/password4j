@@ -27,6 +27,7 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -36,7 +37,7 @@ import java.util.regex.Pattern;
 class Utils
 {
 
-    static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+    static final Charset DEFAULT_CHARSET = StandardCharsets.ISO_8859_1;
 
     private static final char[] HEX_ALPHABET = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
@@ -66,11 +67,16 @@ class Utils
 
     static byte[] fromCharSequenceToBytes(CharSequence charSequence)
     {
+        return fromCharSequenceToBytes(charSequence, DEFAULT_CHARSET);
+    }
+
+    static byte[] fromCharSequenceToBytes(CharSequence charSequence, Charset charset)
+    {
         if (charSequence == null)
         {
             return new byte[0];
         }
-        CharsetEncoder encoder = DEFAULT_CHARSET.newEncoder();
+        CharsetEncoder encoder = charset.newEncoder();
         int length = charSequence.length();
         int arraySize = scale(length, encoder.maxBytesPerChar());
         byte[] result = new byte[arraySize];
@@ -120,19 +126,9 @@ class Utils
         return result;
     }
 
-    protected static boolean slowEquals(CharSequence a, CharSequence b)
+    static char[] fromBytesToChars(byte[] bytes)
     {
-        return slowEquals(fromCharSequenceToBytes(a), fromCharSequenceToBytes(b));
-    }
-
-    static boolean slowEquals(byte[] a, byte[] b)
-    {
-        int diff = a.length ^ b.length;
-        for (int i = 0; i < a.length && i < b.length; i++)
-        {
-            diff |= a[i] ^ b[i];
-        }
-        return diff == 0;
+        return new String(bytes, DEFAULT_CHARSET).toCharArray();
     }
 
     static CharSequence append(CharSequence cs1, CharSequence cs2)
@@ -158,6 +154,14 @@ class Utils
 
     }
 
+    static byte[] append(byte[] byteArray1, byte[] byteArray2)
+    {
+        byte[] result = new byte[byteArray1.length + byteArray2.length];
+        System.arraycopy(byteArray1, 0, result, 0, byteArray1.length);
+        System.arraycopy(byteArray2, 0, result, byteArray1.length, byteArray2.length);
+        return result;
+    }
+
     static String toHex(byte[] bytes)
     {
         final int length = bytes.length;
@@ -169,6 +173,21 @@ class Utils
             output[j++] = HEX_ALPHABET[0x0F & aByte];
         }
         return new String(output);
+    }
+
+    protected static boolean slowEquals(CharSequence a, CharSequence b)
+    {
+        return slowEquals(fromCharSequenceToBytes(a), fromCharSequenceToBytes(b));
+    }
+
+    static boolean slowEquals(byte[] a, byte[] b)
+    {
+        int diff = a.length ^ b.length;
+        for (int i = 0; i < a.length && i < b.length; i++)
+        {
+            diff |= a[i] ^ b[i];
+        }
+        return diff == 0;
     }
 
     static long littleEndianToLong(byte[] bs, int off)
@@ -324,7 +343,7 @@ class Utils
 
     static byte[] decodeBase64(String src)
     {
-        return decodeBase64(src.getBytes(StandardCharsets.ISO_8859_1));
+        return decodeBase64(src.getBytes(DEFAULT_CHARSET));
     }
 
     static String encodeBase64(byte[] src)
@@ -588,7 +607,7 @@ class Utils
             String banner ="\n";
             banner += "    |\n" +
                     "    |                \033[0;1mPassword4j\033[0;0m\n" +
-                    "    + \\             .: v1.6.2 :.\n" +
+                    "    + \\             .: v1.7.0 :.\n" +
                     "    \\\\.G_.*=.\n" +
                     "     `(H'/.\\|        ✅ Argon2\n" +
                     "      .>' (_--.      ✅ scrypt\n" +
@@ -604,5 +623,25 @@ class Utils
 
         }
     }
+
+    static List<byte[]> split(byte[] array, byte delimiter) {
+        List<byte[]> byteArrays = new LinkedList<>();
+
+        int begin = 0;
+
+        for (int i = 0; i < array.length; i++) {
+
+            if (array[i] != delimiter) {
+                continue;
+            }
+
+            byteArrays.add(Arrays.copyOfRange(array, begin, i));
+            begin = i + 1;
+        }
+        byteArrays.add(Arrays.copyOfRange(array, begin, array.length));
+        return byteArrays;
+    }
+
+
 
 }

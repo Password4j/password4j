@@ -16,17 +16,17 @@
  */
 package com.password4j;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import com.password4j.types.Hmac;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-
-import com.password4j.types.Hmac;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -114,15 +114,56 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
     }
 
-    protected static SecretKey internalHash(CharSequence plainTextPassword, String salt, String algorithm, int iterations,
-            int length) throws NoSuchAlgorithmException, InvalidKeySpecException
+
+
+    @Override
+    public Hash hash(CharSequence plainTextPassword)
+    {
+        byte[] salt = SaltGenerator.generate();
+        return hash(Utils.fromCharSequenceToBytes(plainTextPassword), salt);
+    }
+
+    @Override
+    public Hash hash(byte[] plainTextPasswordAsBytes)
+    {
+        byte[] salt = SaltGenerator.generate();
+        return hash(plainTextPasswordAsBytes, salt);
+    }
+
+    @Override
+    public Hash hash(CharSequence plainTextPassword, String salt)
+    {
+        return hash(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(salt));
+    }
+
+    @Override
+    public Hash hash(byte[] plainTextPassword, byte[] salt)
+    {
+        try
+        {
+            SecretKey key = internalHash(plainTextPassword, salt, this.algorithmAsString, this.iterations, this.length);
+            byte[] encodedKey = key.getEncoded();
+            return new Hash(this, getHash(encodedKey, salt), encodedKey, salt);
+        }
+        catch (NoSuchAlgorithmException nsae)
+        {
+            String message = "`" + algorithm + "` is not a valid algorithm";
+            throw new UnsupportedOperationException(message, nsae);
+        }
+        catch (IllegalArgumentException | InvalidKeySpecException e)
+        {
+            String message = "Invalid specification with salt=" + Arrays.toString(salt) + ", iterations=" + iterations + " and length=" + length;
+            throw new BadParametersException(message, e);
+        }
+    }
+
+    protected static SecretKey internalHash(byte[] plainTextPassword, byte[] salt, String algorithm, int iterations, int length) throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         if (salt == null)
         {
             throw new IllegalArgumentException("Salt cannot be null");
         }
-        return internalHash(Utils.fromCharSequenceToChars(plainTextPassword), Utils.fromCharSequenceToBytes(salt), algorithm,
-                iterations, length);
+        return internalHash(Utils.fromBytesToChars(plainTextPassword), salt, algorithm, iterations, length);
     }
 
     protected static SecretKey internalHash(char[] plain, byte[] salt, String algorithm, int iterations, int length)
@@ -143,33 +184,7 @@ public class PBKDF2Function extends AbstractHashingFunction
         return "a=" + algorithm + ", i=" + iterations + ", l=" + length;
     }
 
-    @Override
-    public Hash hash(CharSequence plainTextPassword)
-    {
-        byte[] salt = SaltGenerator.generate();
-        return hash(plainTextPassword, Utils.fromBytesToString(salt));
-    }
 
-    @Override
-    public Hash hash(CharSequence plainTextPassword, String salt)
-    {
-        try
-        {
-            SecretKey key = internalHash(plainTextPassword, salt, this.algorithmAsString, this.iterations, this.length);
-            byte[] encodedKey = key.getEncoded();
-            return new Hash(this, getHash(encodedKey, salt), encodedKey, salt);
-        }
-        catch (NoSuchAlgorithmException nsae)
-        {
-            String message = "`" + algorithm + "` is not a valid algorithm";
-            throw new UnsupportedOperationException(message, nsae);
-        }
-        catch (IllegalArgumentException | InvalidKeySpecException e)
-        {
-            String message = "Invalid specification with salt=" + salt + ", #iterations=" + iterations + " and length=" + length;
-            throw new BadParametersException(message, e);
-        }
-    }
 
     /**
      * Overridable PBKDF2 generator
@@ -178,9 +193,22 @@ public class PBKDF2Function extends AbstractHashingFunction
      * @param salt       cryptographic salt
      * @return the PBKDF2 hash string
      */
-    protected String getHash(byte[] encodedKey, String salt)
+    protected String getHash(byte[] encodedKey, byte[] salt)
     {
         return Utils.encodeBase64(encodedKey);
+    }
+
+    @Override
+    public boolean check(CharSequence plainTextPassword, String hashed)
+    {
+        return check((byte[]) null, null);
+    }
+
+    @Override
+    public boolean check(byte[] plainTextPasswordAsBytes, byte[] hashed)
+    {
+        throw new UnsupportedOperationException("This implementation requires an explicit salt.");
+
     }
 
     @Override
@@ -191,12 +219,13 @@ public class PBKDF2Function extends AbstractHashingFunction
     }
 
     @Override
-    public boolean check(CharSequence plainTextPassword, String hashed)
+    public boolean check(byte[] plainTextPasswordAsBytes, byte[] hashed, byte[] salt)
     {
-        throw new UnsupportedOperationException(
-                "This implementation requires an explicit salt. Use check(CharSequence, String, String) method instead.");
-
+        Hash internalHash = hash(plainTextPasswordAsBytes, salt);
+        return slowEquals(internalHash.getResultAsBytes(), hashed);
     }
+
+
 
     public String getAlgorithm()
     {

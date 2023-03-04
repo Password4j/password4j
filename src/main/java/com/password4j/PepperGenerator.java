@@ -17,8 +17,6 @@
 
 package com.password4j;
 
-import org.apache.commons.lang3.RandomStringUtils;
-
 
 /**
  * This class contains static functions that
@@ -58,7 +56,7 @@ public class PepperGenerator
         {
             throw new BadParametersException("Pepper length cannot be negative");
         }
-        return RandomStringUtils.random(length, 32, 126, false, false, null, AlgorithmFinder.getSecureRandom());
+        return Utils.randomPrintable(length);
     }
 
     /**

@@ -32,6 +32,8 @@ public class HashUpdate
 
     private Hash hash;
 
+    private boolean updated;
+
     private HashUpdate()
     {
         //
@@ -45,6 +47,18 @@ public class HashUpdate
     public HashUpdate(Hash hash)
     {
         this.hash = hash;
+    }
+
+    /**
+     * @param hash the new hash
+     * @param updated flag for updated hash
+     * @throws BadParametersException if hash is null but verified is true
+     * @since 1.7.0
+     */
+    public HashUpdate(Hash hash, boolean updated)
+    {
+        this(hash);
+        this.updated = updated;
     }
 
     /**
@@ -73,4 +87,15 @@ public class HashUpdate
         return hash != null;
     }
 
+    /**
+     * True if the update process changed the original hash due to changes on parameters.
+     * Changing the algorithms always set this flag to true.
+     *
+     * @return true if the hash was updated
+     * @since 1.7.0
+     */
+    public boolean isUpdated()
+    {
+        return updated;
+    }
 }

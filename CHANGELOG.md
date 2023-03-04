@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.7.0](https://github.com/Password4j/password4j/releases/tag/1.7.0) - (2023-02-18)
+### Added
+* APIs now accepts `byte[]` arguments ([#93](../../issues/99))
+* `.forceUpdate()` forces Password4j to recalculate a new hash even if the parameters didn't change ([#102](../../issues/102))
+* configurable salt length with property `global.salt.length` when using `#addRandomSalt()` ([#97](../../issues/97))
+### Changed
+* `.andUpdate()` no more recalculates the hash if the algorithm, salt or pepper changed from the hash found in `Password.check()` ([#102](../../issues/102))
+### Fixed
+* Inconsistency between public and internal APIs for Argon2 ([#93](../../issues/93))
+
+## [1.6.3](https://github.com/Password4j/password4j/releases/tag/1.6.3) - (2022-12-08)
+### Fixed
+* Inconsistency of Argon2 with some kind of salts generated from external libraries [#92](../../issues/92)
+
+## [1.6.2](https://github.com/Password4j/password4j/releases/tag/1.6.2) - (2022-10-20)
+### Added
+* Application banner ([#83](../../issues/83)).
+### Fixed
+* Typo for issue [#80](../../issues/80)
+### Removed
+* Dependencies to Apache Commons Text, which had been vulnerable to arbitrary code execution in the past ([#84](../../issues/84)).
+
+## [1.6.1](https://github.com/Password4j/password4j/releases/tag/1.6.1) - (2022-10-07)
+### Changed
+* Algorithms' default values are aligned to [OWASP recommendation](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) ([#80](../../issues/80))
+
 ## [1.6.0](https://github.com/Password4j/password4j/releases/tag/1.6.0) - (2022-06-17)
 ### Changed
 * `BCryptFunction`, `SCryptFunction`, `#withBCrypt()`, `#withSCrypt()`, `getBCryptInstance()`, `getSCryptInstance()` to `BcryptFunction`, `ScryptFunction`, `#withBcrypt()`, `#withScrypt()`, `getBcryptInstance()`, `getScryptInstance()` ([#36](../../issues/36)).

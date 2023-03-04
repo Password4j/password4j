@@ -16,9 +16,6 @@
  */
 package com.password4j;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
 import com.password4j.types.Bcrypt;
 import com.password4j.types.Hmac;
 import org.junit.Assert;
@@ -27,6 +24,9 @@ import org.junit.Test;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 
 public class PBKDF2FunctionTest

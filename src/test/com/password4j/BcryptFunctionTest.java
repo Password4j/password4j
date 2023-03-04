@@ -17,10 +17,10 @@
 package com.password4j;
 
 import com.password4j.types.Bcrypt;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -401,11 +401,11 @@ public class BcryptFunctionTest
         BcryptFunction function = BcryptFunction.getInstance(10);
 
 
-        String h1 = function.hash(pw1).getResult();
+        String h1 = function.hash(pw1.getBytes(StandardCharsets.UTF_8)).getResult();
         Assert.assertFalse(function.check(pw2, h1));
 
-        String h2 = function.hash(pw2).getResult();
-        Assert.assertFalse(function.check(pw1, h2));
+        byte[] h2 = function.hash(pw2).getResultAsBytes();
+        Assert.assertFalse(function.check(pw1.getBytes(StandardCharsets.UTF_8), h2));
     }
 
 
@@ -551,8 +551,8 @@ public class BcryptFunctionTest
     @Test
     public void genSaltGeneratesCorrectSaltPrefix()
     {
-        Assert.assertTrue(StringUtils.startsWith(BcryptFunction.getInstance(4).hash("").getResult(), "$2b$04$"));
-        Assert.assertTrue(StringUtils.startsWith(BcryptFunction.getInstance(31).hash("").getResult(), "$2b$31$"));
+        Assert.assertEquals(0, BcryptFunction.getInstance(4).hash("").getResult().indexOf("$2b$04$"));
+        Assert.assertEquals(0, BcryptFunction.getInstance(31).hash("").getResult().indexOf("$2b$31$"));
     }
 
     @Test(expected = BadParametersException.class)
@@ -595,13 +595,13 @@ public class BcryptFunctionTest
     @Test
     public void equalsOnStringsIsCorrect()
     {
-        Assert.assertTrue(BcryptFunction.equalsNoEarlyReturn("", ""));
-        Assert.assertTrue(BcryptFunction.equalsNoEarlyReturn("test", "test"));
+        Assert.assertTrue(BcryptFunction.equalsNoEarlyReturn("".getBytes(), "".getBytes()));
+        Assert.assertTrue(BcryptFunction.equalsNoEarlyReturn("test".getBytes(), "test".getBytes()));
 
-        Assert.assertFalse(BcryptFunction.equalsNoEarlyReturn("test", ""));
-        Assert.assertFalse(BcryptFunction.equalsNoEarlyReturn("", "test"));
+        Assert.assertFalse(BcryptFunction.equalsNoEarlyReturn("test".getBytes(), "".getBytes()));
+        Assert.assertFalse(BcryptFunction.equalsNoEarlyReturn("".getBytes(), "test".getBytes()));
 
-        Assert.assertFalse(BcryptFunction.equalsNoEarlyReturn("test", "pass"));
+        Assert.assertFalse(BcryptFunction.equalsNoEarlyReturn("test".getBytes(), "pass".getBytes()));
     }
 
     @Test

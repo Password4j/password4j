@@ -17,12 +17,12 @@
 
 package com.password4j;
 
-import java.util.List;
-import java.util.Set;
-
 import com.password4j.types.Argon2;
 import com.password4j.types.Bcrypt;
 import com.password4j.types.Hmac;
+
+import java.util.List;
+import java.util.Set;
 
 
 /**

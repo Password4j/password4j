@@ -1,14 +1,13 @@
 package com.password4j;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 public class PasswordGenerator
 {
 
-    public String newHOTP(String key, long counter)
+    public String newHOTP(CharSequence key, long counter)
     {
-        return newHOTP(key.getBytes(StandardCharsets.UTF_8), counter);
+        return newHOTP(Utils.fromCharSequenceToBytes(key), counter);
     }
 
     public String newHOTP(byte[] key, long counter)
@@ -17,11 +16,18 @@ public class PasswordGenerator
         return hotpGenerator.generate(key, counter);
     }
 
+    public String newTOTP(CharSequence key, Instant instant)
+    {
+        return newTOTP(Utils.fromCharSequenceToBytes(key), instant);
+    }
+
     public String newTOTP(byte[] key, Instant instant)
     {
         TOTPGenerator totpGenerator = AlgorithmFinder.getTOTPGeneratorInstance();
         return totpGenerator.generate(key, instant);
     }
+
+
 
 
 

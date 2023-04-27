@@ -552,7 +552,7 @@ public class BcryptFunctionTest
     public void genSaltGeneratesCorrectSaltPrefix()
     {
         Assert.assertEquals(0, BcryptFunction.getInstance(4).hash("").getResult().indexOf("$2b$04$"));
-        Assert.assertEquals(0, BcryptFunction.getInstance(31).hash("").getResult().indexOf("$2b$31$"));
+        Assert.assertEquals(0, BcryptFunction.getInstance(10).hash("").getResult().indexOf("$2b$10$"));
     }
 
     @Test(expected = BadParametersException.class)

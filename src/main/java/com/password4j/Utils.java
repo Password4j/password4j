@@ -162,6 +162,14 @@ class Utils
         return result;
     }
 
+    static char[] append(char[] byteArray1, char[] byteArray2)
+    {
+        char[] result = new char[byteArray1.length + byteArray2.length];
+        System.arraycopy(byteArray1, 0, result, 0, byteArray1.length);
+        System.arraycopy(byteArray2, 0, result, byteArray1.length, byteArray2.length);
+        return result;
+    }
+
     static String toHex(byte[] bytes)
     {
         final int length = bytes.length;

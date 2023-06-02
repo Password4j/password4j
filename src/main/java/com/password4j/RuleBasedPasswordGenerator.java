@@ -3,11 +3,9 @@ package com.password4j;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class RuleBasedPasswordGenerator
+public class RuleBasedPasswordGenerator extends PasswordGenerator
 {
     private static final Map<String, RuleBasedPasswordGenerator> INSTANCES = new ConcurrentHashMap<>();
-
-    protected char[] symbols;
 
     private RuleBasedPasswordGenerator(char[] symbols)
     {

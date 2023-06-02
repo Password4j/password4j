@@ -25,7 +25,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-abstract class OTPGenerator
+abstract class OTPGenerator extends PasswordGenerator
 {
     private static final int[] DIGITS_POWER = {10, 100, 1_000, 10_000, 100_000, 1_000_000, 10_000_000, 100_000_000};
 

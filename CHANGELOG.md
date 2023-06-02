@@ -1,8 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/Password4j/password4j/releases/tag/1.7.1) - (2023-02-18)
+### Fixed
+* Bcrypt used negative rounds when cost factor = 31 ([#114](../../issues/114))
+
 ## [1.7.0](https://github.com/Password4j/password4j/releases/tag/1.7.0) - (2023-02-18)
 ### Added
-* APIs now accepts `byte[]` arguments ([#93](../../issues/99))
+* APIs now accepts `byte[]` arguments ([#99](../../issues/99))
 * `.forceUpdate()` forces Password4j to recalculate a new hash even if the parameters didn't change ([#102](../../issues/102))
 * configurable salt length with property `global.salt.length` when using `#addRandomSalt()` ([#97](../../issues/97))
 ### Changed

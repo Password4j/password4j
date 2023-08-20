@@ -1,6 +1,12 @@
 # Changelog
 
-## [1.7.1](https://github.com/Password4j/password4j/releases/tag/1.7.1) - (2023-02-18)
+## [1.7.2](https://github.com/Password4j/password4j/releases/tag/1.7.2) - (2023-08-20)
+### Fixed
+* Suppressed warning for usage of `java.security.AccessController`. This is how the java development team fixed the problem for the moment ([#119](../../issues/119))
+* In some custom JDK implementations `java.security.Provider#getServices()` can return `null` instead of empty `java.security.Provider.Service[]` ([#120](../../issues/120))
+
+
+## [1.7.1](https://github.com/Password4j/password4j/releases/tag/1.7.1) - (2023-06-02)
 ### Fixed
 * Bcrypt used negative rounds when cost factor = 31 ([#114](../../issues/114))
 

@@ -23,6 +23,7 @@ import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Random;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -1219,6 +1220,28 @@ public class PasswordTest
         assertFalse(Password.check((CharSequence) null, new Hash(MessageDigestFunction.getInstance("MD5"), new byte[0], new byte[0], new byte[0])));
         assertThrows(BadParametersException.class, () -> Password.check(new byte[0], (Hash) null));
         assertThrows(BadParametersException.class, () -> Password.check(new byte[0], new Hash(null, new byte[0], new byte[0], new byte[0])));
+    }
+
+    @Test
+    public void issue120()
+    {
+        // GIVEN
+        String name = "issue120FakeProvider";
+        Provider emptyProvider = new Provider(name, 1, "info")
+        {
+            @Override
+            public synchronized Set<Service> getServices()
+            {
+                return null;
+            }
+        };
+        Security.addProvider(emptyProvider);
+
+        // WHEN
+        Password.hash("hash");
+
+        // THEN
+        Security.removeProvider(name);
     }
 
     private static String printBytesToString(byte[] bytes)

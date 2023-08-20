@@ -505,10 +505,9 @@ class Utils
         return dp;
     }
 
-    @SuppressWarnings("java:S1604")
+    @SuppressWarnings({"removal", "java:S1604"})
     static SecureRandom getInstanceStrong() throws NoSuchAlgorithmException
     {
-
         String property = AccessController.doPrivileged(new PrivilegedAction<String>()
         {
             @Override

@@ -1219,10 +1219,11 @@ public class PasswordTest
         assertFalse(Password.check((byte[]) null, new Hash(MessageDigestFunction.getInstance("MD5"), new byte[0], new byte[0], new byte[0])));
         assertFalse(Password.check((CharSequence) null, new Hash(MessageDigestFunction.getInstance("MD5"), new byte[0], new byte[0], new byte[0])));
         assertThrows(BadParametersException.class, () -> Password.check(new byte[0], (Hash) null));
-        assertThrows(BadParametersException.class, () -> Password.check(new byte[0], new Hash(null, new byte[0], new byte[0], new byte[0])));
+        Hash emptyHash = new Hash(null, new byte[0], new byte[0], new byte[0]);
+        assertThrows(BadParametersException.class, () -> Password.check(new byte[0], emptyHash));
     }
 
-    @Test
+    @Test(expected = Test.None.class)
     public void issue120()
     {
         // GIVEN

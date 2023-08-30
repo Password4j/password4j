@@ -6,8 +6,37 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+
 public class RuleBasedPasswordGeneratorTest
 {
+
+
+    @Test
+    public void testPBKDF2equality()
+    {
+        // GIVEN
+        RuleBasedPasswordGenerator strategy1 = RuleBasedPasswordGenerator.getInstance(34, Rule.specials, Rule.alphanumeric);
+        RuleBasedPasswordGenerator strategy2 = RuleBasedPasswordGenerator.getInstance(34, Rule.specials, Rule.alphanumeric);
+        RuleBasedPasswordGenerator strategy3 = RuleBasedPasswordGenerator.getInstance(33, Rule.specials, Rule.alphanumeric);
+        RuleBasedPasswordGenerator strategy4 = RuleBasedPasswordGenerator.getInstance(23, Rule.printable, Rule.digits);
+        RuleBasedPasswordGenerator strategy5 = RuleBasedPasswordGenerator.getInstance(23, Rule.letters, Rule.digits);
+
+
+        // WHEN
+        Map<RuleBasedPasswordGenerator, String> map = new HashMap<>();
+        map.put(strategy1, strategy1.toString());
+        map.put(strategy2, strategy2.toString());
+        map.put(strategy3, strategy3.toString());
+        map.put(strategy4, strategy4.toString());
+        map.put(strategy5, strategy5.toString());
+
+
+        // THEN
+        assertEquals(4, map.size());
+        assertEquals(strategy1, strategy2);
+    }
+
 
     @Test
     public void testCustomRule()

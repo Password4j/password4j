@@ -34,22 +34,6 @@ public interface Rule
 
     Rule printable = new SymbolBasedRule(Symbols.PRINTABLE.toCharArray());
 
-    class NoConsecutives extends LogicBasedRule
-    {
-
-        NoConsecutives(PasswordGenerator generator)
-        {
-            super(generator);
-        }
-
-        @Override
-        public void generate(char[] generatedSoFar, char newChar)
-        {
-            char lastChar = generatedSoFar[generatedSoFar.length - 1];
-            generator.pickNewChar(lastChar);
-        }
-    }
-
 
 
 

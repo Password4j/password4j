@@ -8,9 +8,9 @@ public class EntropyBasedPasswordGeneratorTest
     @Test
     public void test()
     {
-        EntropyBasedPasswordGenerator generator = EntropyBasedPasswordGenerator.getInstance(30);
+        EntropyBasedPasswordGenerator generator = EntropyBasedPasswordGenerator.getInstance(120);
 
-        System.out.println(generator.generate(Symbols.PRINTABLE));
+        System.out.println(generator.generate(Symbols.SPECIALS_CHARACTERS));
 
     }
 

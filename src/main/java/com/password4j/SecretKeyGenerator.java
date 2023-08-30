@@ -52,18 +52,6 @@ public class SecretKeyGenerator
         return this;
     }
 
-    public SecretKeyGenerator fromSource(InputStream source) throws IOException
-    {
-        this.source = Utils.fromInputStreamToString(source, Utils.DEFAULT_CHARSET);
-        return this;
-    }
-
-    public SecretKeyGenerator fromSource(InputStream source, Charset charset) throws IOException
-    {
-        this.source = Utils.fromInputStreamToString(source, charset);
-        return this;
-    }
-
     public String withBase32()
     {
         if (randomly)

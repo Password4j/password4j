@@ -17,13 +17,37 @@
 
 package com.password4j;
 
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Objects;
+
 public class SymbolBasedRule implements Rule
 {
-    private final char[] symbols;
+    final char[] symbols;
+
+    final int quantity;
 
     SymbolBasedRule(char[] symbols)
     {
+        this(symbols, 1);
+    }
+
+    SymbolBasedRule(char[] symbols, int quantity)
+    {
         this.symbols = symbols;
+        this.quantity = quantity;
+    }
+
+    char[] generateMinimumChars()
+    {
+        SecureRandom random = AlgorithmFinder.getSecureRandom();
+        char[] result = new char[quantity];
+        for (int i = 0; i < quantity; i++)
+        {
+            result[i] = symbols[random.nextInt(symbols.length)];
+        }
+        return result;
     }
 
     char[] symbols()
@@ -31,8 +55,28 @@ public class SymbolBasedRule implements Rule
         return symbols;
     }
 
-    SymbolBasedRule plus(SymbolBasedRule other)
+    @Override
+    public int hashCode()
     {
-        return new SymbolBasedRule(Utils.append(symbols, other.symbols));
+        return Objects.hash(Arrays.hashCode(symbols), quantity);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "sbr[s=" + new String(symbols) + ", q=" + quantity + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null || !this.getClass().equals(obj.getClass()))
+        {
+            return false;
+        }
+
+        SymbolBasedRule otherRule = (SymbolBasedRule) obj;
+        return Arrays.equals(symbols, otherRule.symbols) //
+                && quantity == otherRule.quantity;
     }
 }

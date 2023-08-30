@@ -58,13 +58,20 @@ public class EntropyBasedPasswordGenerator extends PasswordGenerator
         SecureRandom random = AlgorithmFinder.getSecureRandom();
         char[] symbolsAsArray = symbols.toCharArray();
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb;
 
-        while (calculateEntropy(sb.toString()) < minimumEntropy)
+        int length = (int) Math.ceil(minimumEntropy * LOG2 / Math.log10(symbols.length()));
+
+        do
         {
-            char newChar = symbolsAsArray[random.nextInt(symbolsAsArray.length)];
-            sb.append(newChar);
-        }
+            sb = new StringBuilder();
+            do
+            {
+                char newChar = symbolsAsArray[random.nextInt(symbolsAsArray.length)];
+                sb.append(newChar);
+
+            } while (sb.length() < length);
+        } while (calculateEntropy(sb.toString()) < minimumEntropy);
 
         return sb.toString();
     }

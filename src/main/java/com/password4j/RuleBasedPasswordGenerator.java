@@ -1,8 +1,7 @@
 package com.password4j;
 
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RuleBasedPasswordGenerator extends PasswordGenerator
@@ -75,6 +74,25 @@ public class RuleBasedPasswordGenerator extends PasswordGenerator
             {
                 sb.append(symbols[secureRandom.nextInt(symbols.length)]);
             }
+        }
+
+        return shuffle(sb.toString());
+    }
+
+    private String shuffle(String generated)
+    {
+        List<Character> list = new ArrayList<>();
+        for(char c :  generated.toCharArray())
+        {
+            list.add(c);
+        }
+
+        Collections.shuffle(list, AlgorithmFinder.getSecureRandom());
+
+        StringBuilder sb = new StringBuilder();
+        for(char c : list)
+        {
+            sb.append(c);
         }
 
         return sb.toString();

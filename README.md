@@ -45,7 +45,7 @@ Add the dependency of the latest version to your `pom.xml`:
 <dependency>
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
 </dependency>
 ```
 
@@ -222,3 +222,6 @@ This project is licensed under the Apache License 2.0 License - see the [LICENSE
 ![GitHub Release Date](https://img.shields.io/github/release-date/Password4j/password4j)
 
 See the [CHANGELOG.md](CHANGELOG.md) file for a more detailed description of each release.
+
+
+<img src="https://visitor-badge.laobi.icu/badge?page_id=Password4j.password4j&title=views">

@@ -757,7 +757,7 @@ public class BcryptFunction extends AbstractHashingFunction
      */
     protected byte[] cryptRaw(byte[] password, byte[] salt, int logRounds, boolean sign, int safety)
     {
-        int rounds;
+        long rounds;
         int i;
         int j;
         int[] cdata = BF_CRYPT_CIPHERTEXT.clone();
@@ -766,7 +766,7 @@ public class BcryptFunction extends AbstractHashingFunction
 
         if (logRounds < 4 || logRounds > 31)
             throw new BadParametersException("Bad number of rounds");
-        rounds = 1 << logRounds;
+        rounds = 1L << logRounds;
         if (salt.length != BCRYPT_SALT_LEN)
             throw new BadParametersException("Bad salt length");
 

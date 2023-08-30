@@ -18,7 +18,6 @@ package com.password4j;
 
 import com.password4j.types.Argon2;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

@@ -143,12 +143,13 @@ public class SaltGeneratorTest
         setSecurityProperty(old);
 
     }
-
+    @SuppressWarnings("removal")
     private String getSecurityProperty()
     {
         return AccessController.doPrivileged((PrivilegedAction<String>) () -> Security.getProperty("securerandom.strongAlgorithms"));
     }
 
+    @SuppressWarnings("removal")
     private void setSecurityProperty(String value)
     {
         AccessController.doPrivileged((PrivilegedAction<Object>) () -> {

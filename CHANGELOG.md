@@ -1,12 +1,22 @@
 # Changelog
 
+## [1.7.2](https://github.com/Password4j/password4j/releases/tag/1.7.2) - (2023-08-20)
+### Fixed
+* Suppressed warning for usage of `java.security.AccessController`. This is how the java development team fixed the problem for the moment ([#119](../../issues/119))
+* In some custom JDK implementations `java.security.Provider#getServices()` can return `null` instead of empty `java.security.Provider.Service[]` ([#120](../../issues/120))
+
+
+## [1.7.1](https://github.com/Password4j/password4j/releases/tag/1.7.1) - (2023-06-02)
+### Fixed
+* Bcrypt used negative rounds when cost factor = 31 ([#114](../../issues/114))
+
 ## [1.7.0](https://github.com/Password4j/password4j/releases/tag/1.7.0) - (2023-02-18)
 ### Added
-* APIs now accepts `byte[]` arguments ([#93](../../issues/99))
+* APIs now accepts `byte[]` arguments ([#99](../../issues/99))
 * `.forceUpdate()` forces Password4j to recalculate a new hash even if the parameters didn't change ([#102](../../issues/102))
 * configurable salt length with property `global.salt.length` when using `#addRandomSalt()` ([#97](../../issues/97))
 ### Changed
-* `.andUpdate()` no more recalculates the hash if the algorithm, salt or pepper changed from the hash found in `Password.check()` ([#102](../../issues/102))
+* `.andUpdate()` no more recalculations of the hash if the algorithm, salt or pepper changed from the hash found in `Password.check()` ([#102](../../issues/102))
 ### Fixed
 * Inconsistency between public and internal APIs for Argon2 ([#93](../../issues/93))
 

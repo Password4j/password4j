@@ -344,11 +344,16 @@ public class AlgorithmFinder
         List<String> result = new ArrayList<>();
         for (Provider provider : Security.getProviders())
         {
-            for (Provider.Service service : provider.getServices())
+            // Some JDK implementation may return null instead of an empty array.
+            // see https://github.com/Password4j/password4j/issues/120
+            if (provider.getServices() != null)
             {
-                if ("SecretKeyFactory".equals(service.getType()) && service.getAlgorithm().startsWith("PBKDF2"))
+                for (Provider.Service service : provider.getServices())
                 {
-                    result.add(service.getAlgorithm());
+                    if ("SecretKeyFactory".equals(service.getType()) && service.getAlgorithm().startsWith("PBKDF2"))
+                    {
+                        result.add(service.getAlgorithm());
+                    }
                 }
             }
         }

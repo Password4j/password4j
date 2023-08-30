@@ -528,10 +528,9 @@ class Utils
         return dp;
     }
 
-    @SuppressWarnings("java:S1604")
+    @SuppressWarnings({"removal", "java:S1604"})
     static SecureRandom getInstanceStrong() throws NoSuchAlgorithmException
     {
-
         String property = AccessController.doPrivileged(new PrivilegedAction<String>()
         {
             @Override
@@ -615,7 +614,7 @@ class Utils
             String banner ="\n";
             banner += "    |\n" +
                     "    |                \033[0;1mPassword4j\033[0;0m\n" +
-                    "    + \\             .: v1.7.0 :.\n" +
+                    "    + \\             .: v1.7.2 :.\n" +
                     "    \\\\.G_.*=.\n" +
                     "     `(H'/.\\|        ✅ Argon2\n" +
                     "      .>' (_--.      ✅ scrypt\n" +

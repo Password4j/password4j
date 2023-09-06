@@ -33,51 +33,44 @@ public class EntropyBasedPasswordGenerator extends PasswordGenerator
 
     protected double minimumEntropy;
 
-    private EntropyBasedPasswordGenerator(double minimumEntropy)
+    private EntropyBasedPasswordGenerator(double minimumEntropy, char[] symbols)
     {
         this.minimumEntropy = minimumEntropy;
+        this.symbols = symbols;
     }
 
-    public static EntropyBasedPasswordGenerator getInstance(double minimumEntropy)
+    public static EntropyBasedPasswordGenerator getInstance(double minimumEntropy, String symbols)
     {
-        String key = getUID(minimumEntropy);
+        return getInstance(minimumEntropy, symbols.toCharArray());
+    }
+
+    public static EntropyBasedPasswordGenerator getInstance(double minimumEntropy, char[] symbols)
+    {
+        String key = getUID(minimumEntropy, symbols);
         if (INSTANCES.containsKey(key))
         {
             return INSTANCES.get(key);
         }
         else
         {
-            EntropyBasedPasswordGenerator generator = new EntropyBasedPasswordGenerator(minimumEntropy);
+            EntropyBasedPasswordGenerator generator = new EntropyBasedPasswordGenerator(minimumEntropy, symbols);
             INSTANCES.put(key, generator);
             return generator;
         }
     }
 
-    public String generate(String symbols)
+    public String generate()
     {
-        SecureRandom random = AlgorithmFinder.getSecureRandom();
-        char[] symbolsAsArray = symbols.toCharArray();
-
-        StringBuilder sb;
-
-        int length = (int) Math.ceil(minimumEntropy * LOG2 / Math.log10(symbols.length()));
+        StringBuilder sb = new StringBuilder();
 
         do
         {
-            sb = new StringBuilder();
-            do
-            {
-                char newChar = symbolsAsArray[random.nextInt(symbolsAsArray.length)];
-                sb.append(newChar);
+            sb.append(pickNewChar());
 
-            } while (sb.length() < length);
         } while (calculateEntropy(sb.toString()) < minimumEntropy);
 
         return sb.toString();
     }
-
-    
-
 
     double calculateEntropy(String testString)
     {
@@ -116,9 +109,15 @@ public class EntropyBasedPasswordGenerator extends PasswordGenerator
     }
 
 
-    private static String getUID(double minimumEntropy)
+    private static String getUID(double minimumEntropy, char[] symbols)
     {
-        return String.valueOf(minimumEntropy);
+        StringBuilder sb = new StringBuilder(symbols.length + 1);
+        sb.append(minimumEntropy);
+        for (char c: symbols)
+        {
+            sb.append(c);
+        }
+        return sb.toString();
     }
 
 

@@ -13,7 +13,7 @@ public class RuleBasedPasswordGeneratorTest
 
 
     @Test
-    public void testPBKDF2equality()
+    public void testEquality()
     {
         // GIVEN
         RuleBasedPasswordGenerator strategy1 = RuleBasedPasswordGenerator.getInstance(34, Rule.specials, Rule.alphanumeric);
@@ -140,6 +140,57 @@ public class RuleBasedPasswordGeneratorTest
 
         // THEN
 
+    }
+
+    @Test
+    public void testNoRep()
+    {
+        // GIVEN
+        Rule[] rules = new Rule[]{new SymbolBasedRule("ab".toCharArray(), 15),  Rule.noRepetitions};
+        int length = 20;
+
+        // WHEN
+        RuleBasedPasswordGenerator generator = RuleBasedPasswordGenerator.getInstance(length, rules);
+        String generated = generator.generate();
+
+        // THEN
+        Assert.assertEquals(length, generated.length());
+        Assert.assertTrue(contains(generated, 'a', 'b'));
+        Assert.assertTrue(generated.equals("babababababababababa") || generated.equals("abababababababababab"));
+    }
+
+    @Test
+    public void testNoCons()
+    {
+        // GIVEN
+        Rule[] rules = new Rule[]{Rule.digits,  Rule.noConsecutives};
+        int length = 1000;
+
+        // WHEN
+        RuleBasedPasswordGenerator generator = RuleBasedPasswordGenerator.getInstance(length, rules);
+        String generated = generator.generate();
+
+        // THEN
+        Assert.assertEquals(length, generated.length());
+        Assert.assertTrue(contains(generated, "0123456789".toCharArray()));
+        Assert.assertFalse(consecutive(generated));
+        System.out.println(generated);
+
+    }
+
+    private static boolean consecutive(String generated)
+    {
+        String[] checks = new String[]{"01", "12", "23", "34", "45", "56", "67", "78", "89", //
+                                        "10", "21", "32", "43", "54", "65", "76", "87", "98" };
+
+        for (String check : checks)
+        {
+            if (generated.contains(check))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean contains(String generated, char... symbols)

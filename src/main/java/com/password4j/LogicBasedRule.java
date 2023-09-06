@@ -17,22 +17,17 @@
 
 package com.password4j;
 
-import java.util.Random;
-
-public abstract  class PasswordGenerator
+public abstract class LogicBasedRule implements Rule
 {
-    protected char[] symbols;
 
-    protected char pickNewChar()
+
+    public LogicBasedRule()
     {
-        Random random = AlgorithmFinder.getSecureRandom();
-        return symbols[random.nextInt(symbols.length)];
+
     }
 
-    public char[] getSymbols()
-    {
-        return this.symbols;
-    }
+
+    public abstract String apply (PasswordGenerator generator, String generatedSoFar);
 
 
 }

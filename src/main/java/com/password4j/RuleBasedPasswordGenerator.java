@@ -16,6 +16,15 @@ public class RuleBasedPasswordGenerator extends PasswordGenerator
     {
         this.length = length;
         this.rules = rules;
+
+        for (Rule rule : rules)
+        {
+            if (rule instanceof SymbolBasedRule)
+            {
+                SymbolBasedRule symbolBasedRule = (SymbolBasedRule) rule;
+                symbols = Utils.append(symbols, symbolBasedRule.symbols);
+            }
+        }
     }
 
 
@@ -54,7 +63,6 @@ public class RuleBasedPasswordGenerator extends PasswordGenerator
             throw new BadParametersException("Insufficient length: with the current rules needed " + minimumLength + " but got " + length);
         }
 
-        SecureRandom secureRandom = AlgorithmFinder.getSecureRandom();
         StringBuilder sb = new StringBuilder();
 
         for (Rule rule : rules)
@@ -72,11 +80,22 @@ public class RuleBasedPasswordGenerator extends PasswordGenerator
 
             for (int i = 0; i < uncovered; i++)
             {
-                sb.append(symbols[secureRandom.nextInt(symbols.length)]);
+                sb.append(pickNewChar());
             }
         }
 
-        return shuffle(sb.toString());
+        String result =  shuffle(sb.toString());
+
+        for (Rule rule : rules)
+        {
+            if (rule instanceof LogicBasedRule)
+            {
+                LogicBasedRule logicBasedRule = (LogicBasedRule) rule;
+                result = logicBasedRule.apply(this, result);
+            }
+        }
+
+        return result;
     }
 
     private String shuffle(String generated)

@@ -34,7 +34,69 @@ public interface Rule
 
     Rule printable = new SymbolBasedRule(Symbols.PRINTABLE.toCharArray());
 
+    Rule noRepetitions = new LogicBasedRule()
+    {
+        @Override
+        public String apply(PasswordGenerator generator, String generatedSoFar)
+        {
+            if (generatedSoFar.length() == 0)
+            {
+                return "";
+            }
+            else if (generatedSoFar.length() == 1)
+            {
+                return generatedSoFar;
+            }
 
+            char[] result = generatedSoFar.toCharArray();
+
+            for (int i = 1; i < generatedSoFar.length(); i++)
+            {
+                char previous = result[i - 1];
+
+                while (previous == result[i])
+                {
+                    result[i] = generator.pickNewChar();
+                }
+            }
+
+            return new String(result);
+
+        }
+    };
+
+
+    Rule noConsecutives = new LogicBasedRule()
+    {
+        @Override
+        public String apply(PasswordGenerator generator, String generatedSoFar)
+        {
+            if (generatedSoFar.length() == 0)
+            {
+                return "";
+            }
+            else if (generatedSoFar.length() == 1)
+            {
+                return generatedSoFar;
+            }
+
+            char[] result = generatedSoFar.toCharArray();
+
+            for (int i = 1; i < generatedSoFar.length(); i++)
+            {
+                char previous = result[i - 1];
+
+                while (Character.isDigit(previous) //
+                        && Character.isDigit(result[i]) //
+                        && Math.abs(previous - result[i]) == 1)
+                {
+                    result[i] = generator.pickNewChar();
+                }
+            }
+
+            return new String(result);
+        }
+    };
 
 
 }

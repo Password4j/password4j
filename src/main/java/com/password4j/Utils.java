@@ -164,6 +164,16 @@ class Utils
 
     static char[] append(char[] byteArray1, char[] byteArray2)
     {
+        if (byteArray1 == null || byteArray1.length == 0)
+        {
+            return byteArray2;
+        }
+
+        if (byteArray2 == null || byteArray2.length == 0)
+        {
+            return byteArray1;
+        }
+
         char[] result = new char[byteArray1.length + byteArray2.length];
         System.arraycopy(byteArray1, 0, result, 0, byteArray1.length);
         System.arraycopy(byteArray2, 0, result, byteArray1.length, byteArray2.length);

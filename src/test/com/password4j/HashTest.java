@@ -107,4 +107,27 @@ public class HashTest
         Assert.assertNotEquals(hash4, hash3);
     }
 
+    @Test
+    public void testHashUtf8()
+    {
+        byte[] hashBytes = Password
+                .hash("’(っ＾▿＾)۶\uD83C\uDF78\uD83C\uDF1F\uD83C\uDF7A٩(˘◡˘ ) ❌❌ ❌❌❌")
+                .addSalt("\uD83E\uDDC2")
+                .withScrypt()
+                .getBytes();
+
+        Assert.assertEquals(
+                "827b022b411e712e5ae4855d8c71cb047d882b2457120d1019974d17dcf6f1bf59644d9a93e470ab14ee5f7a88ae9b0140d2db121de58f6d830fc9c16c82f212",
+                hex(hashBytes)
+        );
+    }
+
+    private static String hex(byte[] bytes)
+    {
+        StringBuilder result = new StringBuilder();
+        for (byte b : bytes) {
+            result.append(String.format("%02x", b));
+        }
+        return result.toString();
+    }
 }

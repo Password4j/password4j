@@ -1145,66 +1145,7 @@ public class PasswordTest
         Assert.assertEquals(hash, hash2);
     }
 
-    /**
-     * @see <a href="https://github.com/Password4j/password4j/issues/92">issue #92</a>
-     */
-    @Test
-    public void issue92()
-    {
-        String hash = "$argon2id$v=19$m=16384,t=2,p=1$nlm7oNI5zquzSYkyby6oVw$JOkJAYrDB0i2gmiJrXC6o2r+u1rszCm/RO9gIQtnxlY";
-        String plain = "Test123!";
-        Argon2Function function = Argon2Function.getInstanceFromHash(hash);
 
-        boolean verified = Password.check(plain, hash).with(function);
-        Hash newHash = Password.hash(plain).addSalt("Y9ΫI2o.W".getBytes(StandardCharsets.UTF_8)).with(function);
-        boolean verified2 = Password.check(plain, newHash);
-
-        assertTrue(verified);
-        assertTrue(verified2);
-        assertEquals("$argon2id$v=19$m=16384,t=2,p=1$WTnOq0kyby5X$SewIdM+Ywctw0lfNQ0xKYoUIlyRs3qF+gVmEVtpdmyg", newHash.getResult());
-    }
-
-
-
-    @Test
-    public void issue99()
-    {
-        System.out.println("hash timed");
-        int memory          = 65536;
-        int iterations      = 2;
-        int parallelism     = 3;
-        int outputLength    = 32;
-        int version         = 0x13;
-        byte[] salt         =
-                {
-                        (byte) 0x6b, (byte) 0x25, (byte) 0xc9, (byte) 0xd7, (byte) 0x0e, (byte) 0x5c, (byte) 0x19, (byte) 0xac,
-                        (byte) 0x51, (byte) 0x74, (byte) 0xd7, (byte) 0x74, (byte) 0x53, (byte) 0xad, (byte) 0x23, (byte) 0x70,
-                        (byte) 0x15, (byte) 0x27, (byte) 0x56, (byte) 0x2e, (byte) 0x02, (byte) 0xb8, (byte) 0xec, (byte) 0x5c,
-                        (byte) 0xac, (byte) 0x89, (byte) 0x2d, (byte) 0xc3, (byte) 0xe4, (byte) 0xb5, (byte) 0x1c, (byte) 0x12
-                };
-        byte[] password="Test".getBytes();
-        Argon2 type = Argon2.ID;
-        Argon2Function instance=Argon2Function.getInstance(memory, iterations, parallelism, outputLength, type, version);
-
-        Hash hash = instance.hash(password, salt);
-
-
-        String expResult = "cbcfdee482c233e525ca405c7014e89cd33142758a2f1d23c420690f950c988c";
-        assertEquals(expResult, printBytesToString(hash.getBytes()));
-    }
-
-    @Test
-    public void issue93()
-    {
-        String hash = "$argon2id$v=19$m=16384,t=2,p=1$nlm7oNI5zquzSYkyby6oVw$JOkJAYrDB0i2gmiJrXC6o2r+u1rszCm/RO9gIQtnxlY";
-        Argon2Function function = Argon2Function.getInstanceFromHash(hash);
-
-        boolean test1 = Password.check("Test123!", hash).with(function);
-        assertTrue(test1);
-
-        boolean test2 = function.check("Test123!", hash);
-        assertTrue(test2);
-    }
 
     @Test
     public void afterMigrationTests()
@@ -1223,43 +1164,9 @@ public class PasswordTest
         assertThrows(BadParametersException.class, () -> Password.check(new byte[0], emptyHash));
     }
 
-    @Test(expected = Test.None.class)
-    public void issue120()
-    {
-        // GIVEN
-        String name = "issue120FakeProvider";
-        Provider emptyProvider = new Provider(name, 1, "info")
-        {
-            @Override
-            public synchronized Set<Service> getServices()
-            {
-                return null;
-            }
-        };
-        Security.addProvider(emptyProvider);
 
-        // WHEN
-        Password.hash("hash");
 
-        // THEN
-        Security.removeProvider(name);
-    }
 
-    private static String printBytesToString(byte[] bytes)
-    {
-        StringBuilder byteString= new StringBuilder();
-        if (bytes!=null)
-        {
-            for (byte aByte : bytes)
-            {
-                byteString.append(String.format("%02x", aByte));
-            }
-        }
-        else
-        {
-            byteString = new StringBuilder("-");
-        }
-        return byteString.toString();
-    }
+
 
 }

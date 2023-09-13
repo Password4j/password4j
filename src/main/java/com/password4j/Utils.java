@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 class Utils
 {
 
-    static final Charset DEFAULT_CHARSET = StandardCharsets.ISO_8859_1;
+    static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     private static final char[] HEX_ALPHABET = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 

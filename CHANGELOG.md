@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.7.3](https://github.com/Password4j/password4j/releases/tag/1.7.3) - (2023-09-14)
+### Fixed
+* Wrong hashes when the password contains non ISO 8859-1 characters ([#126](../../issues/126))
+
+
 ## [1.7.2](https://github.com/Password4j/password4j/releases/tag/1.7.2) - (2023-08-20)
 ### Fixed
 * Suppressed warning for usage of `java.security.AccessController`. This is how the java development team fixed the problem for the moment ([#119](../../issues/119))

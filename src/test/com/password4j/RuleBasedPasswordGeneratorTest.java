@@ -174,7 +174,6 @@ public class RuleBasedPasswordGeneratorTest
         Assert.assertEquals(length, generated.length());
         Assert.assertTrue(contains(generated, "0123456789".toCharArray()));
         Assert.assertFalse(consecutive(generated));
-        System.out.println(generated);
 
     }
 

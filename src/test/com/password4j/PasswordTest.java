@@ -1245,6 +1245,12 @@ public class PasswordTest
         Security.removeProvider(name);
     }
 
+    @Test
+    public void generation()
+    {
+        Password.generate().
+    }
+
     private static String printBytesToString(byte[] bytes)
     {
         StringBuilder byteString= new StringBuilder();

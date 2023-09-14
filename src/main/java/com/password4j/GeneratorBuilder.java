@@ -17,12 +17,56 @@
 
 package com.password4j;
 
+import com.password4j.types.Hmac;
+
+import java.time.Duration;
+
 public class GeneratorBuilder
 {
 
+    private PasswordGenerator passwordGenerator;
+
+    private int length = 8;
+
+    public String _new(PasswordGenerator passwordGenerator)
+
+    public GeneratorBuilder newTOTP(Hmac hmac, Duration duration)
+    {
+        passwordGenerator = TOTPGenerator.getInstance(hmac, duration, length);
+        return this;
+    }
 
 
+    public GeneratorBuilder newHOTP()
+    {
+        passwordGenerator = HOTPGenerator.getInstance(length);
+        return this;
+    }
 
 
+    public GeneratorBuilder newPassword(double minimumEntropy, String symbols)
+    {
+        passwordGenerator = EntropyBasedPasswordGenerator.getInstance(minimumEntropy, symbols);
+        return this;
+    }
+
+    public GeneratorBuilder newPassword(double minimumEntropy, char[] symbols)
+    {
+        passwordGenerator = EntropyBasedPasswordGenerator.getInstance(minimumEntropy, symbols);
+        return this;
+    }
+
+    public GeneratorBuilder newPassword(Rule... rules)
+    {
+        passwordGenerator = RuleBasedPasswordGenerator.getInstance(length, rules);
+        return this;
+    }
+
+
+    public GeneratorBuilder withLength(int length)
+    {
+        this.length = length;
+        return this;
+    }
 
 }

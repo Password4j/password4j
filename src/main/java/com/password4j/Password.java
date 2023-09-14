@@ -148,16 +148,7 @@ public class Password
      */
     public static boolean check(CharSequence plainTextPassword, Hash hashObject)
     {
-        if (hashObject == null || hashObject.getHashingFunction() == null)
-        {
-            throw new BadParametersException("Invalid Hash object. " + (hashObject != null ? hashObject.toString() : null));
-        }
-        if (plainTextPassword == null)
-        {
-            return false;
-        }
-
-        return hashObject.getHashingFunction().check(plainTextPassword, hashObject.getResult(), hashObject.getSalt(), hashObject.getPepper());
+        return check(Utils.fromCharSequenceToBytes(plainTextPassword), hashObject);
     }
 
     /**

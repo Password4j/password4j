@@ -45,7 +45,7 @@ Add the dependency of the latest version to your `pom.xml`:
 <dependency>
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.3</version>
 </dependency>
 ```
 

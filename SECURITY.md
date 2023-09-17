@@ -6,7 +6,8 @@ We release patches for security vulnerabilities. Which versions are eligible rec
 | Version | Supported      |
 |---------|----------------|
 | 0.x     | :red_circle:   |
-| 1.x     | :green_circle: |
+| 1.0.x - 1.4.x     | :red_circle:   |
+| 1.5.x +     | :green_circle: |
 
 ## Reporting a Vulnerability
 

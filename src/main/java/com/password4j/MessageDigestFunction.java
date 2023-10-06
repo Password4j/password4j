@@ -34,7 +34,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
 {
     private static final Map<String, MessageDigestFunction> INSTANCES = new ConcurrentHashMap<>();
 
-    private static final SaltOption DEFAULT_SALT_OPTION = SaltOption.APPEND;
+    protected static final SaltOption DEFAULT_SALT_OPTION = SaltOption.APPEND;
 
     private final String algorithm;
 

@@ -16,8 +16,6 @@
  */
 package com.password4j;
 
-import java.security.NoSuchAlgorithmException;
-
 /**
  * This interface declares the basic methods that
  * all the Cryptographic Hashing Functions (CHF) must have.

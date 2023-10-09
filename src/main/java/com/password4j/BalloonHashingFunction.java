@@ -17,11 +17,11 @@
 
 package com.password4j;
 
-import javax.rmi.CORBA.Util;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**

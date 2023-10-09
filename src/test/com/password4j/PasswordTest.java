@@ -1165,7 +1165,34 @@ public class PasswordTest
     }
 
 
+    @Test
+    public void testBalloon1()
+    {
+        // GIVEN
+        BalloonHashingFunction balloonHashingFunction = BalloonHashingFunction.getInstance("SHA-256", 16, 20, 0, 4);
 
+
+        // WHEN
+        Hash hash = Password.hash("buildmeupbuttercup").addSalt("JqMcHqUcjinFhQKJ").with(balloonHashingFunction);
+
+        // THEN
+        Assert.assertEquals("2ec8d833db5f88e584ab793950ecfb21657a3816edea8d9e73ea23c13ba2b740", hash.getResult());
+    }
+
+
+    @Test
+    public void testBalloon2()
+    {
+        // GIVEN
+        BalloonHashingFunction balloonHashingFunction = BalloonHashingFunction.getInstance("SHA-256", 24, 18, 0, 5);
+
+
+        // WHEN
+        Hash hash = Password.hash("buildmeupbuttercup").addSalt("JqMcHqUcjinFhQKJ").with(balloonHashingFunction);
+
+        // THEN
+        Assert.assertEquals("69f86890cef40a7ec5f70daff1ce8e2cde233a15bffa785e7efdb5143af51bfb", hash.getResult());
+    }
 
 
 

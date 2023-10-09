@@ -19,8 +19,11 @@ package com.password4j;
 
 
 import java.io.PrintStream;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.CharBuffer;
+import java.nio.IntBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
@@ -68,6 +71,16 @@ class Utils
     static byte[] fromCharSequenceToBytes(CharSequence charSequence)
     {
         return fromCharSequenceToBytes(charSequence, DEFAULT_CHARSET);
+    }
+
+    static int[] fromStringToUnsignedInts(String charSequence)
+    {
+        byte[] byteArray = charSequence.getBytes(DEFAULT_CHARSET);
+        int[] ints = new int[byteArray.length];
+        for(int i = 0; i < ints.length; i++) {
+            ints[i] = Byte.toUnsignedInt(byteArray[i]);
+        }
+        return ints;
     }
 
     static byte[] fromCharSequenceToBytes(CharSequence charSequence, Charset charset)
@@ -175,6 +188,16 @@ class Utils
         return new String(output);
     }
 
+    static BigInteger bytesToInt(byte[] bytes)
+    {
+        for (int i = 0; i < bytes.length / 2; i++) {
+            byte temp = bytes[i];
+            bytes[i] = bytes[bytes.length - i - 1];
+            bytes[bytes.length - i - 1] = temp;
+        }
+        return new BigInteger(1, bytes);
+    }
+
     static long littleEndianToLong(byte[] bs, int off)
     {
         int lo = littleEndianToInt(bs, off);
@@ -220,6 +243,11 @@ class Utils
         result[2] = (byte) ((a >> 16) & 0xFF);
         result[3] = (byte) ((a >> 24) & 0xFF);
         return result;
+    }
+
+    static byte[] intToLittleEndianBytes(int a, int length)
+    {
+        return ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN).putInt(a).array();
     }
 
     static long[] fromBytesToLongs(byte[] input)
@@ -591,13 +619,13 @@ class Utils
             String banner ="\n";
             banner += "    |\n" +
                     "    |                \033[0;1mPassword4j\033[0;0m\n" +
-                    "    + \\             .: v1.7.3 :.\n" +
+                    "    + \\             .: v1.8.0 :.\n" +
                     "    \\\\.G_.*=.\n" +
                     "     `(H'/.\\|        ✅ Argon2\n" +
                     "      .>' (_--.      ✅ scrypt\n" +
                     "   _=/d   ,^\\        ✅ bcrypt\n" +
                     " ~~ \\)-'-'           " + pbkdf2Banner + "\n" +
-                    "    / |\n" +
+                    "    / |              ✅ balloon hashing\n" +
                     "    '  '";
             banner += "\n";
             banner += " ⭐ If you enjoy Password4j, please star the project at https://github.com/Password4j/password4j\n";

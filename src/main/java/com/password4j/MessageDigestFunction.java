@@ -40,6 +40,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
 
     private final SaltOption saltOption;
 
+
     MessageDigestFunction(String algorithm, SaltOption saltOption)
     {
         this.algorithm = algorithm;
@@ -119,15 +120,18 @@ public class MessageDigestFunction extends AbstractHashingFunction
 
     protected Hash internalHash(byte[] plainTextPassword, byte[] salt)
     {
+        byte[] finalCharSequence = concatenateSalt(plainTextPassword, salt);
+
+        byte[] result = getMessageDigest().digest(finalCharSequence);
+        return new Hash(this, Utils.toHex(result), result, salt);
+    }
+
+    protected MessageDigest getMessageDigest()
+    {
         try
         {
-            MessageDigest messageDigest = MessageDigest.getInstance(algorithm);
-            byte[] finalCharSequence = concatenateSalt(plainTextPassword, salt);
-
-            byte[] result = messageDigest.digest(finalCharSequence);
-            return new Hash(this, Utils.toHex(result), result, salt);
-        }
-        catch (NoSuchAlgorithmException nsae)
+            return MessageDigest.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException nsae)
         {
             throw new UnsupportedOperationException("`" + algorithm + "` is not supported by your system.", nsae);
         }
@@ -181,6 +185,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
     {
         return algorithm;
     }
+
 
     private byte[] concatenateSalt(byte[] plainTextPassword, byte[] salt)
     {

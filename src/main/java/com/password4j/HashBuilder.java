@@ -278,4 +278,10 @@ public class HashBuilder
         return with(AlgorithmFinder.getArgon2Instance());
     }
 
+
+    public Hash withBalloonHashing()
+    {
+        return with(AlgorithmFinder.getBalloonHashingInstance());
+    }
+
 }

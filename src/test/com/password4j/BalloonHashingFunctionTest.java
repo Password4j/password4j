@@ -20,6 +20,7 @@ package com.password4j;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class BalloonHashingFunctionTest
@@ -75,6 +76,5 @@ public class BalloonHashingFunctionTest
         }
 
     }
-
 
 }

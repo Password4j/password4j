@@ -52,6 +52,8 @@ public class Argon2Function extends AbstractHashingFunction
 
     public static final int ARGON2_QWORDS_IN_BLOCK = ARGON2_BLOCK_SIZE / 8;
 
+    private ExecutorService service;
+
     private final int iterations;
 
     private final int memory;
@@ -95,6 +97,11 @@ public class Argon2Function extends AbstractHashingFunction
         for (int i = 0; i < memoryBlocks; i++)
         {
             initialBlockMemory[i] = new long[ARGON2_QWORDS_IN_BLOCK];
+        }
+
+        if (parallelism >= 1)
+        {
+            service = Executors.newFixedThreadPool(Utils.AVAILABLE_PROCESSORS);
         }
     }
 
@@ -588,8 +595,6 @@ public class Argon2Function extends AbstractHashingFunction
 
     private void fillMemoryBlockMultiThreaded(long[][] blockMemory)
     {
-
-        ExecutorService service = Executors.newFixedThreadPool(parallelism);
         List<Future<?>> futures = new ArrayList<>();
 
         for (int i = 0; i < iterations; i++)
@@ -621,8 +626,6 @@ public class Argon2Function extends AbstractHashingFunction
                 }
             }
         }
-
-        service.shutdownNow();
     }
 
     private void fillSegment(int pass, int lane, int slice, long[][] blockMemory)

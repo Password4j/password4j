@@ -32,7 +32,11 @@ public class BalloonHashingFunction extends MessageDigestFunction
 {
 
     private static final Map<String, BalloonHashingFunction> INSTANCES = new ConcurrentHashMap<>();
+
     private static final int DEFAULT_DELTA = 3;
+
+    private ExecutorService service;
+
     private final int spaceCost;
 
     private final int timeCost;
@@ -48,6 +52,11 @@ public class BalloonHashingFunction extends MessageDigestFunction
         this.timeCost = timeCost;
         this.parallelism = parallelism;
         this.delta = delta;
+        if (parallelism > 1)
+        {
+            this.service = Executors.newFixedThreadPool(Utils.AVAILABLE_PROCESSORS);
+        }
+
     }
 
 
@@ -110,7 +119,7 @@ public class BalloonHashingFunction extends MessageDigestFunction
         }
         else if (parallelism > 1)
         {
-            ExecutorService service = Executors.newFixedThreadPool(parallelism);
+
             List<Future<?>> futures = new ArrayList<>();
 
             for (int i = 0; i < parallelism; i++)
@@ -143,7 +152,6 @@ public class BalloonHashingFunction extends MessageDigestFunction
                 Thread.currentThread().interrupt();
             }
 
-            service.shutdownNow();
 
             output = hashFunc(getMessageDigest(), plainTextPassword, salt, output);
         }

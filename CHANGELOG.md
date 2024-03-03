@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.8.0](https://github.com/Password4j/password4j/releases/tag/1.8.0) - (2024-03-03)
+### Added
+* Balloon Hashing implementation ([#131](../../issues/131))
+
+### Fixed
+* Parallelism is achieved by an `ExecutorService` instantiated during object creation instead of during the hashing process
+
+### Changed
+* Banner is disabled by default
+
 ## [1.7.3](https://github.com/Password4j/password4j/releases/tag/1.7.3) - (2023-09-14)
 ### Fixed
 * Wrong hashes when the password contains non ISO 8859-1 characters ([#126](../../issues/126))

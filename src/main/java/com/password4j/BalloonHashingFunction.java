@@ -17,22 +17,31 @@
 
 package com.password4j;
 
+import com.password4j.types.Argon2;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 /**
+ * Class containing the implementation of Balloon hashing function and its parameters.
+ *
  * @author David Bertoldi
  * @since 1.8.0
  */
-public class BalloonHashingFunction extends MessageDigestFunction
+public class BalloonHashingFunction extends AbstractHashingFunction
 {
 
     private static final Map<String, BalloonHashingFunction> INSTANCES = new ConcurrentHashMap<>();
     private static final int DEFAULT_DELTA = 3;
+
+    private final String algorithm;
+
     private final int spaceCost;
 
     private final int timeCost;
@@ -43,11 +52,12 @@ public class BalloonHashingFunction extends MessageDigestFunction
 
     BalloonHashingFunction(String algorithm, int spaceCost, int timeCost,  int parallelism, int delta)
     {
-        super(algorithm, DEFAULT_SALT_OPTION);
+        this.algorithm = algorithm;
         this.spaceCost = spaceCost;
         this.timeCost = timeCost;
         this.parallelism = parallelism;
         this.delta = delta;
+
     }
 
 
@@ -95,18 +105,17 @@ public class BalloonHashingFunction extends MessageDigestFunction
         return internalHash(plainTextPassword, salt);
     }
 
-    @Override
     protected Hash internalHash(byte[] plainTextPassword, byte[] salt)
     {
 
         byte[] output;
 
-
         if (parallelism == 1)
         {
             byte[] parallelSalt = Utils.append(salt, Utils.longToLittleEndian((1)));
-            output = balloonM(getMessageDigest(), plainTextPassword, parallelSalt);
-            output = hashFunc(getMessageDigest(), plainTextPassword, salt, output);
+            MessageDigest messageDigest = getMessageDigest();
+            output = balloon(messageDigest, plainTextPassword, parallelSalt);
+            output = hashFunc(messageDigest, plainTextPassword, salt, output);
         }
         else if (parallelism > 1)
         {
@@ -116,12 +125,13 @@ public class BalloonHashingFunction extends MessageDigestFunction
             for (int i = 0; i < parallelism; i++)
             {
                 byte[] parallelSalt = Utils.append(salt, Utils.longToLittleEndian((i + 1)));
-                Future<byte[]> future = service.submit(() -> balloonM(MessageDigest.getInstance(getAlgorithm()), plainTextPassword, parallelSalt));
+                Future<byte[]> future = service.submit(() -> balloon(getMessageDigest(), plainTextPassword, parallelSalt));
 
                 futures.add(future);
             }
 
-            output = new byte[getMessageDigest().getDigestLength()];
+            MessageDigest messageDigest = getMessageDigest();
+            output = new byte[messageDigest.getDigestLength()];
 
             try
             {
@@ -145,17 +155,29 @@ public class BalloonHashingFunction extends MessageDigestFunction
 
             service.shutdownNow();
 
-            output = hashFunc(getMessageDigest(), plainTextPassword, salt, output);
+            output = hashFunc(messageDigest, plainTextPassword, salt, output);
         }
         else
         {
-            output =  balloonM(getMessageDigest(), plainTextPassword, salt);
+            output =  balloon(getMessageDigest(), plainTextPassword, salt);
         }
 
         return new Hash(this, Utils.toHex(output), output, salt);
     }
 
-    private byte[] balloonM(MessageDigest messageDigest, byte[] plainTextPassword, byte[] salt)
+    protected MessageDigest getMessageDigest()
+    {
+        try
+        {
+            return MessageDigest.getInstance(algorithm);
+        }
+        catch (NoSuchAlgorithmException nsae)
+        {
+            throw new UnsupportedOperationException("`" + algorithm + "` is not supported by your system.", nsae);
+        }
+    }
+
+    private byte[] balloon(MessageDigest messageDigest, byte[] plainTextPassword, byte[] salt)
     {
         List<byte[]> buffer = new ArrayList<>();
         buffer.add(hashFunc(messageDigest, 0, plainTextPassword, salt));
@@ -227,10 +249,6 @@ public class BalloonHashingFunction extends MessageDigestFunction
             {
                 t = Utils.append(t, Utils.intToLittleEndianBytes((Integer) arg, 8));
             }
-            else if (arg instanceof CharSequence)
-            {
-                t = Utils.append(t, Utils.fromCharSequenceToBytes((CharSequence) arg));
-            }
             else if (arg instanceof byte[])
             {
                 t = Utils.append(t, (byte[]) arg);
@@ -245,17 +263,63 @@ public class BalloonHashingFunction extends MessageDigestFunction
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed)
     {
-        return false;
+        return check(plainTextPassword, hashed, null);
+    }
+
+    @Override
+    public boolean check(CharSequence plainTextPassword, String hashed, String salt)
+    {
+        Hash hash = internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(salt));
+        return slowEquals(hash.getResult(), hashed);
     }
 
     @Override
     public boolean check(byte[] plainTextPassword, byte[] hashed)
     {
-        return false;
+        return check(plainTextPassword, new byte[0], hashed, null);
+    }
+
+    @Override
+    public boolean check(byte[] plainTextPassword, byte[] hashed, byte[] salt)
+    {
+        Hash hash = internalHash(plainTextPassword, salt);
+        return slowEquals(hash.getResultAsBytes(), hashed);
     }
 
     private static String getUID(String algorithm, int spaceCost, int timeCost,  int parallelism, int delta)
     {
-        return MessageDigestFunction.getUID(algorithm, DEFAULT_SALT_OPTION) + '|' + spaceCost + '|' + timeCost + '|' + parallelism + '|' + delta;
+        return algorithm + '|' + spaceCost + '|' + timeCost + '|' + parallelism + '|' + delta;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+            return true;
+        if (!(o instanceof BalloonHashingFunction))
+            return false;
+        BalloonHashingFunction other = (BalloonHashingFunction) o;
+        return algorithm .equals(other.algorithm) //
+                && spaceCost == other.spaceCost //
+                && timeCost == other.timeCost //
+                && parallelism == other.parallelism //
+                && delta == other.delta;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(algorithm, spaceCost, timeCost, parallelism, delta);
+    }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName() + '[' + toString(algorithm, spaceCost, timeCost, parallelism, delta) + ']';
+    }
+
+    protected static String toString(String algorithm, int spaceCost, int timeCost, int parallelism, int delta)
+    {
+        return "a=" + algorithm + ", s=" + spaceCost + ", t=" + timeCost + ", p=" + parallelism + ", d=" + delta;
     }
 }

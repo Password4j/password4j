@@ -602,7 +602,7 @@ class Utils
 
     static void printBanner(PrintStream printStream)
     {
-        if (PropertyReader.readBoolean("global.banner", true))
+        if (PropertyReader.readBoolean("global.banner", false))
         {
             String pbkdf2Banner;
             List<String> pbkd2s = AlgorithmFinder.getAllPBKDF2Variants();

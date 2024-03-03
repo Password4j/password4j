@@ -409,4 +409,42 @@ public class HashUpdater
     {
         return with(Argon2Function.getInstanceFromHash(hashChecker.getHashed()), newHashingFunction);
     }
+
+    /**
+     * Hashes the previously given plain text password
+     * with {@link BalloonHashingFunction}.
+     * <p>
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
+     * then the default parameters are used.
+     * <p>
+     * Finally calls {@link #with(HashingFunction, HashingFunction)}
+     *
+     * @return the result of the verification with the new hash
+     * @see AlgorithmFinder#getBalloonHashingInstance()
+     * @see #with(HashingFunction, HashingFunction)
+     * @since 1.5.0
+     */
+    public HashUpdate withBalloonHashing()
+    {
+        return withBalloonHashing(AlgorithmFinder.getBalloonHashingInstance());
+    }
+
+    /**
+     * Hashes the previously given plain text password
+     * with {@link BalloonHashingFunction}.
+     * <p>
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
+     * then the default parameters are used.
+     * <p>
+     * Finally calls {@link #with(HashingFunction, HashingFunction)}
+     *
+     * @return the result of the verification with the new hash
+     * @see AlgorithmFinder#getBalloonHashingInstance()
+     * @see #with(HashingFunction, HashingFunction)
+     * @since 1.5.0
+     */
+    public HashUpdate withBalloonHashing(HashingFunction newHashingFunction)
+    {
+        return with(AlgorithmFinder.getBalloonHashingInstance(), newHashingFunction);
+    }
 }

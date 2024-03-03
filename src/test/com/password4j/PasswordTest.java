@@ -1164,6 +1164,9 @@ public class PasswordTest
         assertThrows(BadParametersException.class, () -> Password.check(new byte[0], emptyHash));
     }
 
+    /**
+     *
+     */
 
     @Test
     public void testBalloon1()
@@ -1192,6 +1195,42 @@ public class PasswordTest
 
         // THEN
         Assert.assertEquals("69f86890cef40a7ec5f70daff1ce8e2cde233a15bffa785e7efdb5143af51bfb", hash.getResult());
+    }
+
+    @Test
+    public void testBalloon3()
+    {
+        // GIVEN
+        String plainTextPassword = "buttercup";
+        String pepper = "buildmeup";
+        String salt = "JqMcHqUcjinFhQKJ";
+        BalloonHashingFunction balloonHashingFunction = BalloonHashingFunction.getInstance("SHA-256", 24, 18, 7, 5);
+
+
+        // WHEN
+        Hash hash = Password.hash(plainTextPassword).addSalt(salt).addPepper(pepper).with(balloonHashingFunction);
+        String hashed = hash.getResult();
+
+        // THEN
+        Assert.assertTrue(Password.check(plainTextPassword, hash));
+        Assert.assertTrue(Password.check(plainTextPassword, hashed).addPepper(pepper).addSalt(salt).with(balloonHashingFunction));
+    }
+
+    @Test
+    public void testBalloon4()
+    {
+        // GIVEN
+        String plainTextPassword = "buttercup";
+        String pepper = "buildmeup";
+        String salt = "JqMcHqUcjinFhQKJ";
+
+        // WHEN
+        Hash hash = Password.hash(plainTextPassword).addSalt(salt).addPepper(pepper).withBalloonHashing();
+        String hashed = hash.getResult();
+
+        // THEN
+        Assert.assertTrue(Password.check(plainTextPassword, hash));
+        Assert.assertTrue(Password.check(plainTextPassword, hashed).addPepper(pepper).addSalt(salt).withBalloonHashing());
     }
 
 

@@ -17,9 +17,12 @@
 
 package com.password4j;
 
+import com.password4j.types.Argon2;
+import com.password4j.types.Bcrypt;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class BalloonHashingFunctionTest
@@ -70,11 +73,50 @@ public class BalloonHashingFunctionTest
         {
             balloonHashingFunction = BalloonHashingFunction.getInstance((String) testVector[2], (Integer) testVector[3], (Integer) testVector[4], (Integer) testVector[5], (Integer) testVector[6]);
             Assert.assertEquals(testVector[7], balloonHashingFunction.hash((String) testVector[0], (String) testVector[1]).getResult());
+            Assert.assertEquals(testVector[7], balloonHashingFunction.hash(((String) testVector[0]).getBytes(), ((String) testVector[1]).getBytes()).getResult());
 
             Assert.assertTrue(balloonHashingFunction.check((String) testVector[0], (String) testVector[7], (String) testVector[1]));
+            Assert.assertTrue(balloonHashingFunction.check(((String) testVector[0]).getBytes(), ((String) testVector[7]).getBytes(), ((String) testVector[1]).getBytes()));
         }
 
     }
 
+    @Test
+    public void testEquality()
+    {
+        // GIVEN
+        String m = "SHA-256";
+        int i = 2;
+        int p = 3;
+        int l = 4;
+        int v = 5;
+        BalloonHashingFunction balloonHashingFunction = BalloonHashingFunction.getInstance(m, i, p, l, v);
+
+        // THEN
+        boolean eqNull = balloonHashingFunction.equals(null);
+        boolean eqClass = balloonHashingFunction.equals(new BcryptFunction(Bcrypt.A, 10));
+        boolean sameInst = balloonHashingFunction.equals(BalloonHashingFunction.getInstance(m, i, p, l, v));
+        boolean sameInst2 = balloonHashingFunction.equals(new BalloonHashingFunction(m, i, p, l, v));
+        String toString = balloonHashingFunction.toString();
+        int hashCode = balloonHashingFunction.hashCode();
+        boolean notSameInst1 = balloonHashingFunction.equals(new BalloonHashingFunction("SHA-512", i, p, l, v));
+        boolean notSameInst2 = balloonHashingFunction.equals(new BalloonHashingFunction(m, i+1, p, l, v));
+        boolean notSameInst3 = balloonHashingFunction.equals(new BalloonHashingFunction(m, i, p+1, l, v));
+        boolean notSameInst4 = balloonHashingFunction.equals(new BalloonHashingFunction(m, i, p, l+1, v));
+        boolean notSameInst6 = balloonHashingFunction.equals(new BalloonHashingFunction(m, i, p, l,  v+1));
+
+        // END
+        Assert.assertFalse(eqNull);
+        Assert.assertFalse(eqClass);
+        Assert.assertTrue(sameInst);
+        Assert.assertTrue(sameInst2);
+        Assert.assertNotEquals(toString, new BalloonHashingFunction(m, i+1, p, l, v).toString());
+        Assert.assertNotEquals(hashCode, new BalloonHashingFunction(m, i, p, l, v+1).hashCode());
+        Assert.assertFalse(notSameInst1);
+        Assert.assertFalse(notSameInst2);
+        Assert.assertFalse(notSameInst3);
+        Assert.assertFalse(notSameInst4);
+        Assert.assertFalse(notSameInst6);
+    }
 
 }

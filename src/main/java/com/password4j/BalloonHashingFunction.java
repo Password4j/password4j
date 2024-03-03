@@ -17,8 +17,6 @@
 
 package com.password4j;
 
-import com.password4j.types.Argon2;
-
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -42,6 +40,8 @@ public class BalloonHashingFunction extends AbstractHashingFunction
 
     private final String algorithm;
 
+    private ExecutorService service;
+
     private final int spaceCost;
 
     private final int timeCost;
@@ -57,6 +57,10 @@ public class BalloonHashingFunction extends AbstractHashingFunction
         this.timeCost = timeCost;
         this.parallelism = parallelism;
         this.delta = delta;
+        if (parallelism > 1)
+        {
+            this.service = Executors.newFixedThreadPool(Utils.AVAILABLE_PROCESSORS);
+        }
 
     }
 
@@ -119,7 +123,7 @@ public class BalloonHashingFunction extends AbstractHashingFunction
         }
         else if (parallelism > 1)
         {
-            ExecutorService service = Executors.newFixedThreadPool(parallelism);
+
             List<Future<?>> futures = new ArrayList<>();
 
             for (int i = 0; i < parallelism; i++)
@@ -153,7 +157,6 @@ public class BalloonHashingFunction extends AbstractHashingFunction
                 Thread.currentThread().interrupt();
             }
 
-            service.shutdownNow();
 
             output = hashFunc(messageDigest, plainTextPassword, salt, output);
         }
@@ -248,6 +251,10 @@ public class BalloonHashingFunction extends AbstractHashingFunction
             if (arg instanceof Integer)
             {
                 t = Utils.append(t, Utils.intToLittleEndianBytes((Integer) arg, 8));
+            }
+            else if (arg instanceof CharSequence)
+            {
+                t = Utils.append(t, Utils.fromCharSequenceToBytes((CharSequence) arg));
             }
             else if (arg instanceof byte[])
             {

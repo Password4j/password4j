@@ -62,6 +62,8 @@ class Utils
 
     private static final Pattern STRONG_PATTERN = Pattern.compile("\\s*([\\S&&[^:,]]*)(\\:([\\S&&[^,]]*))?\\s*(\\,(.*))?");
 
+    static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
+
     private Utils()
     {
         //

@@ -95,7 +95,7 @@ public class HashBuilder
      */
     public HashBuilder addRandomSalt()
     {
-        this.salt = SaltGenerator.generate();
+        addSalt(new String(SaltGenerator.generate(), Utils.DEFAULT_CHARSET));
         return this;
     }
 
@@ -117,7 +117,7 @@ public class HashBuilder
         }
         else
         {
-            this.salt = SaltGenerator.generate(length);
+            addSalt(new String(SaltGenerator.generate(length), Utils.DEFAULT_CHARSET));
         }
         return this;
     }

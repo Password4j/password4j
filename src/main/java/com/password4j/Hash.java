@@ -120,7 +120,10 @@ public class Hash
      * @param bytes           the hash without additional information.
      * @param salt            the salt used for the computation.
      * @since 0.1.0
+     * @deprecated            As of 1.8.1 because of the salt conversion from {@link String} to byte[].
+     *                        {@link Hash#Hash(HashingFunction, String, byte[], byte[])} should be used instead.
      */
+    @Deprecated
     public Hash(HashingFunction hashingFunction, String result, byte[] bytes, String salt)
     {
         this(hashingFunction, Utils.fromCharSequenceToBytes(result), bytes, Utils.fromCharSequenceToBytes(salt));

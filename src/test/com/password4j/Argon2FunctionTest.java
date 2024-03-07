@@ -280,6 +280,28 @@ public class Argon2FunctionTest
         PropertyReader.properties = oldProps;
     }
 
+    @Test
+    public void testWithGeneratedSalt()
+    {
+        for (TestCase test : CASES)
+        {
+            Argon2Function f = getFunction(test.memory, test.iterations, test.parallelism, test.outLength, test.type, test.version);
+            Hash hash = Password.hash(test.plainTextPassword).addRandomSalt().with(f);
+            assertTrue(Password.check(test.plainTextPassword, hash));
+        }
+    }
+
+    @Test
+    public void testWithGeneratedSaltAndSetLenght()
+    {
+        for (TestCase test : CASES)
+        {
+            Argon2Function f = getFunction(test.memory, test.iterations, test.parallelism, test.outLength, test.type, test.version);
+            Hash hash = Password.hash(test.plainTextPassword).addRandomSalt(128).with(f);
+            assertTrue(Password.check(test.plainTextPassword, hash));
+        }
+    }
+
 
 
 

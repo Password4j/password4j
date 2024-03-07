@@ -174,17 +174,18 @@ public class ScryptFunction extends AbstractHashingFunction
 
     private Hash internalHash(byte[] plainTextPassword, byte[] salt)
     {
-        String stringedSalt = Utils.fromBytesToString(salt);
+
         try
         {
             byte[] derived = scrypt(plainTextPassword, salt, derivedKeyLength);
             String params = Long.toString((long) Utils.log2(workFactor) << 16 | (long) resources << 8 | parallelization, 16);
             String sb = "$" + params + '$' + Utils.encodeBase64(salt) + '$'
                     + Utils.encodeBase64(derived);
-            return new Hash(this, sb, derived, stringedSalt);
+            return new Hash(this, sb, derived, salt);
         }
         catch (IllegalArgumentException | GeneralSecurityException e)
         {
+            String stringedSalt = Utils.fromBytesToString(salt);
             String message = "Invalid specification with salt=" + stringedSalt + ", N=" + workFactor + ", r=" + resources + " and p=" + parallelization;
             throw new BadParametersException(message, e);
         }

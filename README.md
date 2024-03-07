@@ -23,7 +23,7 @@ a set of optimal parameters** based on the system performance and the desired ma
 ![Imgur](https://imgur.com/7xyROFH.png)
 
 
-The library fully supports **[Argon2](https://en.wikipedia.org/wiki/Argon2)**, **[bcrypt](https://en.wikipedia.org/wiki/Bcrypt)**, **[scrypt](https://en.wikipedia.org/wiki/Scrypt)** and **[PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)** 
+The library fully supports **[Argon2](https://en.wikipedia.org/wiki/Argon2)**, **[bcrypt](https://en.wikipedia.org/wiki/Bcrypt)**, **[scrypt](https://en.wikipedia.org/wiki/Scrypt)**, **[balloon hashing](https://en.wikipedia.org/wiki/Balloon_hashing)** and **[PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)** 
 and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/Salt_%28cryptography%29)** and **[pepper](https://en.wikipedia.org/wiki/Pepper_%28cryptography%29)**.
 
 ## Documentation
@@ -93,6 +93,7 @@ Or if you want to switch from a CHF to another one:
 | bcrypt                   | 1.0.0 |                                                      |
 | scrypt                   | 1.0.0 |                                                      |
 | Argon2                   | 1.5.0 |                                                      |
+| Balloon Hashing                   | 1.8.0 |                                                      |
 
 | Cryptographic Hash Functions | Since | Notes                                                 |
 |------------------------------|-------|-------------------------------------------------------|

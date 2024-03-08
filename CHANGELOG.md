@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/Password4j/password4j/releases/tag/1.8.1) - (2024-03-08)
+### Fixed
+* `Argon2Function#internalHash(...)` used a double conversion from `byte[]` to `String` and back to `byte[]` that created inconsistencies in `Hash#salt`  ([#143](../../issues/143))
+
+### Changed
+* `Hash#Hash(HashingFunction, String, byte[], String)` marked deprecated
+
 ## [1.8.0](https://github.com/Password4j/password4j/releases/tag/1.8.0) - (2024-03-03)
 ### Added
 * Balloon Hashing implementation ([#131](../../issues/131))

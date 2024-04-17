@@ -101,7 +101,7 @@ public class Argon2Function extends AbstractHashingFunction
 
         if (parallelism >= 1)
         {
-            service = Executors.newFixedThreadPool(Utils.AVAILABLE_PROCESSORS);
+            service = Utils.createExecutorService();
         }
     }
 

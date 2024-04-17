@@ -32,6 +32,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,6 +52,10 @@ class Utils
             '/' };
 
     private static final int[] FROM_BASE64 = new int[256];
+
+    private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1);
+
+    private static final ThreadGroup THREAD_GROUP = new ThreadGroup("Password4j Workers");
 
     static
     {
@@ -655,6 +662,11 @@ class Utils
         return byteArrays;
     }
 
-
-
+    static ExecutorService createExecutorService() {
+        return Executors.newFixedThreadPool(AVAILABLE_PROCESSORS, runnable -> {
+            Thread thread = new Thread(THREAD_GROUP, runnable, "password4j-worker-" + THREAD_COUNTER.getAndIncrement());
+            thread.setDaemon(true);
+            return thread;
+        });
+    }
 }

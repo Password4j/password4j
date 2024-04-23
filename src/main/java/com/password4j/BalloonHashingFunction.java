@@ -59,7 +59,7 @@ public class BalloonHashingFunction extends AbstractHashingFunction
         this.delta = delta;
         if (parallelism > 1)
         {
-            this.service = Executors.newFixedThreadPool(Utils.AVAILABLE_PROCESSORS);
+            this.service = Utils.createExecutorService();
         }
 
     }

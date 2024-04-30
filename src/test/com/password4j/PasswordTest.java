@@ -19,11 +19,14 @@ package com.password4j;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.security.CodeSource;
+import java.security.PermissionCollection;
+import java.security.Permissions;
+import java.security.Policy;
 import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Random;
-import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -1233,6 +1236,30 @@ public class PasswordTest
         Assert.assertTrue(Password.check(plainTextPassword, hashed).addPepper(pepper).addSalt(salt).withBalloonHashing());
     }
 
+    @Test
+    public void testRestrictedPermissions()
+    {
+        // GIVEN
+        Policy.setPolicy(new Policy(){
+            @Override
+            public PermissionCollection getPermissions(CodeSource codesource) {
+                Permissions permissions = new Permissions();
+                permissions.add(new RuntimePermission("setSecurityManager"));
+                return permissions;
+            }
+        });
+        System.setSecurityManager(new SecurityManager());
 
+        // WHEN
+        Hash hash1 = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withPBKDF2();
+        Hash hash2 = Password.hash(PASSWORD).addPepper(PEPPER).withBcrypt();
+        Hash hash3 = Password.hash(PASSWORD).addPepper(PEPPER).addSalt(SALT).withScrypt();
 
+        // THEN
+        assertTrue(Password.check(PASSWORD, hash1));
+        assertTrue(Password.check(PASSWORD, hash2));
+        assertTrue(Password.check(PASSWORD, hash3));
+
+        System.setSecurityManager(null);
+    }
 }

@@ -54,9 +54,7 @@ class Utils
     private static final int[] FROM_BASE64 = new int[256];
 
     private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1);
-
-    private static final ThreadGroup THREAD_GROUP = new ThreadGroup("Password4j Workers");
-
+    
     static
     {
         Arrays.fill(FROM_BASE64, -1);
@@ -664,7 +662,7 @@ class Utils
 
     static ExecutorService createExecutorService() {
         return Executors.newFixedThreadPool(AVAILABLE_PROCESSORS, runnable -> {
-            Thread thread = new Thread(THREAD_GROUP, runnable, "password4j-worker-" + THREAD_COUNTER.getAndIncrement());
+            Thread thread = new Thread(runnable, "password4j-worker-" + THREAD_COUNTER.getAndIncrement());
             thread.setDaemon(true);
             return thread;
         });

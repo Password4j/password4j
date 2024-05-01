@@ -4,13 +4,16 @@
 
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.8.1</version>
+    <version>1.8.2</version>
     <packaging>jar</packaging>
     
 
     <name>Password4j</name>
     <description>
-        Password4j is a user-friendly cryptographic library that supports Argon2, Bcrypt, Scrypt, PBKDF2 and various cryptographic hash functions.
+        About
+        Java cryptographic library that supports Argon2, bcrypt, scrypt and PBKDF2 aimed to protect passwords in databases.
+        Easy to use by design, highly customizable, secure and portable.
+        All the implementations follow the standards and have been reviewed to perform better in the JVM.
     </description>
     <url>https://password4j.com/</url>
 
@@ -19,7 +22,7 @@
         <connection>scm:git:git@github.com/Password4j/${project.artifactId}.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/Password4j/${project.artifactId}.git</developerConnection>
         <url>https://github.com/Password4j/password4j</url>
-        <tag>1.8.1</tag>
+        <tag>1.8.2</tag>
     </scm>
 
     <licenses>

@@ -1,5 +1,11 @@
 # Changelog
 
+# [1.8.2](https://github.com/Password4j/password4j/releases/tag/1.8.2) - (2024-05-01)
+### Fixed
+*  Multi thread algorithms use daemon threads in order to not block the application shutdown if there is no explicit `System.exit()` ([#151](../../issues/151))
+*  Password4j works even when there is no access to `psw4j.properties` file due to restrictive security policies ([#153](../../issues/153))
+
+
 ## [1.8.1](https://github.com/Password4j/password4j/releases/tag/1.8.1) - (2024-03-08)
 ### Fixed
 * `Argon2Function#internalHash(...)` used a double conversion from `byte[]` to `String` and back to `byte[]` that created inconsistencies in `Hash#salt  ([#143](../../issues/143))

@@ -53,6 +53,8 @@ class Utils
     private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1);
     private static final Pattern STRONG_PATTERN = Pattern.compile("\\s*([\\S&&[^:,]]*)(\\:([\\S&&[^,]]*))?\\s*(\\,(.*))?");
 
+    private static final ThreadGroup THREAD_GROUP = new ThreadGroup("Password4j Workers");
+
     static
     {
         Arrays.fill(FROM_BASE64, -1);
@@ -621,7 +623,7 @@ class Utils
             String banner = "\n";
             banner += "    |\n" +
                     "    |                \033[0;1mPassword4j\033[0;0m\n" +
-                    "    + \\             .: v1.8.1 :.\n" +
+                    "    + \\             .: v1.8.2 :.\n" +
                     "    \\\\.G_.*=.\n" +
                     "     `(H'/.\\|        ✅ Argon2\n" +
                     "      .>' (_--.      ✅ scrypt\n" +
@@ -662,7 +664,7 @@ class Utils
     static ExecutorService createExecutorService()
     {
         return Executors.newFixedThreadPool(AVAILABLE_PROCESSORS, runnable -> {
-            Thread thread = new Thread(runnable, "password4j-worker-" + THREAD_COUNTER.getAndIncrement());
+            Thread thread = new Thread(THREAD_GROUP, runnable, "password4j-worker-" + THREAD_COUNTER.getAndIncrement());
             thread.setDaemon(true);
             return thread;
         });

@@ -54,7 +54,7 @@ class Utils
     private static final int[] FROM_BASE64 = new int[256];
 
     private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1);
-    
+
     static
     {
         Arrays.fill(FROM_BASE64, -1);
@@ -373,7 +373,7 @@ class Utils
     static String encodeBase64(byte[] src, boolean padding)
     {
         byte[] encoded = encode(src, padding);
-        return new String(encoded, 0, encoded.length);
+        return new String(encoded);
     }
 
     static byte[] decodeBase64(byte[] src)
@@ -539,7 +539,7 @@ class Utils
         return dp;
     }
 
-    @SuppressWarnings({"removal", "java:S1604"})
+    @SuppressWarnings({"java:S1604"})
     static SecureRandom getInstanceStrong() throws NoSuchAlgorithmException
     {
         String property = AccessController.doPrivileged(new PrivilegedAction<String>()
@@ -551,7 +551,7 @@ class Utils
             }
         });
 
-        if ((property == null) || (property.length() == 0))
+        if ((property == null) || (property.isEmpty()))
         {
             throw new NoSuchAlgorithmException("Null/empty securerandom.strongAlgorithms Security Property");
         }

@@ -52,7 +52,7 @@ class PropertyReader
             LOG.warn(MESSAGE, message, defaultValue, key);
             return defaultValue;
         }
-        return Integer.parseInt(readString(key));
+        return Integer.parseInt(str);
     }
 
     static boolean readBoolean(String key, boolean defaultValue)
@@ -62,7 +62,7 @@ class PropertyReader
         {
             return defaultValue;
         }
-        return Boolean.parseBoolean(readString(key));
+        return Boolean.parseBoolean(str);
     }
 
     static String readString(String key, String defaultValue, String message)
@@ -116,7 +116,7 @@ class PropertyReader
         String customPath = System.getProperty(CONFIGURATION_KEY, null);
 
         InputStream in;
-        if (customPath == null || customPath.length() == 0)
+        if (customPath == null || customPath.isEmpty())
         {
             in = getResource('/' + FILE_NAME);
         }
@@ -140,7 +140,7 @@ class PropertyReader
         }
         else
         {
-            LOG.debug("Cannot find any properties file.");
+            LOG.warn("Cannot find any properties file.");
         }
 
         properties = props;

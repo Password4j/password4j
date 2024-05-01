@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.AccessControlException;
 import java.util.Properties;
 
 
@@ -113,19 +114,29 @@ class PropertyReader
 
     static void init()
     {
-        String customPath = System.getProperty(CONFIGURATION_KEY, null);
+        String customPath = null;
 
-        InputStream in;
-        if (customPath == null || customPath.length() == 0)
-        {
-            in = getResource('/' + FILE_NAME);
-        }
-        else
-        {
-            in = getResource(customPath);
+        try {
+            customPath = System.getProperty(CONFIGURATION_KEY, null);
+        } catch (AccessControlException ex) {
+            LOG.debug("Cannot access configuration key property", ex);
         }
 
+        InputStream in = null;
         Properties props = new Properties();
+        try {
+            if (customPath == null || customPath.length() == 0)
+            {
+                in = getResource('/' + FILE_NAME);
+            }
+            else
+            {
+                in = getResource(customPath);
+            }
+        } catch (AccessControlException ex) {
+            LOG.debug("Cannot access properties file", ex);
+            props.setProperty("global.banner", "false");
+        }
 
         if (in != null)
         {

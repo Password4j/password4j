@@ -25,11 +25,9 @@ package com.password4j;
  */
 public class HashBuilder
 {
-    private byte[] plainTextPassword;
-
     protected byte[] salt;
-
     protected CharSequence pepper;
+    private byte[] plainTextPassword;
 
     @SuppressWarnings("unused")
     private HashBuilder()

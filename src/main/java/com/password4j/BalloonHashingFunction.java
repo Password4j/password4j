@@ -24,7 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * Class containing the implementation of Balloon hashing function and its parameters.
@@ -39,18 +42,13 @@ public class BalloonHashingFunction extends AbstractHashingFunction
     private static final int DEFAULT_DELTA = 3;
 
     private final String algorithm;
-
+    private final int spaceCost;
+    private final int timeCost;
+    private final int parallelism;
+    private final int delta;
     private ExecutorService service;
 
-    private final int spaceCost;
-
-    private final int timeCost;
-
-    private final int parallelism;
-
-    private final int delta;
-
-    BalloonHashingFunction(String algorithm, int spaceCost, int timeCost,  int parallelism, int delta)
+    BalloonHashingFunction(String algorithm, int spaceCost, int timeCost, int parallelism, int delta)
     {
         this.algorithm = algorithm;
         this.spaceCost = spaceCost;
@@ -65,7 +63,7 @@ public class BalloonHashingFunction extends AbstractHashingFunction
     }
 
 
-    public static BalloonHashingFunction getInstance(String algorithm, int spaceCost, int timeCost,  int parallelism, int delta)
+    public static BalloonHashingFunction getInstance(String algorithm, int spaceCost, int timeCost, int parallelism, int delta)
     {
         String key = getUID(algorithm, spaceCost, timeCost, parallelism, delta);
         if (INSTANCES.containsKey(key))
@@ -80,9 +78,19 @@ public class BalloonHashingFunction extends AbstractHashingFunction
         }
     }
 
-    public static BalloonHashingFunction getInstance(String algorithm, int spaceCost, int timeCost,  int parallelism)
+    public static BalloonHashingFunction getInstance(String algorithm, int spaceCost, int timeCost, int parallelism)
     {
         return getInstance(algorithm, spaceCost, timeCost, parallelism, DEFAULT_DELTA);
+    }
+
+    private static String getUID(String algorithm, int spaceCost, int timeCost, int parallelism, int delta)
+    {
+        return algorithm + '|' + spaceCost + '|' + timeCost + '|' + parallelism + '|' + delta;
+    }
+
+    protected static String toString(String algorithm, int spaceCost, int timeCost, int parallelism, int delta)
+    {
+        return "a=" + algorithm + ", s=" + spaceCost + ", t=" + timeCost + ", p=" + parallelism + ", d=" + delta;
     }
 
     @Override
@@ -162,7 +170,7 @@ public class BalloonHashingFunction extends AbstractHashingFunction
         }
         else
         {
-            output =  balloon(getMessageDigest(), plainTextPassword, salt);
+            output = balloon(getMessageDigest(), plainTextPassword, salt);
         }
 
         return new Hash(this, Utils.toHex(output), output, salt);
@@ -191,8 +199,6 @@ public class BalloonHashingFunction extends AbstractHashingFunction
         mix(messageDigest, buffer, cnt, salt);
         return extract(buffer);
     }
-
-
 
     private int expand(MessageDigest messageDigest, List<byte[]> buffer, int cnt)
     {
@@ -241,7 +247,6 @@ public class BalloonHashingFunction extends AbstractHashingFunction
         return buffer.get(position);
     }
 
-
     private byte[] hashFunc(MessageDigest md, Object... args)
     {
         byte[] t = new byte[0];
@@ -264,8 +269,6 @@ public class BalloonHashingFunction extends AbstractHashingFunction
 
         return md.digest(t);
     }
-
-
 
     @Override
     public boolean check(CharSequence plainTextPassword, String hashed)
@@ -293,11 +296,6 @@ public class BalloonHashingFunction extends AbstractHashingFunction
         return slowEquals(hash.getResultAsBytes(), hashed);
     }
 
-    private static String getUID(String algorithm, int spaceCost, int timeCost,  int parallelism, int delta)
-    {
-        return algorithm + '|' + spaceCost + '|' + timeCost + '|' + parallelism + '|' + delta;
-    }
-
     @Override
     public boolean equals(Object o)
     {
@@ -306,7 +304,7 @@ public class BalloonHashingFunction extends AbstractHashingFunction
         if (!(o instanceof BalloonHashingFunction))
             return false;
         BalloonHashingFunction other = (BalloonHashingFunction) o;
-        return algorithm .equals(other.algorithm) //
+        return algorithm.equals(other.algorithm) //
                 && spaceCost == other.spaceCost //
                 && timeCost == other.timeCost //
                 && parallelism == other.parallelism //
@@ -323,10 +321,5 @@ public class BalloonHashingFunction extends AbstractHashingFunction
     public String toString()
     {
         return getClass().getSimpleName() + '[' + toString(algorithm, spaceCost, timeCost, parallelism, delta) + ']';
-    }
-
-    protected static String toString(String algorithm, int spaceCost, int timeCost, int parallelism, int delta)
-    {
-        return "a=" + algorithm + ", s=" + spaceCost + ", t=" + timeCost + ", p=" + parallelism + ", d=" + delta;
     }
 }

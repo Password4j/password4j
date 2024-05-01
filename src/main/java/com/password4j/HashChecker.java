@@ -25,12 +25,9 @@ package com.password4j;
  */
 public class HashChecker
 {
-    private byte[] plainTextPassword;
-
     protected byte[] hashed;
-
     protected byte[] salt;
-
+    private byte[] plainTextPassword;
     private CharSequence pepper;
 
 

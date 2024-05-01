@@ -58,6 +58,11 @@ public class AlgorithmFinder
      */
     private static SecureRandom secureRandom;
 
+    static
+    {
+        initialize();
+    }
+
     private AlgorithmFinder()
     {
         //
@@ -418,10 +423,5 @@ public class AlgorithmFinder
             this.iterations = iterations;
             this.length = length;
         }
-    }
-
-    static
-    {
-        initialize();
     }
 }

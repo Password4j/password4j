@@ -43,17 +43,15 @@ class Utils
 {
 
     static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
-
-    private static final char[] HEX_ALPHABET = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-
-    private static final char[] TO_BASE64 = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+    static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
+    private static final char[] HEX_ALPHABET = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    private static final char[] TO_BASE64 = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
             'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
             'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+',
-            '/' };
-
+            '/'};
     private static final int[] FROM_BASE64 = new int[256];
-
     private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1);
+    private static final Pattern STRONG_PATTERN = Pattern.compile("\\s*([\\S&&[^:,]]*)(\\:([\\S&&[^,]]*))?\\s*(\\,(.*))?");
 
     static
     {
@@ -64,10 +62,6 @@ class Utils
         }
         FROM_BASE64['='] = -2;
     }
-
-    private static final Pattern STRONG_PATTERN = Pattern.compile("\\s*([\\S&&[^:,]]*)(\\:([\\S&&[^,]]*))?\\s*(\\,(.*))?");
-
-    static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
     private Utils()
     {
@@ -83,7 +77,8 @@ class Utils
     {
         byte[] byteArray = charSequence.getBytes(DEFAULT_CHARSET);
         int[] ints = new int[byteArray.length];
-        for(int i = 0; i < ints.length; i++) {
+        for (int i = 0; i < ints.length; i++)
+        {
             ints[i] = Byte.toUnsignedInt(byteArray[i]);
         }
         return ints;
@@ -196,7 +191,8 @@ class Utils
 
     static BigInteger bytesToInt(byte[] bytes)
     {
-        for (int i = 0; i < bytes.length / 2; i++) {
+        for (int i = 0; i < bytes.length / 2; i++)
+        {
             byte temp = bytes[i];
             bytes[i] = bytes[bytes.length - i - 1];
             bytes[bytes.length - i - 1] = temp;
@@ -622,7 +618,7 @@ class Utils
                 pbkdf2Banner = "❌ PBKDF2 <-- not supported by " + System.getProperty("java.vm.name");
             }
 
-            String banner ="\n";
+            String banner = "\n";
             banner += "    |\n" +
                     "    |                \033[0;1mPassword4j\033[0;0m\n" +
                     "    + \\             .: v1.8.1 :.\n" +
@@ -642,14 +638,17 @@ class Utils
         }
     }
 
-    static List<byte[]> split(byte[] array, byte delimiter) {
+    static List<byte[]> split(byte[] array, byte delimiter)
+    {
         List<byte[]> byteArrays = new LinkedList<>();
 
         int begin = 0;
 
-        for (int i = 0; i < array.length; i++) {
+        for (int i = 0; i < array.length; i++)
+        {
 
-            if (array[i] != delimiter) {
+            if (array[i] != delimiter)
+            {
                 continue;
             }
 
@@ -660,7 +659,8 @@ class Utils
         return byteArrays;
     }
 
-    static ExecutorService createExecutorService() {
+    static ExecutorService createExecutorService()
+    {
         return Executors.newFixedThreadPool(AVAILABLE_PROCESSORS, runnable -> {
             Thread thread = new Thread(runnable, "password4j-worker-" + THREAD_COUNTER.getAndIncrement());
             thread.setDaemon(true);

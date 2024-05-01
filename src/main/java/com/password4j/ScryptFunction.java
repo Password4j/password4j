@@ -144,83 +144,6 @@ public class ScryptFunction extends AbstractHashingFunction
         }
     }
 
-    @Override
-    public Hash hash(CharSequence plainTextPassword)
-    {
-        byte[] salt = SaltGenerator.generate();
-        return internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), salt);
-    }
-
-    @Override
-    public Hash hash(byte[] plainTextPasswordAsBytes)
-    {
-        byte[] salt = SaltGenerator.generate();
-        return internalHash(plainTextPasswordAsBytes, salt);
-    }
-
-    @Override
-    public Hash hash(CharSequence plainTextPassword, String salt)
-    {
-        byte[] saltAsBytes = Utils.fromCharSequenceToBytes(salt);
-        byte[] plainTextPasswordAsBytes = Utils.fromCharSequenceToBytes(plainTextPassword);
-        return internalHash(plainTextPasswordAsBytes, saltAsBytes);
-    }
-
-    @Override
-    public Hash hash(byte[] plainTextPasswordAsBytes, byte[] salt)
-    {
-        return internalHash(plainTextPasswordAsBytes, salt);
-    }
-
-    private Hash internalHash(byte[] plainTextPassword, byte[] salt)
-    {
-
-        try
-        {
-            byte[] derived = scrypt(plainTextPassword, salt, derivedKeyLength);
-            String params = Long.toString((long) Utils.log2(workFactor) << 16 | (long) resources << 8 | parallelization, 16);
-            String sb = "$" + params + '$' + Utils.encodeBase64(salt) + '$'
-                    + Utils.encodeBase64(derived);
-            return new Hash(this, sb, derived, salt);
-        }
-        catch (IllegalArgumentException | GeneralSecurityException e)
-        {
-            String stringedSalt = Utils.fromBytesToString(salt);
-            String message = "Invalid specification with salt=" + stringedSalt + ", N=" + workFactor + ", r=" + resources + " and p=" + parallelization;
-            throw new BadParametersException(message, e);
-        }
-    }
-
-    @Override
-    public boolean check(CharSequence plainTextPassword, String hashed)
-    {
-        return check(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(hashed));
-    }
-
-    @Override
-    public boolean check(byte[] plainTextPassword, byte[] hashed)
-    {
-        try
-        {
-            List<byte[]> parts = Utils.split(hashed, (byte) 36);
-            if (parts.size() == 4)
-            {
-                byte[] salt = Utils.decodeBase64(parts.get(2));
-                byte[] derived0 = Utils.decodeBase64(parts.get(3));
-                byte[] derived1 = scrypt(plainTextPassword, salt, derivedKeyLength);
-                return slowEquals(derived0, derived1);
-            }
-            else
-            {
-                throw new BadParametersException("Invalid hashed value");
-            }
-        }
-        catch (GeneralSecurityException gse)
-        {
-            throw new IllegalStateException("JVM doesn't support SHA1PRNG or HMAC_SHA256?", gse);
-        }
-    }
-
     protected static String toString(int resources, int workFactor, int parallelization, int derivedKeyLength)
     {
         return "N=" + workFactor + ", r=" + resources + ", p=" + parallelization + ", l=" + derivedKeyLength;
@@ -312,7 +235,82 @@ public class ScryptFunction extends AbstractHashingFunction
 
     }
 
+    @Override
+    public Hash hash(CharSequence plainTextPassword)
+    {
+        byte[] salt = SaltGenerator.generate();
+        return internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), salt);
+    }
 
+    @Override
+    public Hash hash(byte[] plainTextPasswordAsBytes)
+    {
+        byte[] salt = SaltGenerator.generate();
+        return internalHash(plainTextPasswordAsBytes, salt);
+    }
+
+    @Override
+    public Hash hash(CharSequence plainTextPassword, String salt)
+    {
+        byte[] saltAsBytes = Utils.fromCharSequenceToBytes(salt);
+        byte[] plainTextPasswordAsBytes = Utils.fromCharSequenceToBytes(plainTextPassword);
+        return internalHash(plainTextPasswordAsBytes, saltAsBytes);
+    }
+
+    @Override
+    public Hash hash(byte[] plainTextPasswordAsBytes, byte[] salt)
+    {
+        return internalHash(plainTextPasswordAsBytes, salt);
+    }
+
+    private Hash internalHash(byte[] plainTextPassword, byte[] salt)
+    {
+
+        try
+        {
+            byte[] derived = scrypt(plainTextPassword, salt, derivedKeyLength);
+            String params = Long.toString((long) Utils.log2(workFactor) << 16 | (long) resources << 8 | parallelization, 16);
+            String sb = "$" + params + '$' + Utils.encodeBase64(salt) + '$'
+                    + Utils.encodeBase64(derived);
+            return new Hash(this, sb, derived, salt);
+        }
+        catch (IllegalArgumentException | GeneralSecurityException e)
+        {
+            String stringedSalt = Utils.fromBytesToString(salt);
+            String message = "Invalid specification with salt=" + stringedSalt + ", N=" + workFactor + ", r=" + resources + " and p=" + parallelization;
+            throw new BadParametersException(message, e);
+        }
+    }
+
+    @Override
+    public boolean check(CharSequence plainTextPassword, String hashed)
+    {
+        return check(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(hashed));
+    }
+
+    @Override
+    public boolean check(byte[] plainTextPassword, byte[] hashed)
+    {
+        try
+        {
+            List<byte[]> parts = Utils.split(hashed, (byte) 36);
+            if (parts.size() == 4)
+            {
+                byte[] salt = Utils.decodeBase64(parts.get(2));
+                byte[] derived0 = Utils.decodeBase64(parts.get(3));
+                byte[] derived1 = scrypt(plainTextPassword, salt, derivedKeyLength);
+                return slowEquals(derived0, derived1);
+            }
+            else
+            {
+                throw new BadParametersException("Invalid hashed value");
+            }
+        }
+        catch (GeneralSecurityException gse)
+        {
+            throw new IllegalStateException("JVM doesn't support SHA1PRNG or HMAC_SHA256?", gse);
+        }
+    }
 
     /**
      * Estimates the required memory to calculate an hash with

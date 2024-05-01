@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.AccessControlException;
 import java.util.Properties;
 
 
@@ -38,6 +39,11 @@ class PropertyReader
     private static final String MESSAGE = "{}. Default value is used ({}). Please set property {} in your " + FILE_NAME + " file.";
 
     protected static Properties properties;
+
+    static
+    {
+        init();
+    }
 
     private PropertyReader()
     {
@@ -104,7 +110,7 @@ class PropertyReader
             throw new BadParametersException("Key cannot be null");
         }
 
-        if(properties != null)
+        if (properties != null)
         {
             return properties.getProperty(key);
         }
@@ -113,19 +119,35 @@ class PropertyReader
 
     static void init()
     {
-        String customPath = System.getProperty(CONFIGURATION_KEY, null);
+        String customPath = null;
 
-        InputStream in;
-        if (customPath == null || customPath.isEmpty())
+        try
         {
-            in = getResource('/' + FILE_NAME);
+            customPath = System.getProperty(CONFIGURATION_KEY, null);
         }
-        else
+        catch (AccessControlException ex)
         {
-            in = getResource(customPath);
+            LOG.debug("Cannot access configuration key property", ex);
         }
 
+        InputStream in = null;
         Properties props = new Properties();
+        try
+        {
+            if (customPath == null || customPath.isEmpty())
+            {
+                in = getResource('/' + FILE_NAME);
+            }
+            else
+            {
+                in = getResource(customPath);
+            }
+        }
+        catch (AccessControlException ex)
+        {
+            LOG.debug("Cannot access properties file", ex);
+            props.setProperty("global.banner", "false");
+        }
 
         if (in != null)
         {
@@ -140,7 +162,7 @@ class PropertyReader
         }
         else
         {
-            LOG.warn("Cannot find any properties file.");
+            LOG.debug("Cannot find any properties file.");
         }
 
         properties = props;
@@ -196,11 +218,6 @@ class PropertyReader
             return PropertyReader.class.getResourceAsStream(resource);
         }
 
-    }
-
-    static
-    {
-        init();
     }
 
 }

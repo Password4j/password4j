@@ -50,7 +50,7 @@ public class HashUpdate
     }
 
     /**
-     * @param hash the new hash
+     * @param hash    the new hash
      * @param updated flag for updated hash
      * @throws BadParametersException if hash is null but verified is true
      * @since 1.7.0

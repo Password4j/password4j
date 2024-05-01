@@ -59,9 +59,9 @@ public class SystemChecker
             throw new BadParametersException("Algorithm cannot be null.");
         }
         List<String> variants = AlgorithmFinder.getAllPBKDF2Variants();
-        for(String variant : variants)
+        for (String variant : variants)
         {
-            if(algorithm.equals(variant))
+            if (algorithm.equals(variant))
             {
                 return true;
             }
@@ -84,9 +84,9 @@ public class SystemChecker
             throw new BadParametersException("Algorithm cannot be null.");
         }
         Set<String> mds = AlgorithmFinder.getAllMessageDigests();
-        for(String md : mds)
+        for (String md : mds)
         {
-            if(algorithm.equals(md))
+            if (algorithm.equals(md))
             {
                 return true;
             }
@@ -166,7 +166,7 @@ public class SystemChecker
      */
     @SuppressWarnings("Duplicates")
     public static BenchmarkResult<Argon2Function> benchmarkForArgon2(long maxMilliseconds, int memory, int parallelism,
-            int outputLength, Argon2 type)
+                                                                     int outputLength, Argon2 type)
     {
         warmUpArgon2();
 
@@ -271,7 +271,7 @@ public class SystemChecker
      * @since 1.0.0
      */
     public static BenchmarkResult<ScryptFunction> findWorkFactorForScrypt(long maxMilliseconds, int resources,
-            int parallelization)
+                                                                          int parallelization)
     {
         int workFactor = 2;
         warmUpScrypt(workFactor, parallelization);
@@ -317,7 +317,7 @@ public class SystemChecker
      * @since 1.0.0
      */
     public static BenchmarkResult<ScryptFunction> findResourcesForScrypt(long maxMilliseconds, int workFactor,
-            int parallelization)
+                                                                         int parallelization)
     {
         warmUpScrypt(workFactor, parallelization);
 

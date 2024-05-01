@@ -32,10 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class MessageDigestFunction extends AbstractHashingFunction
 {
-    private static final Map<String, MessageDigestFunction> INSTANCES = new ConcurrentHashMap<>();
-
     protected static final SaltOption DEFAULT_SALT_OPTION = SaltOption.APPEND;
-
+    private static final Map<String, MessageDigestFunction> INSTANCES = new ConcurrentHashMap<>();
     private final String algorithm;
 
     private final SaltOption saltOption;
@@ -131,7 +129,8 @@ public class MessageDigestFunction extends AbstractHashingFunction
         try
         {
             return MessageDigest.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException nsae)
+        }
+        catch (NoSuchAlgorithmException nsae)
         {
             throw new UnsupportedOperationException("`" + algorithm + "` is not supported by your system.", nsae);
         }
@@ -191,7 +190,7 @@ public class MessageDigestFunction extends AbstractHashingFunction
     {
         if (salt == null || salt.length == 0)
         {
-            return  plainTextPassword;
+            return plainTextPassword;
         }
 
         if (saltOption == SaltOption.PREPEND)

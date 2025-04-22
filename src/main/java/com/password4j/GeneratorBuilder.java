@@ -28,8 +28,6 @@ public class GeneratorBuilder
 
     private int length = 8;
 
-    public String _new(PasswordGenerator passwordGenerator)
-
     public GeneratorBuilder newTOTP(Hmac hmac, Duration duration)
     {
         passwordGenerator = TOTPGenerator.getInstance(hmac, duration, length);
@@ -40,25 +38,6 @@ public class GeneratorBuilder
     public GeneratorBuilder newHOTP()
     {
         passwordGenerator = HOTPGenerator.getInstance(length);
-        return this;
-    }
-
-
-    public GeneratorBuilder newPassword(double minimumEntropy, String symbols)
-    {
-        passwordGenerator = EntropyBasedPasswordGenerator.getInstance(minimumEntropy, symbols);
-        return this;
-    }
-
-    public GeneratorBuilder newPassword(double minimumEntropy, char[] symbols)
-    {
-        passwordGenerator = EntropyBasedPasswordGenerator.getInstance(minimumEntropy, symbols);
-        return this;
-    }
-
-    public GeneratorBuilder newPassword(Rule... rules)
-    {
-        passwordGenerator = RuleBasedPasswordGenerator.getInstance(length, rules);
         return this;
     }
 

@@ -202,6 +202,21 @@ class Utils
         return new BigInteger(1, bytes);
     }
 
+    protected static boolean slowEquals(CharSequence a, CharSequence b)
+    {
+        return slowEquals(fromCharSequenceToBytes(a), fromCharSequenceToBytes(b));
+    }
+
+    static boolean slowEquals(byte[] a, byte[] b)
+    {
+        int diff = a.length ^ b.length;
+        for (int i = 0; i < a.length && i < b.length; i++)
+        {
+            diff |= a[i] ^ b[i];
+        }
+        return diff == 0;
+    }
+
     static long littleEndianToLong(byte[] bs, int off)
     {
         int lo = littleEndianToInt(bs, off);

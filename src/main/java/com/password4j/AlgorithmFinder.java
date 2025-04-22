@@ -59,6 +59,11 @@ public class AlgorithmFinder
      */
     private static SecureRandom secureRandom;
 
+    static
+    {
+        initialize();
+    }
+
     private AlgorithmFinder()
     {
         //
@@ -332,6 +337,16 @@ public class AlgorithmFinder
                 .getInstance(memory, iterations, parallelism, outputLength, Argon2.valueOf(type.toUpperCase()), version);
     }
 
+    public static BalloonHashingFunction getBalloonHashingInstance()
+    {
+        int space = PropertyReader.readInt("hash.balloon.space", 1024, "BalloonHashing memory (space) is not defined");
+        int time = PropertyReader.readInt("hash.balloon.time", 3, "BalloonHashing #iterations (time) is not defined");
+        int parallelism = PropertyReader.readInt("hash.balloon.parallelism", 1, "BalloonHashing parallelism is not defined");
+        int delta = PropertyReader.readInt("hash.balloon.delta", 3, "BalloonHashing delta is not defined");
+        String algorithm = PropertyReader.readString("hash.balloon.algorithm", "SHA-256", "BalloonHashing algorithm is not defined");
+        return BalloonHashingFunction.getInstance(algorithm, space, time, parallelism, delta);
+    }
+
     /**
      * Finds the list of supported PBKDF2 algorithms by
      * the environment's {@link Provider}s.
@@ -423,10 +438,5 @@ public class AlgorithmFinder
             this.iterations = iterations;
             this.length = length;
         }
-    }
-
-    static
-    {
-        initialize();
     }
 }

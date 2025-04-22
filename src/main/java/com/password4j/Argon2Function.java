@@ -52,24 +52,16 @@ public class Argon2Function extends AbstractHashingFunction
     private static final int ARGON2_BLOCK_SIZE = 1024;
 
     public static final int ARGON2_QWORDS_IN_BLOCK = ARGON2_BLOCK_SIZE / 8;
-
     private final int iterations;
-
     private final int memory;
-
     private final long[][] initialBlockMemory;
-
     private final int parallelism;
-
     private final int outputLength;
-
     private final int segmentLength;
-
     private final Argon2 variant;
-
     private final int version;
-
     private final int laneLength;
+    private ExecutorService service;
 
     Argon2Function(int memory, int iterations, int parallelism, int outputLength, Argon2 variant, int version)
     {
@@ -96,6 +88,11 @@ public class Argon2Function extends AbstractHashingFunction
         for (int i = 0; i < memoryBlocks; i++)
         {
             initialBlockMemory[i] = new long[ARGON2_QWORDS_IN_BLOCK];
+        }
+
+        if (parallelism >= 1)
+        {
+            service = Utils.createExecutorService();
         }
     }
 
@@ -130,7 +127,7 @@ public class Argon2Function extends AbstractHashingFunction
      * @since 1.5.0
      */
     public static Argon2Function getInstance(int memory, int iterations, int parallelism, int outputLength, Argon2 type,
-            int version)
+                                             int version)
     {
         String key = getUID(memory, iterations, parallelism, outputLength, type, version);
         if (INSTANCES.containsKey(key))
@@ -163,99 +160,6 @@ public class Argon2Function extends AbstractHashingFunction
         int parallelism = (int) params[4];
         int outputLength = ((byte[]) params[6]).length;
         return getInstance(memory, iterations, parallelism, outputLength, type, version);
-    }
-
-    @Override
-    public Hash hash(CharSequence plainTextPassword)
-    {
-        byte[] salt = SaltGenerator.generate();
-        return internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), salt, null);
-    }
-
-    @Override
-    public Hash hash(byte[] plainTextPassword)
-    {
-        byte[] salt = SaltGenerator.generate();
-        return internalHash(plainTextPassword, salt, null);
-    }
-
-    @Override
-    public Hash hash(CharSequence plainTextPassword, String salt)
-    {
-        return hash(plainTextPassword, salt, null);
-    }
-
-    @Override
-    public Hash hash(byte[] plainTextPassword, byte[] salt)
-    {
-        return hash(plainTextPassword, salt, null);
-    }
-
-    @Override
-    public Hash hash(CharSequence plainTextPassword, String salt, CharSequence pepper)
-    {
-        return internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(salt), pepper);
-    }
-
-    @Override
-    public Hash hash(byte[] plainTextPassword, byte[] salt, CharSequence pepper)
-    {
-        return internalHash(plainTextPassword, salt, pepper);
-    }
-
-    private Hash internalHash(byte[] plainTextPassword, byte[] salt, CharSequence pepper)
-    {
-        long[][] blockMemory = copyOf(initialBlockMemory);
-
-        if (salt == null)
-        {
-            salt = SaltGenerator.generate();
-        }
-        initialize(plainTextPassword, salt, Utils.fromCharSequenceToBytes(pepper), null, blockMemory);
-        fillMemoryBlocks(blockMemory);
-        byte[] hash = ending(blockMemory);
-        Hash result = new Hash(this, encodeHash(hash, salt), hash, Utils.fromBytesToString(salt));
-        result.setPepper(pepper);
-        return result;
-    }
-
-    @Override
-    public boolean check(CharSequence plainTextPassword, String hashed)
-    {
-        return check(plainTextPassword, hashed, null, null);
-    }
-
-    @Override
-    public boolean check(byte[] plainTextPassword, byte[] hashed)
-    {
-        return check(plainTextPassword, hashed, null, null);
-    }
-
-    @Override
-    public boolean check(CharSequence plainTextPassword, String hashed, String salt, CharSequence pepper)
-    {
-        byte[] plainTextPasswordAsBytes = Utils.fromCharSequenceToBytes(plainTextPassword);
-        byte[] saltAsBytes = Utils.fromCharSequenceToBytes(salt);
-        byte[] hashedAsBytes = Utils.fromCharSequenceToBytes(hashed);
-        return check(plainTextPasswordAsBytes, hashedAsBytes, saltAsBytes, pepper);
-    }
-
-    @Override
-    public boolean check(byte[] plainTextPassword, byte[] hashed, byte[] salt, CharSequence pepper)
-    {
-        byte[] theSalt;
-        if (salt == null || salt.length == 0)
-        {
-            Object[] params = decodeHash(Utils.fromBytesToString(hashed));
-            theSalt = (byte[]) params[5];
-        }
-        else
-        {
-            theSalt = salt;
-        }
-
-        Hash internalHash = internalHash(plainTextPassword, theSalt, pepper);
-        return slowEquals(internalHash.getResultAsBytes(), hashed);
     }
 
     protected static String getUID(int memory, int iterations, int parallelism, int outputLength, Argon2 type, int version)
@@ -340,8 +244,8 @@ public class Argon2Function extends AbstractHashingFunction
     }
 
     private static void roundFunction(long[] block, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8,
-            int v9, // NOSONAR
-            int v10, int v11, int v12, int v13, int v14, int v15)
+                                      int v9, // NOSONAR
+                                      int v10, int v11, int v12, int v13, int v14, int v15)
     {
         f(block, v0, v4, v8, v12);
         f(block, v1, v5, v9, v13);
@@ -412,7 +316,103 @@ public class Argon2Function extends AbstractHashingFunction
                 .name() + ", v=" + version;
     }
 
+    private static String remove(String source, String remove)
+    {
+        return source.substring(remove.length());
+    }
 
+    @Override
+    public Hash hash(CharSequence plainTextPassword)
+    {
+        byte[] salt = SaltGenerator.generate();
+        return internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), salt, null);
+    }
+
+    @Override
+    public Hash hash(byte[] plainTextPassword)
+    {
+        byte[] salt = SaltGenerator.generate();
+        return internalHash(plainTextPassword, salt, null);
+    }
+
+    @Override
+    public Hash hash(CharSequence plainTextPassword, String salt)
+    {
+        return hash(plainTextPassword, salt, null);
+    }
+
+    @Override
+    public Hash hash(byte[] plainTextPassword, byte[] salt)
+    {
+        return hash(plainTextPassword, salt, null);
+    }
+
+    @Override
+    public Hash hash(CharSequence plainTextPassword, String salt, CharSequence pepper)
+    {
+        return internalHash(Utils.fromCharSequenceToBytes(plainTextPassword), Utils.fromCharSequenceToBytes(salt), pepper);
+    }
+
+    @Override
+    public Hash hash(byte[] plainTextPassword, byte[] salt, CharSequence pepper)
+    {
+        return internalHash(plainTextPassword, salt, pepper);
+    }
+
+    private Hash internalHash(byte[] plainTextPassword, byte[] salt, CharSequence pepper)
+    {
+        long[][] blockMemory = copyOf(initialBlockMemory);
+
+        if (salt == null)
+        {
+            salt = SaltGenerator.generate();
+        }
+        initialize(plainTextPassword, salt, Utils.fromCharSequenceToBytes(pepper), null, blockMemory);
+        fillMemoryBlocks(blockMemory);
+        byte[] hash = ending(blockMemory);
+        Hash result = new Hash(this, encodeHash(hash, salt), hash, salt);
+        result.setPepper(pepper);
+        return result;
+    }
+
+    @Override
+    public boolean check(CharSequence plainTextPassword, String hashed)
+    {
+        return check(plainTextPassword, hashed, null, null);
+    }
+
+    @Override
+    public boolean check(byte[] plainTextPassword, byte[] hashed)
+    {
+        return check(plainTextPassword, hashed, null, null);
+    }
+
+    @Override
+    public boolean check(CharSequence plainTextPassword, String hashed, String salt, CharSequence pepper)
+    {
+        byte[] plainTextPasswordAsBytes = Utils.fromCharSequenceToBytes(plainTextPassword);
+        byte[] saltAsBytes = Utils.fromCharSequenceToBytes(salt);
+        byte[] hashedAsBytes = Utils.fromCharSequenceToBytes(hashed);
+        return check(plainTextPasswordAsBytes, hashedAsBytes, saltAsBytes, pepper);
+    }
+
+    @Override
+    public boolean check(byte[] plainTextPassword, byte[] hashed, byte[] salt, CharSequence pepper)
+    {
+        byte[] theSalt;
+        if (salt == null || salt.length == 0)
+        {
+            Object[] params = decodeHash(Utils.fromBytesToString(hashed));
+            theSalt = (byte[]) params[5];
+        }
+        else
+        {
+            theSalt = salt;
+        }
+
+        Hash internalHash = internalHash(plainTextPassword, theSalt, pepper);
+        return slowEquals(internalHash.getResultAsBytes(), hashed);
+    }
 
     /**
      * @return the memory in bytes
@@ -490,8 +490,8 @@ public class Argon2Function extends AbstractHashingFunction
         byte[] initialHash = new byte[64];
         blake2b.doFinal(initialHash, 0);
 
-        final byte[] zeroBytes = { 0, 0, 0, 0 };
-        final byte[] oneBytes = { 1, 0, 0, 0 };
+        final byte[] zeroBytes = {0, 0, 0, 0};
+        final byte[] oneBytes = {1, 0, 0, 0};
 
         byte[] initialHashWithZeros = getInitialHashLong(initialHash, zeroBytes);
         byte[] initialHashWithOnes = getInitialHashLong(initialHash, oneBytes);
@@ -589,8 +589,6 @@ public class Argon2Function extends AbstractHashingFunction
 
     private void fillMemoryBlockMultiThreaded(long[][] blockMemory)
     {
-
-        ExecutorService service = Executors.newFixedThreadPool(parallelism);
         List<Future<?>> futures = new ArrayList<>();
 
         for (int i = 0; i < iterations; i++)
@@ -622,8 +620,6 @@ public class Argon2Function extends AbstractHashingFunction
                 }
             }
         }
-
-        service.shutdownNow();
     }
 
     private void fillSegment(int pass, int lane, int slice, long[][] blockMemory)
@@ -694,7 +690,7 @@ public class Argon2Function extends AbstractHashingFunction
     }
 
     private long getPseudoRandom(int index, long[] addressBlock, long[] inputBlock, long[] zeroBlock, int prevOffset,
-            boolean dataIndependentAddressing, long[][] blockMemory)
+                                 boolean dataIndependentAddressing, long[][] blockMemory)
     {
         if (dataIndependentAddressing)
         {
@@ -722,7 +718,7 @@ public class Argon2Function extends AbstractHashingFunction
     }
 
     private void initAddressBlocks(int pass, int lane, int slice, long[] zeroBlock, long[] inputBlock, long[] addressBlock,
-            long[][] blockMemory)
+                                   long[][] blockMemory)
     {
         inputBlock[0] = Utils.intToLong(pass);
         inputBlock[1] = Utils.intToLong(lane);
@@ -827,11 +823,6 @@ public class Argon2Function extends AbstractHashingFunction
             System.arraycopy(current[i], 0, old[i], 0, ARGON2_QWORDS_IN_BLOCK);
         }
         return current;
-    }
-
-    private static String remove(String source, String remove)
-    {
-        return source.substring(remove.length());
     }
 
     private String encodeHash(byte[] hash, byte[] salt)

@@ -19,7 +19,9 @@ package com.password4j;
 
 
 import java.io.PrintStream;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
@@ -30,6 +32,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,16 +42,18 @@ import java.util.regex.Pattern;
 class Utils
 {
 
-    static final Charset DEFAULT_CHARSET = StandardCharsets.ISO_8859_1;
-
-    private static final char[] HEX_ALPHABET = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-
-    private static final char[] TO_BASE64 = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+    static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+    static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
+    private static final char[] HEX_ALPHABET = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    private static final char[] TO_BASE64 = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
             'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
             'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+',
-            '/' };
-
+            '/'};
     private static final int[] FROM_BASE64 = new int[256];
+    private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1);
+    private static final Pattern STRONG_PATTERN = Pattern.compile("\\s*([\\S&&[^:,]]*)(\\:([\\S&&[^,]]*))?\\s*(\\,(.*))?");
+
+    private static final ThreadGroup THREAD_GROUP = new ThreadGroup("Password4j Workers");
 
     static
     {
@@ -58,8 +65,6 @@ class Utils
         FROM_BASE64['='] = -2;
     }
 
-    private static final Pattern STRONG_PATTERN = Pattern.compile("\\s*([\\S&&[^:,]]*)(\\:([\\S&&[^,]]*))?\\s*(\\,(.*))?");
-
     private Utils()
     {
         //
@@ -68,6 +73,17 @@ class Utils
     static byte[] fromCharSequenceToBytes(CharSequence charSequence)
     {
         return fromCharSequenceToBytes(charSequence, DEFAULT_CHARSET);
+    }
+
+    static int[] fromStringToUnsignedInts(String charSequence)
+    {
+        byte[] byteArray = charSequence.getBytes(DEFAULT_CHARSET);
+        int[] ints = new int[byteArray.length];
+        for (int i = 0; i < ints.length; i++)
+        {
+            ints[i] = Byte.toUnsignedInt(byteArray[i]);
+        }
+        return ints;
     }
 
     static byte[] fromCharSequenceToBytes(CharSequence charSequence, Charset charset)
@@ -162,24 +178,6 @@ class Utils
         return result;
     }
 
-    static char[] append(char[] byteArray1, char[] byteArray2)
-    {
-        if (byteArray1 == null || byteArray1.length == 0)
-        {
-            return byteArray2;
-        }
-
-        if (byteArray2 == null || byteArray2.length == 0)
-        {
-            return byteArray1;
-        }
-
-        char[] result = new char[byteArray1.length + byteArray2.length];
-        System.arraycopy(byteArray1, 0, result, 0, byteArray1.length);
-        System.arraycopy(byteArray2, 0, result, byteArray1.length, byteArray2.length);
-        return result;
-    }
-
     static String toHex(byte[] bytes)
     {
         final int length = bytes.length;
@@ -193,19 +191,15 @@ class Utils
         return new String(output);
     }
 
-    protected static boolean slowEquals(CharSequence a, CharSequence b)
+    static BigInteger bytesToInt(byte[] bytes)
     {
-        return slowEquals(fromCharSequenceToBytes(a), fromCharSequenceToBytes(b));
-    }
-
-    static boolean slowEquals(byte[] a, byte[] b)
-    {
-        int diff = a.length ^ b.length;
-        for (int i = 0; i < a.length && i < b.length; i++)
+        for (int i = 0; i < bytes.length / 2; i++)
         {
-            diff |= a[i] ^ b[i];
+            byte temp = bytes[i];
+            bytes[i] = bytes[bytes.length - i - 1];
+            bytes[bytes.length - i - 1] = temp;
         }
-        return diff == 0;
+        return new BigInteger(1, bytes);
     }
 
     static long littleEndianToLong(byte[] bs, int off)
@@ -253,6 +247,11 @@ class Utils
         result[2] = (byte) ((a >> 16) & 0xFF);
         result[3] = (byte) ((a >> 24) & 0xFF);
         return result;
+    }
+
+    static byte[] intToLittleEndianBytes(int a, int length)
+    {
+        return ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN).putInt(a).array();
     }
 
     static long[] fromBytesToLongs(byte[] input)
@@ -372,7 +371,7 @@ class Utils
     static String encodeBase64(byte[] src, boolean padding)
     {
         byte[] encoded = encode(src, padding);
-        return new String(encoded, 0, encoded.length);
+        return new String(encoded);
     }
 
     static byte[] decodeBase64(byte[] src)
@@ -538,7 +537,7 @@ class Utils
         return dp;
     }
 
-    @SuppressWarnings({"removal", "java:S1604"})
+    @SuppressWarnings({"java:S1604"})
     static SecureRandom getInstanceStrong() throws NoSuchAlgorithmException
     {
         String property = AccessController.doPrivileged(new PrivilegedAction<String>()
@@ -550,7 +549,7 @@ class Utils
             }
         });
 
-        if ((property == null) || (property.length() == 0))
+        if ((property == null) || (property.isEmpty()))
         {
             throw new NoSuchAlgorithmException("Null/empty securerandom.strongAlgorithms Security Property");
         }
@@ -608,7 +607,7 @@ class Utils
 
     static void printBanner(PrintStream printStream)
     {
-        if (PropertyReader.readBoolean("global.banner", true))
+        if (PropertyReader.readBoolean("global.banner", false))
         {
             String pbkdf2Banner;
             List<String> pbkd2s = AlgorithmFinder.getAllPBKDF2Variants();
@@ -621,16 +620,16 @@ class Utils
                 pbkdf2Banner = "❌ PBKDF2 <-- not supported by " + System.getProperty("java.vm.name");
             }
 
-            String banner ="\n";
+            String banner = "\n";
             banner += "    |\n" +
                     "    |                \033[0;1mPassword4j\033[0;0m\n" +
-                    "    + \\             .: v1.7.2 :.\n" +
+                    "    + \\             .: v1.8.2 :.\n" +
                     "    \\\\.G_.*=.\n" +
                     "     `(H'/.\\|        ✅ Argon2\n" +
                     "      .>' (_--.      ✅ scrypt\n" +
                     "   _=/d   ,^\\        ✅ bcrypt\n" +
                     " ~~ \\)-'-'           " + pbkdf2Banner + "\n" +
-                    "    / |\n" +
+                    "    / |              ✅ balloon hashing\n" +
                     "    '  '";
             banner += "\n";
             banner += " ⭐ If you enjoy Password4j, please star the project at https://github.com/Password4j/password4j\n";
@@ -641,14 +640,17 @@ class Utils
         }
     }
 
-    static List<byte[]> split(byte[] array, byte delimiter) {
+    static List<byte[]> split(byte[] array, byte delimiter)
+    {
         List<byte[]> byteArrays = new LinkedList<>();
 
         int begin = 0;
 
-        for (int i = 0; i < array.length; i++) {
+        for (int i = 0; i < array.length; i++)
+        {
 
-            if (array[i] != delimiter) {
+            if (array[i] != delimiter)
+            {
                 continue;
             }
 
@@ -659,6 +661,12 @@ class Utils
         return byteArrays;
     }
 
-
-
+    static ExecutorService createExecutorService()
+    {
+        return Executors.newFixedThreadPool(AVAILABLE_PROCESSORS, runnable -> {
+            Thread thread = new Thread(THREAD_GROUP, runnable, "password4j-worker-" + THREAD_COUNTER.getAndIncrement());
+            thread.setDaemon(true);
+            return thread;
+        });
+    }
 }

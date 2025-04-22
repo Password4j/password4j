@@ -114,7 +114,32 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
     }
 
+    protected static SecretKey internalHash(byte[] plainTextPassword, byte[] salt, String algorithm, int iterations, int length) throws NoSuchAlgorithmException, InvalidKeySpecException
+    {
+        if (salt == null)
+        {
+            throw new IllegalArgumentException("Salt cannot be null");
+        }
+        return internalHash(Utils.fromBytesToChars(plainTextPassword), salt, algorithm, iterations, length);
+    }
 
+    protected static SecretKey internalHash(char[] plain, byte[] salt, String algorithm, int iterations, int length)
+            throws NoSuchAlgorithmException, InvalidKeySpecException
+    {
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(ALGORITHM_PREFIX + algorithm);
+        PBEKeySpec spec = new PBEKeySpec(plain, salt, iterations, length);
+        return secretKeyFactory.generateSecret(spec);
+    }
+
+    protected static String getUID(String algorithm, int iterations, int length)
+    {
+        return algorithm + "|" + iterations + "|" + length;
+    }
+
+    protected static String toString(String algorithm, int iterations, int length)
+    {
+        return "a=" + algorithm + ", i=" + iterations + ", l=" + length;
+    }
 
     @Override
     public Hash hash(CharSequence plainTextPassword)
@@ -157,35 +182,6 @@ public class PBKDF2Function extends AbstractHashingFunction
         }
     }
 
-    protected static SecretKey internalHash(byte[] plainTextPassword, byte[] salt, String algorithm, int iterations, int length) throws NoSuchAlgorithmException, InvalidKeySpecException
-    {
-        if (salt == null)
-        {
-            throw new IllegalArgumentException("Salt cannot be null");
-        }
-        return internalHash(Utils.fromBytesToChars(plainTextPassword), salt, algorithm, iterations, length);
-    }
-
-    protected static SecretKey internalHash(char[] plain, byte[] salt, String algorithm, int iterations, int length)
-            throws NoSuchAlgorithmException, InvalidKeySpecException
-    {
-        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(ALGORITHM_PREFIX + algorithm);
-        PBEKeySpec spec = new PBEKeySpec(plain, salt, iterations, length);
-        return secretKeyFactory.generateSecret(spec);
-    }
-
-    protected static String getUID(String algorithm, int iterations, int length)
-    {
-        return algorithm + "|" + iterations + "|" + length;
-    }
-
-    protected static String toString(String algorithm, int iterations, int length)
-    {
-        return "a=" + algorithm + ", i=" + iterations + ", l=" + length;
-    }
-
-
-
     /**
      * Overridable PBKDF2 generator
      *
@@ -224,7 +220,6 @@ public class PBKDF2Function extends AbstractHashingFunction
         Hash internalHash = hash(plainTextPasswordAsBytes, salt);
         return slowEquals(internalHash.getResultAsBytes(), hashed);
     }
-
 
 
     public String getAlgorithm()

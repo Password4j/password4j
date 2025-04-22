@@ -147,7 +147,16 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         throw new BadParametersException("`" + hashed + "` is not a valid hash");
     }
 
+    protected static List<byte[]> getParts(byte[] hashed)
+    {
+        return Utils.split(hashed, (byte) DELIMITER);
+    }
 
+    protected static String[] getParts(String hashed)
+    {
+        String regex = "\\" + DELIMITER;
+        return hashed.split(regex);
+    }
 
     @Override
     protected String getHash(byte[] encodedKey, byte[] salt)
@@ -189,17 +198,6 @@ public class CompressedPBKDF2Function extends PBKDF2Function
         byte[] realSalt = getSaltFromHash(hashed);
         Hash internalHash = hash(plainTextPassword, realSalt);
         return slowEquals(internalHash.getResultAsBytes(), hashed);
-    }
-
-    protected static List<byte[]> getParts(byte[] hashed)
-    {
-       return Utils.split(hashed, (byte) DELIMITER);
-    }
-
-    protected static String[] getParts(String hashed)
-    {
-        String regex = "\\" + DELIMITER;
-        return hashed.split(regex);
     }
 
     private byte[] getSaltFromHash(byte[] hashed)

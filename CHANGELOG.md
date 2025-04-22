@@ -1,5 +1,33 @@
 # Changelog
 
+# [1.8.2](https://github.com/Password4j/password4j/releases/tag/1.8.2) - (2024-05-01)
+### Fixed
+*  Multi thread algorithms use daemon threads in order to not block the application shutdown if there is no explicit `System.exit()` ([#151](../../issues/151))
+*  Password4j works even when there is no access to `psw4j.properties` file due to restrictive security policies ([#153](../../issues/153))
+
+
+## [1.8.1](https://github.com/Password4j/password4j/releases/tag/1.8.1) - (2024-03-08)
+### Fixed
+* `Argon2Function#internalHash(...)` used a double conversion from `byte[]` to `String` and back to `byte[]` that created inconsistencies in `Hash#salt  ([#143](../../issues/143))
+
+### Changed
+* `Hash#Hash(HashingFunction, String, byte[], String)` marked deprecated
+
+## [1.8.0](https://github.com/Password4j/password4j/releases/tag/1.8.0) - (2024-03-03)
+### Added
+* Balloon Hashing implementation ([#131](../../issues/131))
+
+### Fixed
+* Parallelism is achieved by an `ExecutorService` instantiated during object creation instead of during the hashing process
+
+### Changed
+* Banner is disabled by default
+
+## [1.7.3](https://github.com/Password4j/password4j/releases/tag/1.7.3) - (2023-09-14)
+### Fixed
+* Wrong hashes when the password contains non ISO 8859-1 characters ([#126](../../issues/126))
+
+
 ## [1.7.2](https://github.com/Password4j/password4j/releases/tag/1.7.2) - (2023-08-20)
 ### Fixed
 * Suppressed warning for usage of `java.security.AccessController`. This is how the java development team fixed the problem for the moment ([#119](../../issues/119))

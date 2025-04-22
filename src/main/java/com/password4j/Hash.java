@@ -120,12 +120,14 @@ public class Hash
      * @param bytes           the hash without additional information.
      * @param salt            the salt used for the computation.
      * @since 0.1.0
+     * @deprecated As of 1.8.1 because of the salt conversion from {@link String} to byte[].
+     * {@link Hash#Hash(HashingFunction, String, byte[], byte[])} should be used instead.
      */
+    @Deprecated
     public Hash(HashingFunction hashingFunction, String result, byte[] bytes, String salt)
     {
         this(hashingFunction, Utils.fromCharSequenceToBytes(result), bytes, Utils.fromCharSequenceToBytes(salt));
     }
-
 
 
     /**
@@ -169,6 +171,19 @@ public class Hash
         this.salt = salt;
         this.result = result;
         this.bytes = bytes;
+    }
+
+    private static boolean areEquals(CharSequence cs1, CharSequence cs2)
+    {
+        if (cs1 == cs2)
+        {
+            return true;
+        }
+        else if (cs1 != null && cs2 != null)
+        {
+            return cs1.equals(cs2);
+        }
+        return false;
     }
 
     /**
@@ -310,19 +325,6 @@ public class Hash
                 && Arrays.equals(this.salt, otherHash.salt) //
                 && areEquals(this.pepper, otherHash.pepper) //
                 && this.hashingFunction.equals(otherHash.hashingFunction);
-    }
-
-    private static boolean areEquals(CharSequence cs1, CharSequence cs2)
-    {
-        if (cs1 == cs2)
-        {
-            return true;
-        }
-        else if (cs1 != null && cs2 != null)
-        {
-            return cs1.equals(cs2);
-        }
-        return false;
     }
 
     @Override

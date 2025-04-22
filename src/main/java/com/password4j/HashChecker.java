@@ -25,12 +25,9 @@ package com.password4j;
  */
 public class HashChecker
 {
-    private byte[] plainTextPassword;
-
     protected byte[] hashed;
-
     protected byte[] salt;
-
+    private byte[] plainTextPassword;
     private CharSequence pepper;
 
 
@@ -242,13 +239,30 @@ public class HashChecker
      * then the default parameters are used.
      *
      * @return true if the hash was produced by the given plain text password; false otherwise.
-     * @see AlgorithmFinder#getArgon2Instance() ()
+     * @see AlgorithmFinder#getArgon2Instance()
      * @since 1.5.0
      */
     public boolean withArgon2()
     {
         Argon2Function argon2 = AlgorithmFinder.getArgon2Instance();
         return with(argon2);
+    }
+
+    /**
+     * Check if the previously given hash was produced from the given plain text password
+     * with {@link BalloonHashingFunction}.
+     * <p>
+     * This method reads the configurations in the `psw4j.properties` file. If no configuration is found,
+     * then the default parameters are used.
+     *
+     * @return true if the hash was produced by the given plain text password; false otherwise.
+     * @see AlgorithmFinder#getBalloonHashingInstance()
+     * @since 1.5.0
+     */
+    public boolean withBalloonHashing()
+    {
+        BalloonHashingFunction balloon = AlgorithmFinder.getBalloonHashingInstance();
+        return with(balloon);
     }
 
     /**

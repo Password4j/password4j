@@ -4,7 +4,7 @@
 
     <groupId>com.password4j</groupId>
     <artifactId>password4j</artifactId>
-    <version>1.8.2</version>
+    <version>1.8.3</version>
     <packaging>jar</packaging>
     
 
@@ -22,7 +22,7 @@
         <connection>scm:git:git@github.com/Password4j/${project.artifactId}.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/Password4j/${project.artifactId}.git</developerConnection>
         <url>https://github.com/Password4j/password4j</url>
-        <tag>1.8.2</tag>
+        <tag>1.8.3</tag>
     </scm>
 
     <licenses>

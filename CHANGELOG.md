@@ -2,7 +2,7 @@
 
 # [1.8.3](https://github.com/Password4j/password4j/releases/tag/1.8.3) - (2025-05-08)
 ### Fixed
-*  Multi thread algorithms use daemon threads in order to not block the application shutdown if there is no explicit `System.exit()` ([#162](../../issues/162))
+*  Threads belonging to the parallelization pool are now shutdown during JVM shutdown in order to preven memory leaks ([#162](../../issues/162))
 
 
 # [1.8.2](https://github.com/Password4j/password4j/releases/tag/1.8.2) - (2024-05-01)

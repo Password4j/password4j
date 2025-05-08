@@ -25,7 +25,7 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     env:
-      JAVA_TOOL_OPTIONS: "--add-opens=java.base/java.lang=ALL-UNNAMED"
+      JAVA_TOOL_OPTIONS: "--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED"
     steps:
     - uses: actions/checkout@v2
       with:

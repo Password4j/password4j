@@ -139,8 +139,13 @@ public class IssuesTest
     public void issue162() throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException
     {
         // GIVEN
-        int major = Integer.parseInt(System.getProperty("java.specification.version"));
-        Assume.assumeTrue(major < 17 );
+        String versionProperty = System.getProperty("java.specification.version");
+        if(!versionProperty.contains("."))
+        {
+            int major = Integer.parseInt(versionProperty);
+            Assume.assumeTrue(major < 17 );
+        }
+
         Argon2Function argon2Function = Argon2Function.getInstance(1, 1, 2, 32, Argon2.I);
 
         // WHEN

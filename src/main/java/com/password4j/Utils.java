@@ -663,10 +663,18 @@ class Utils
 
     static ExecutorService createExecutorService()
     {
-        return Executors.newFixedThreadPool(AVAILABLE_PROCESSORS, runnable -> {
+        ExecutorService executorService =  Executors.newFixedThreadPool(AVAILABLE_PROCESSORS, runnable -> {
             Thread thread = new Thread(THREAD_GROUP, runnable, "password4j-worker-" + THREAD_COUNTER.getAndIncrement());
-            thread.setDaemon(true);
+            thread.setDaemon(false);
             return thread;
         });
+
+        addShutdownHook(executorService);
+        return executorService;
+    }
+
+    static void addShutdownHook(ExecutorService executorService)
+    {
+        Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdownNow, "password4j-shutdownhook"));
     }
 }

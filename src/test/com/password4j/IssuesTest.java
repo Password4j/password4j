@@ -4,9 +4,14 @@ import com.password4j.types.Argon2;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
 import java.security.Provider;
 import java.security.Security;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -128,6 +133,31 @@ public class IssuesTest
         Assert.assertEquals("59dedcf45d7a8604926ca66f6abe3990ce8b6ba108f535836fa18e95b7d94e9f56301e422c1d487dd06dc26061261402a5f7fe912bd545b6aeec866fec74df81", printBytesToString(hashBytes));
 
     }
+
+    @Test
+    public void issue162() throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException
+    {
+        // GIVEN
+        Argon2Function argon2Function = Argon2Function.getInstance(1, 1, 2, 32, Argon2.I);
+
+        // WHEN
+        Password.hash("password").with(argon2Function);
+
+        // THEN
+        Class<?> clazz = Class.forName("java.lang.ApplicationShutdownHooks");
+        Field field = clazz.getDeclaredField("hooks");
+        field.setAccessible(true);
+        List<Thread> hooks = ((Map<Thread, Thread>) field.get(null)).values().stream().filter(thread -> "password4j-shutdownhook".equals(thread.getName())).collect(Collectors.toList());
+
+        clazz = Argon2Function.class;
+        field = clazz.getDeclaredField("INSTANCES");
+        field.setAccessible(true);
+        List<Argon2Function> instances = ((ConcurrentMap<String, Argon2Function>) field.get(null)).values().stream().filter(f -> f.getParallelism() > 1).collect(Collectors.toList());
+
+        Assert.assertFalse(hooks.isEmpty());
+        Assert.assertTrue(hooks.size() >= instances.size());
+    }
+
 
     private static String printBytesToString(byte[] bytes)
     {

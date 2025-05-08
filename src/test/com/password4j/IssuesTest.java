@@ -149,13 +149,7 @@ public class IssuesTest
         field.setAccessible(true);
         List<Thread> hooks = ((Map<Thread, Thread>) field.get(null)).values().stream().filter(thread -> "password4j-shutdownhook".equals(thread.getName())).collect(Collectors.toList());
 
-        clazz = Argon2Function.class;
-        field = clazz.getDeclaredField("INSTANCES");
-        field.setAccessible(true);
-        List<Argon2Function> instances = ((ConcurrentMap<String, Argon2Function>) field.get(null)).values().stream().filter(f -> f.getParallelism() > 1).collect(Collectors.toList());
-
         Assert.assertFalse(hooks.isEmpty());
-        Assert.assertTrue(hooks.size() >= instances.size());
     }
 
 

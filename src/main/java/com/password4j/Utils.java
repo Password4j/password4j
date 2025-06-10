@@ -665,7 +665,7 @@ class Utils
     {
         ExecutorService executorService =  Executors.newFixedThreadPool(AVAILABLE_PROCESSORS, runnable -> {
             Thread thread = new Thread(THREAD_GROUP, runnable, "password4j-worker-" + THREAD_COUNTER.getAndIncrement());
-            thread.setDaemon(false);
+            thread.setDaemon(true);
             return thread;
         });
 

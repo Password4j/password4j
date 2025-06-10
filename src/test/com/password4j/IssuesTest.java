@@ -14,8 +14,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class IssuesTest
 {
@@ -178,5 +177,56 @@ public class IssuesTest
         return byteString.toString();
     }
 
+    /**
+     * <h2>Issue #163: Tomcat Thread Leak Prevention</h2>
+     *
+     * <p><strong>Problem:</strong> Tomcat was reporting thread leak warnings:</p>
+     * <blockquote>
+     * "The web application appears to have started a thread named [password4j-worker-X]
+     * but has failed to stop it. This is very likely to create a memory leak."
+     * </blockquote>
+     *
+     * <p><strong>Root Cause:</strong> Non-daemon threads prevent JVM shutdown and cause
+     * application server warnings when web applications are undeployed.</p>
+     *
+     * <p><strong>Solution:</strong> Changed <code>thread.setDaemon(false)</code> to
+     * <code>thread.setDaemon(true)</code> in <code>Utils.createExecutorService()</code></p>
+     *
+     * <p><strong>Impact:</strong> Daemon threads automatically terminate when the main
+     * application shuts down, preventing memory leaks in containerized environments.</p>
+     *
+     * @see <a href="https://github.com/Password4j/password4j/issues/163" target="_blank">GitHub Issue #163</a>
+     * @see Utils#createExecutorService()
+     * @see <a href="https://docs.oracle.com/javase/tutorial/essential/concurrency/daemon.html" target="_blank">Oracle: Daemon Threads</a>
+     * @since 1.8.1
+     * @category Threading
+     * @category MemoryLeak
+     */
+
+    @Test
+    public void issue163() {
+        final String plainText = "The quick brown fox jumps over the lazy dog";
+        final String hash = Password.hash(plainText)
+                                    .withArgon2()
+                                    .getResult();
+        assertNotNull("Password hashing should work", hash);
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        boolean foundWorkerThread = false;
+        for (Thread thread : Thread.getAllStackTraces().keySet()) {
+            if (thread.getName().startsWith("password4j-worker-")) {
+                foundWorkerThread = true;
+
+                // THE FIX: This thread MUST be daemon to prevent Tomcat memory leak warning
+                final String assertionMessage = "Thread " + thread.getName() + " must be daemon thread to prevent Tomcat leak warning";
+                assertTrue(assertionMessage, thread.isDaemon());
+            }
+        }
+        assertTrue("Should have found at least one password4j-worker thread", foundWorkerThread);
+    }
 
 }

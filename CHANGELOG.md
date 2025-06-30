@@ -1,8 +1,12 @@
 # Changelog
 
+# [1.8.4](https://github.com/Password4j/password4j/releases/tag/1.8.4) - (2025-06-30)
+### Fixed
+*  Daemon Threads belonging to the parallelization pool are now shutdown during JVM shutdown in order to prevent memory leaks ([#163](../../issues/163))
+
 # [1.8.3](https://github.com/Password4j/password4j/releases/tag/1.8.3) - (2025-05-08)
 ### Fixed
-*  Threads belonging to the parallelization pool are now shutdown during JVM shutdown in order to preven memory leaks ([#162](../../issues/162))
+*  Threads belonging to the parallelization pool are now shutdown during JVM shutdown in order to prevent memory leaks ([#162](../../issues/162))
 
 
 # [1.8.2](https://github.com/Password4j/password4j/releases/tag/1.8.2) - (2024-05-01)

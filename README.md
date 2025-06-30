@@ -1,7 +1,7 @@
 # ![Password4j](https://i.imgur.com/KVDSJrF.png)
 
 [![Build Status](https://github.com/Password4j/password4j/actions/workflows/build.yml/badge.svg)](https://github.com/Password4j/password4j/actions/workflows/build.yml)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.password4j/password4j/badge.svg?color=purple)](https://maven-badges.herokuapp.com/maven-central/com.password4j/password4j)
+![Maven Central Version](https://img.shields.io/maven-central/v/com.password4j/password4j)
 [![Java 8 or higher](https://img.shields.io/badge/JDK-8%2B-007396)](https://docs.oracle.com/javase/8/)
 [![Android 5.0 or higher](https://img.shields.io/badge/Android-5.0%2B-3DDC84)](https://developer.android.com/about/versions/lollipop4)
 [![Mentioned in Awesome Java](https://awesome.re/mentioned-badge.svg)](https://github.com/sindresorhus/awesome)

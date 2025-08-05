@@ -128,7 +128,14 @@ public class PBKDF2Function extends AbstractHashingFunction
     {
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(ALGORITHM_PREFIX + algorithm);
         PBEKeySpec spec = new PBEKeySpec(plain, salt, iterations, length);
-        return secretKeyFactory.generateSecret(spec);
+        try
+        {   
+            return secretKeyFactory.generateSecret(spec);
+        }
+        finally
+        {   
+            spec.clearPassword();
+        }
     }
 
     protected static String getUID(String algorithm, int iterations, int length)

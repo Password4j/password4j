@@ -31,7 +31,7 @@ and can produce and handle cryptographic **[salt](https://en.wikipedia.org/wiki/
 [![javadoc](https://javadoc.io/badge2/com.password4j/password4j/javadoc.svg)](https://javadoc.io/doc/com.password4j/password4j)
 
 
-The full documentation can be found **[here](https://github.com/Password4j/password4j/wiki)**. For a quick start you can follow the instuctions in the `README.md`.
+The full documentation can be found **[here](https://github.com/Password4j/password4j/wiki)**. For a quick start you can follow the instructions in the `README.md`.
 
 The javadoc can be found [here](https://javadoc.io/doc/com.password4j/password4j).
 

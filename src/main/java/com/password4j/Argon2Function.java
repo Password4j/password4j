@@ -114,7 +114,7 @@ public class Argon2Function extends AbstractHashingFunction
 
     /**
      * Creates a singleton instance, depending on the provided
-     * logarithmic memory, number of iterations, parallelism, lenght og the output, type and version.
+     * logarithmic memory, number of iterations, parallelism, length og the output, type and version.
      *
      * @param memory       logarithmic memory
      * @param iterations   number of iterations

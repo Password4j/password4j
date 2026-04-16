@@ -32,7 +32,7 @@ jobs:
         run: |
           docker build \
             --build-arg TOMCAT_TAG=${{ matrix.tomcat }} \
-            -f .github/docker/Dockerfile.tomcat-it \
+            -f .github/Dockerfile.tomcat-it \
             -t mylib-it:${{ github.sha }} .
 
       - name: Start Tomcat

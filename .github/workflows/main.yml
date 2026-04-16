@@ -1,0 +1,81 @@
+name: Tomcat integration
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tomcat-it:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [17, 21]
+        tomcat: [9.0.117-jre17-temurin, 9.0.117-jre21-temurin]
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+
+      - name: Build library and test webapp
+        run: mvn -B -DskipTests package
+
+      - name: Build Tomcat test image
+        run: |
+          docker build \
+            --build-arg TOMCAT_TAG=${{ matrix.tomcat }} \
+            -f .github/docker/Dockerfile.tomcat-it \
+            -t mylib-it:${{ github.sha }} .
+
+      - name: Start Tomcat
+        run: |
+          docker run -d --name tomcat-it -p 8080:8080 mylib-it:${{ github.sha }}
+
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:8080/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo "Tomcat did not become ready"
+          docker logs tomcat-it || true
+          exit 1
+
+      - name: Exercise app
+        run: |
+          curl -fsS http://127.0.0.1:8080/trigger
+          curl -fsS http://127.0.0.1:8080/health
+
+      - name: Stop Tomcat and collect logs
+        if: always()
+        run: |
+          mkdir -p artifacts
+          docker stop --time 30 tomcat-it || true
+          docker logs tomcat-it > artifacts/container.log 2>&1 || true
+          docker cp tomcat-it:/usr/local/tomcat/logs artifacts/tomcat-logs || true
+          docker inspect tomcat-it > artifacts/container-inspect.json || true
+
+      - name: Fail on unexpected shutdown errors
+        if: always()
+        run: |
+          if grep -R -E "(OutOfMemoryError|SEVERE|NoClassDefFoundError|ClassCastException|memory leak)" artifacts; then
+            echo "Unexpected errors found in Tomcat shutdown logs"
+            exit 1
+          fi
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tomcat-logs-java${{ matrix.java }}-${{ matrix.tomcat }}
+          path: artifacts/
+          retention-days: 7

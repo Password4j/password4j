@@ -29,9 +29,12 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,6 +57,10 @@ class Utils
     private static final Pattern STRONG_PATTERN = Pattern.compile("\\s*([\\S&&[^:,]]*)(\\:([\\S&&[^,]]*))?\\s*(\\,(.*))?");
 
     private static final ThreadGroup THREAD_GROUP = new ThreadGroup("Password4j Workers");
+
+    private static final Set<ExecutorService> EXECUTORS = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
+    private static volatile Thread shutdownHook;
 
     static
     {
@@ -669,12 +676,55 @@ class Utils
             return thread;
         });
 
-        addShutdownHook(executorService);
+        EXECUTORS.add(executorService);
+        ensureShutdownHook();
         return executorService;
     }
 
-    static void addShutdownHook(ExecutorService executorService)
+    private static synchronized void ensureShutdownHook()
     {
-        Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdownNow, "password4j-shutdownhook"));
+        if (shutdownHook != null)
+        {
+            return;
+        }
+        Thread hook = new Thread(() -> {
+            for (ExecutorService service : EXECUTORS)
+            {
+                service.shutdownNow();
+            }
+            EXECUTORS.clear();
+        }, "password4j-shutdownhook");
+        try
+        {
+            Runtime.getRuntime().addShutdownHook(hook);
+            shutdownHook = hook;
+        }
+        catch (IllegalStateException e)
+        {
+            // JVM is already shutting down; no hook needed.
+        }
+    }
+
+    static synchronized void shutdownExecutors()
+    {
+        for (ExecutorService service : EXECUTORS)
+        {
+            service.shutdownNow();
+        }
+        EXECUTORS.clear();
+        Argon2Function.clearInstances();
+        BalloonHashingFunction.clearInstances();
+        if (shutdownHook != null)
+        {
+            try
+            {
+                Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            }
+            catch (IllegalStateException e)
+            {
+                // JVM is shutting down; the hook is running or finished. Nothing to do.
+            }
+            shutdownHook = null;
+        }
     }
 }

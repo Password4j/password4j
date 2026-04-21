@@ -1272,4 +1272,51 @@ public class PasswordTest
             return;
         }
     }
+
+    @Test
+    public void shutdownStopsWorkerThreadsAndPermitsReuse()
+    {
+        // Prime the pool so worker threads exist.
+        Argon2Function argon2 = Argon2Function.getInstance(256, 1, 2, 32, Argon2.ID);
+        Password.hash("password").with(argon2);
+        assertTrue("worker threads should exist before shutdown", workerThreadCount() > 0);
+
+        Password.shutdown();
+
+        // After shutdown the workers should wind down quickly (daemon interrupt).
+        long deadline = System.currentTimeMillis() + 2000;
+        while (workerThreadCount() > 0 && System.currentTimeMillis() < deadline)
+        {
+            try
+            {
+                Thread.sleep(20);
+            }
+            catch (InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        assertEquals("worker threads must be terminated after shutdown", 0, workerThreadCount());
+
+        // Hashing must still work afterwards: a fresh pool is created lazily.
+        Argon2Function argon2Again = Argon2Function.getInstance(256, 1, 2, 32, Argon2.ID);
+        Hash hash = Password.hash("password").with(argon2Again);
+        assertNotNull(hash.getResult());
+        assertTrue("worker threads should exist again after reuse", workerThreadCount() > 0);
+        Password.shutdown();
+    }
+
+    private static int workerThreadCount()
+    {
+        int count = 0;
+        for (Thread thread : Thread.getAllStackTraces().keySet())
+        {
+            if (thread.isAlive() && thread.getName().startsWith("password4j-worker-"))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
 }

@@ -166,6 +166,11 @@ public class Argon2Function extends AbstractHashingFunction
         return memory + "|" + iterations + "|" + parallelism + "|" + outputLength + "|" + type.ordinal() + "|" + version;
     }
 
+    static void clearInstances()
+    {
+        INSTANCES.clear();
+    }
+
     private static byte[] getInitialHashLong(byte[] initialHash, byte[] appendix)
     {
         byte[] initialHashLong = new byte[ARGON2_INITIAL_SEED_LENGTH];

@@ -88,6 +88,11 @@ public class BalloonHashingFunction extends AbstractHashingFunction
         return algorithm + '|' + spaceCost + '|' + timeCost + '|' + parallelism + '|' + delta;
     }
 
+    static void clearInstances()
+    {
+        INSTANCES.clear();
+    }
+
     protected static String toString(String algorithm, int spaceCost, int timeCost, int parallelism, int delta)
     {
         return "a=" + algorithm + ", s=" + spaceCost + ", t=" + timeCost + ", p=" + parallelism + ", d=" + delta;

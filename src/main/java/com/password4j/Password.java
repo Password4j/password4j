@@ -43,6 +43,24 @@ public class Password
     }
 
     /**
+     * Shuts down all internal worker thread pools used by parallel hashing functions
+     * (Argon2, Balloon) and clears their cached instances. This is intended for
+     * environments with a lifecycle shorter than the JVM &mdash; typically servlet
+     * containers, where it should be invoked from {@code ServletContextListener.contextDestroyed}
+     * to prevent thread/classloader leaks on webapp undeploy.
+     * <p>
+     * After this call, subsequent hashing requests will lazily re-create the workers.
+     * In a plain-JVM application it is not necessary to invoke this method: worker
+     * threads are daemons and are shut down automatically when the JVM exits.
+     *
+     * @since 1.8.5
+     */
+    public static void shutdown()
+    {
+        Utils.shutdownExecutors();
+    }
+
+    /**
      * Starts to hash the given plain text password.
      * <p>
      * This method is used to start the setup of a {@link HashBuilder}
